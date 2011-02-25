@@ -127,11 +127,13 @@ class Template(object):
         @rtype              : str
 
         '''
+        from mobilize.filters import apply
         params = dict(self.params)
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        params['elements'] = elements(full_body, self.selectors)
+        raw_elements = elements(full_body, self.selectors)
+        params['elements'] = map(apply, raw_elements)
         return self._render(params)
 
     def _render(self, params):

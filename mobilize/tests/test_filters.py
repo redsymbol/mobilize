@@ -29,8 +29,8 @@ class TestFilters(TestCase):
             {'in'  : '''<a href="#" id="makeHPLink" onClick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
              'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
              },
-            {'in'  : '''<img src="http://example.com/boo.gif" alt="boo!" onmouseover="alert('boo!');">''',
-             'out' : '''<img src="http://example.com/boo.gif" alt="boo!">''',
+            {'in'  : '''<img src="http://example.com/boo.gif" alt="boo!" onmouseover="alert('boo!');"/>''',
+             'out' : '''<img src="http://example.com/boo.gif" alt="boo!"/>''',
              },
             ]
         for ii, td in enumerate(testdata):

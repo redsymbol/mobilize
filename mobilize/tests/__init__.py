@@ -224,7 +224,7 @@ class TestMobileSite(unittest.TestCase):
       </div>
     </div>
     <div>
-      <a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up
+      <div><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>
     </div>
     <div>
 <div id="footer">
@@ -239,7 +239,7 @@ class TestMobileSite(unittest.TestCase):
             xpath(r'//*[@id="header"]'),
             simple('ul.navigation'),
             'div#main-content',
-            (raw_string, '<a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up'),
+            (raw_string, '<div><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
             (raw_template, 'footer1.html', {'full_site_url' : 'http://www.example.com'}),
             ]
         params = {

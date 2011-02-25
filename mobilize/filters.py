@@ -76,12 +76,12 @@ def apply(htmlstr, filters=COMMON_FILTERS):
     
     '''
     from lxml import html
-    doc = html.fromstring(htmlstr)
+    doc = html.fragment_fromstring(htmlstr, create_parent=False)
     for elem in doc.iter():
         for filt in filters:
             assert filt.is_filter
             filt(elem)
-    return html.tostring(doc)
+    return html.tostring(doc, method='xml')
     
 def applyone(htmlstr, filt):
     '''
