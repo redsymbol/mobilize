@@ -40,8 +40,9 @@ def noinlinestyles(elem):
     if 'style' in elem.attrib:
         del elem.attrib['style']
 
-COMMON_FILTERS = [v for v in locals().values()
-                  if getattr(v, 'is_filter', False)]
+COMMON_FILTERS = [
+    noinlinestyles,
+    ]
 
 def apply(htmlstr, filters=COMMON_FILTERS):
     '''
