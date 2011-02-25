@@ -40,6 +40,22 @@ def noinlinestyles(elem):
     if 'style' in elem.attrib:
         del elem.attrib['style']
 
+@filterapi
+def noevents(elem):
+    '''
+    Removes "onSOMETHING" events
+
+    As a side effect, removes all "onClick", "onMouseover",
+    etc. events from the tag.
+    
+    @param elem : Element representing an html tag
+    @type  elem : lxml.html.HTMLElement
+
+    '''
+    for attr in elem.attrib:
+        if attr.startswith('on'):
+            del elem.attrib[attr]
+
 COMMON_FILTERS = [
     noinlinestyles,
     ]
@@ -52,7 +68,7 @@ def apply(htmlstr, filters=COMMON_FILTERS):
     @type  htmlstr : str
 
     @param filters : Filters to apply to the snippet
-    @type  filters : list of function
+    @type  filters : list of functions (each conforming to filter API)
 
     @return        : The same HTML snippet with the indicated filters applied
     @rtype         : str
@@ -62,6 +78,23 @@ def apply(htmlstr, filters=COMMON_FILTERS):
     doc = html.fromstring(htmlstr)
     for elem in doc.iter():
         for filt in filters:
+            assert filt.is_filter
             filt(elem)
     return html.tostring(doc)
+    
+def applyone(htmlstr, filt):
+    '''
+    Apply a single filter to an HTML snippet
+
+    @param htmlstr : An HTML snippet
+    @type  htmlstr : str
+
+    @param filters : Filter to apply to the snippet
+    @type  filters : function (conforming to filter API)
+
+    @return        : The same HTML snippet with the indicated filter applied
+    @rtype         : str
+    
+    '''
+    return apply(htmlstr, filters=[filt])
     
