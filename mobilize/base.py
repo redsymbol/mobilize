@@ -127,15 +127,12 @@ class Template(object):
         @rtype              : str
 
         '''
-        from mobilize.filters import apply
         params = dict(self.params)
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        rendered_elements = elements(full_body, self.selectors)
-        for elem in rendered_elements:
-            apply(elem)
-        params['elements'] = rendered_elements
+        raw_elements = elements(full_body, self.selectors)
+        params['elements'] = render_elements(raw_elements)
         return self._render(params)
 
     def _render(self, params):
@@ -247,7 +244,7 @@ def extract_celems(body, xpath_selectors):
         elems = doc.xpath(selector)
         assert elems, 'No elements matched for selector: "%s"' % selector
         assert len(elems) == 1 , 'Multiple (%d) elements matched for selector: "%s"' % (len(elems), selector)
-        return etree.tostring(elems[0]).strip()
+        return elems[0]
     return [text(selector) for selector in xpath_selectors]
 
 def elements(full_body, selectors):
@@ -296,3 +293,35 @@ def elements(full_body, selectors):
         elements[lookup[jj]] = item
     return elements
 
+def elem2str(elem):
+    from lxml import html
+    return html.tostring(elem, method='xml').strip()
+
+def render_elements(elems):
+    '''
+    Render elements as strings
+
+    This function accepts a lists of objects.  Each object must be either a string,
+    or an lxml Element instance.  If it's the latter, the object is converted to a string.
+
+    @param elems : Objects representing HTML elements
+    @type  elems : list of (Element, str)
+
+    @return : Rendered HTML snippets
+    @rtype  : list of str
+    
+    '''
+    import types
+    from lxml.html import HtmlElement
+    from django.utils.safestring import SafeUnicode
+    string_types = types.StringTypes + (SafeUnicode,)
+    allowed_types = string_types + (HtmlElement,)
+    def render(elem):
+        assert type(elem) in allowed_types, type(elem)
+        if type(elem) in string_types:
+            elem_str = elem
+        else:
+            elem_str = elem2str(elem)
+        return elem_str
+    return map(render, elems)
+    

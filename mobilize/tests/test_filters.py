@@ -1,4 +1,5 @@
 from unittest import TestCase
+from mobilize.base import elem2str
 
 class TestFilters(TestCase):
     def test_noinlinestyles(self):
@@ -15,7 +16,7 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], applyone(td['in'], noinlinestyles))
+            self.assertEquals(td['out'], elem2str(applyone(td['in'], noinlinestyles)))
             
     def test_noevents(self):
         from mobilize.filters import applyone, noevents
@@ -34,7 +35,7 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], applyone(td['in'], noevents))
+            self.assertEquals(td['out'], elem2str(applyone(td['in'], noevents)))
             
     def test_calculate_common_filters(self):
         '''A crude test to at least partly validate the filterapi decorator'''
@@ -57,4 +58,4 @@ class TestFilters(TestCase):
             noinlinestyles,
             noevents,
             ]
-        self.assertEquals(apply(htmlin, my_filters), htmlout)
+        self.assertEquals(elem2str(apply(htmlin, my_filters)), htmlout)

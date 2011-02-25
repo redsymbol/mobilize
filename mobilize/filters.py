@@ -81,7 +81,7 @@ def apply(htmlstr, filters=COMMON_FILTERS):
         for filt in filters:
             assert filt.is_filter
             filt(elem)
-    return html.tostring(doc, method='xml')
+    return doc
     
 def applyone(htmlstr, filt):
     '''

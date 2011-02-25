@@ -287,12 +287,12 @@ class TestUtil(unittest.TestCase):
              'extracted' : ['<p class="skipping graceful enthusiastic">laughing</p>'],
              },
             ]
-        from mobilize.base import extract_celems
+        from mobilize.base import extract_celems, elem2str
         for ii, td in enumerate(testdata):
             body = open(data_file_path('extract_celems', td['datafile'])).read()
             expected = td['extracted']
             selectors = map(xpathsel, td['selectors'])
-            actual = extract_celems(body, selectors)
+            actual = map(elem2str, extract_celems(body, selectors))
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
             self.assertEqual(expected, actual, msg)
 
