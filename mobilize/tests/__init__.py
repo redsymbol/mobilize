@@ -201,13 +201,13 @@ class TestMobileSite(unittest.TestCase):
     <meta http-equiv="HandheldFriendly" content="True" />
   </head>
   <body>
-    <div class="mwu-melem">
+    <div class="mwu-melem" id="mwu-melem-0">
       <div id="header">
         <img src="/logo.png" alt="Acme"/>
         <h1>Acme Services</h1>
       </div>
     </div>
-    <div class="mwu-melem">
+    <div class="mwu-melem" id="mwu-melem-1">
       <ul class="navigation">
         <li><a href="/">Home</a></li>
         <li><a href="/services/">Services</a></li>
@@ -215,7 +215,7 @@ class TestMobileSite(unittest.TestCase):
         <li><a href="/contact/">Contact Us</a></li>
       </ul>
     </div>
-    <div class="mwu-melem">
+    <div class="mwu-melem" id="mwu-melem-2">
       <div id="main-content">
         <h2>Services by Acme</h2>
         <p>Lorem ipsum</p>
