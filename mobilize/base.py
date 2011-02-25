@@ -354,6 +354,6 @@ def process_elements(elems):
         # wrap in div class="melem"
         newelem = HtmlElement()
         newelem.tag = 'div'
-        newelem.attrib['class'] = 'melem'
+        newelem.attrib['class'] = 'mwu-melem'
         newelem.append(elem)
         elems[ii] = newelem

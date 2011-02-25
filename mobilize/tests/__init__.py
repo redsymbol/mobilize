@@ -201,13 +201,13 @@ class TestMobileSite(unittest.TestCase):
     <meta http-equiv="HandheldFriendly" content="True" />
   </head>
   <body>
-    <div class="melem">
+    <div class="mwu-melem">
       <div id="header">
         <img src="/logo.png" alt="Acme"/>
         <h1>Acme Services</h1>
       </div>
     </div>
-    <div class="melem">
+    <div class="mwu-melem">
       <ul class="navigation">
         <li><a href="/">Home</a></li>
         <li><a href="/services/">Services</a></li>
@@ -215,7 +215,7 @@ class TestMobileSite(unittest.TestCase):
         <li><a href="/contact/">Contact Us</a></li>
       </ul>
     </div>
-    <div class="melem">
+    <div class="mwu-melem">
       <div id="main-content">
         <h2>Services by Acme</h2>
         <p>Lorem ipsum</p>
@@ -223,7 +223,7 @@ class TestMobileSite(unittest.TestCase):
       </div>
     </div>
       <div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>
-<div id="footer">
+<div class="mwu-mfoot">
   <a href="http://www.example.com">Full Site</a>
 </div>
   </body>
