@@ -10,3 +10,10 @@ class TestFilters(TestCase):
             ]
         for ii, td in enumerate(testdata):
             self.assertEquals(td['out'], apply(td['in'], filters=[noinlinestyles]))
+
+    def test_calculate_common_filters(self):
+        '''A crude test to at least partly validate the filterapi decorator'''
+        from mobilize.filters import apply, noinlinestyles, COMMON_FILTERS
+        assert noinlinestyles in COMMON_FILTERS # a known filter api function
+        assert apply not in COMMON_FILTERS # a known non-filter-api function
+        

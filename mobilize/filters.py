@@ -14,8 +14,18 @@ A function conforms to the filter API if it:
   * does not return any value, and
   * operates by making any changes directly on the element as a side effect.
 
+Such a function is used as a primitive when iterating through a DOM tree.
+
 '''
 
+def filterapi(f):
+    '''
+    Marks a function as belonging to the filter API.  Decorator.
+    '''
+    f.is_filter = True
+    return f
+
+@filterapi
 def noinlinestyles(elem):
     '''
     Remove any inline styles on a tag
@@ -30,9 +40,8 @@ def noinlinestyles(elem):
     if 'style' in elem.attrib:
         del elem.attrib['style']
 
-COMMON_FILTERS = [
-    noinlinestyles,
-    ]
+COMMON_FILTERS = [v for v in locals().values()
+                  if getattr(v, 'is_filter', False)]
 
 def apply(htmlstr, filters=COMMON_FILTERS):
     '''
