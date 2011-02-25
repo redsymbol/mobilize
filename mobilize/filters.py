@@ -7,22 +7,51 @@ to be a snippet of HTML, and returns another string.  The returned
 string may in general be the same thing as the input, but often it is
 modified in some way.
 
+FILTER API
+
+A function conforms to the filter API if it:
+  * accepts an lxml.html.HTMLElement instance as an argument, and
+  * does not return any value, and
+  * operates by making any changes directly on the element as a side effect.
+
 '''
 
-def noinlinestyles(htmlstr):
+def noinlinestyles(elem):
     '''
-    Remove any inline styles on all tags
+    Remove any inline styles on a tag
 
+    As a side effect, if the passed element has a 'style' attribute,
+    then that attribute is removed.
+    
+    @param elem : Element representing an html tag
+    @type  elem : lxml.html.HTMLElement
+
+    '''
+    if 'style' in elem.attrib:
+        del elem.attrib['style']
+
+COMMON_FILTERS = [
+    noinlinestyles,
+    ]
+
+def apply(htmlstr, filters=COMMON_FILTERS):
+    '''
+    Apply filters to an HTML snippet
+    
     @param htmlstr : An HTML snippet
     @type  htmlstr : str
 
-    @return        : The same HTML snippet with all "style" attributed deleted
+    @param filters : Filters to apply to the snippet
+    @type  filters : list of function
+
+    @return        : The same HTML snippet with the indicated filters applied
     @rtype         : str
     
     '''
     from lxml import html
     doc = html.fromstring(htmlstr)
     for elem in doc.iter():
-        if 'style' in elem.attrib:
-            del elem.attrib['style']
+        for filt in filters:
+            filt(elem)
     return html.tostring(doc)
+    
