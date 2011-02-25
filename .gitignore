@@ -3,3 +3,4 @@ doc/api
 local_settings.py
 *.pyc
 *~
+todo
