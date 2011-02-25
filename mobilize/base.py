@@ -132,8 +132,10 @@ class Template(object):
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        raw_elements = elements(full_body, self.selectors)
-        params['elements'] = map(apply, raw_elements)
+        rendered_elements = elements(full_body, self.selectors)
+        for elem in rendered_elements:
+            apply(elem)
+        params['elements'] = rendered_elements
         return self._render(params)
 
     def _render(self, params):
