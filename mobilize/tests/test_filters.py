@@ -7,6 +7,12 @@ class TestFilters(TestCase):
             {'in'  : '''<div class="foo" style="background-color: red;">Hello.</div>''',
              'out' :  '''<div class="foo">Hello.</div>''',
              },
+            {'in'  : '''<div class="foo" STYLE="background-color: red;">Hello.</div>''',
+             'out' :  '''<div class="foo">Hello.</div>''',
+             },
+            {'in'  : '''<div class="foo" Style="background-color: red;">Hello.</div>''',
+             'out' :  '''<div class="foo">Hello.</div>''',
+             },
             ]
         for ii, td in enumerate(testdata):
             self.assertEquals(td['out'], applyone(td['in'], noinlinestyles))
@@ -15,6 +21,12 @@ class TestFilters(TestCase):
         from mobilize.filters import applyone, noevents
         testdata = [
             {'in'  : '''<a href="#" id="makeHPLink" onclick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
+             'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
+             },
+            {'in'  : '''<a href="#" id="makeHPLink" ONCLICK="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
+             'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
+             },
+            {'in'  : '''<a href="#" id="makeHPLink" onClick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
              'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
              },
             {'in'  : '''<img src="http://example.com/boo.gif" alt="boo!" onmouseover="alert('boo!');">''',
