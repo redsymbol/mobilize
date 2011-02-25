@@ -148,6 +148,7 @@ class TestTemplateMap(unittest.TestCase):
         self.assertRaises(NoMatchingTemplateException, matching, '/no/such/url/')
 
 class TestMobileSite(unittest.TestCase):
+    maxDiff = None
     def test_no_match(self):
         t_a = mobilize.DjangoTemplate('a.html', [])
         mapping = OrderedDict([
@@ -163,8 +164,6 @@ class TestMobileSite(unittest.TestCase):
         msite = mobilize.MobileSite('example.com', mobilize.TemplateMap(OrderedDict()))
         rendered = msite.render_body('/someurl', full_body)
         
-        
-
     def test_render(self):
         from mobilize.dj import DjangoTemplate
         full_body = '''<!doctype html>
@@ -202,13 +201,13 @@ class TestMobileSite(unittest.TestCase):
     <meta http-equiv="HandheldFriendly" content="True" />
   </head>
   <body>
-    <div>
+    <div class="melem">
       <div id="header">
         <img src="/logo.png" alt="Acme"/>
         <h1>Acme Services</h1>
       </div>
     </div>
-    <div>
+    <div class="melem">
       <ul class="navigation">
         <li><a href="/">Home</a></li>
         <li><a href="/services/">Services</a></li>
@@ -216,21 +215,17 @@ class TestMobileSite(unittest.TestCase):
         <li><a href="/contact/">Contact Us</a></li>
       </ul>
     </div>
-    <div>
+    <div class="melem">
       <div id="main-content">
         <h2>Services by Acme</h2>
         <p>Lorem ipsum</p>
         <p>forum gypsum</p>
       </div>
     </div>
-    <div>
-      <div><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>
-    </div>
-    <div>
+      <div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>
 <div id="footer">
   <a href="http://www.example.com">Full Site</a>
 </div>
-    </div>
   </body>
 </html>
 '''
@@ -239,7 +234,7 @@ class TestMobileSite(unittest.TestCase):
             xpath(r'//*[@id="header"]'),
             simple('ul.navigation'),
             'div#main-content',
-            (raw_string, '<div><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
+            (raw_string, '<div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
             (raw_template, 'footer1.html', {'full_site_url' : 'http://www.example.com'}),
             ]
         params = {
@@ -251,7 +246,7 @@ class TestMobileSite(unittest.TestCase):
 
         expected = mobile_body
         actual = msite.render_body('/foo', full_body)
-        self.assertEqual(norm_html(expected), norm_html(actual))
+        self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
     def test_xpathsel(self):
@@ -415,3 +410,6 @@ class TestHttp(unittest.TestCase):
             actual = redir_dest(td['in'])
             msg = 'e: %s, i: %s [%d]' % (expected, actual, ii)
             self.assertEqual(expected, actual, msg)
+if '__main__'==__name__:
+    import unittest
+    unittest.main()

@@ -132,6 +132,7 @@ class Template(object):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         raw_elements = elements(full_body, self.selectors)
+        process_elements(raw_elements)
         params['elements'] = render_elements(raw_elements)
         return self._render(params)
 
@@ -294,6 +295,16 @@ def elements(full_body, selectors):
     return elements
 
 def elem2str(elem):
+    '''
+    Render an HTML element as a string
+
+    @param elem : element
+    @type  elem : lxml.htmlHtmlElement
+
+    @return : HTML snippet
+    @rtype  : str
+    
+    '''
     from lxml import html
     return html.tostring(elem, method='xml').strip()
 
@@ -325,3 +336,24 @@ def render_elements(elems):
         return elem_str
     return map(render, elems)
     
+def process_elements(elems):
+    '''
+    Additional annotation and processing as needed of elements
+
+    Modifies elements in place
+    '''
+    import types
+    from lxml.html import HtmlElement
+    from django.utils.safestring import SafeUnicode
+    string_types = types.StringTypes + (SafeUnicode,)
+    allowed_types = string_types + (HtmlElement,)
+    for ii, elem in enumerate(elems):
+        assert type(elem) in allowed_types, type(elem)
+        if type(elem) in string_types:
+            continue
+        # wrap in div class="melem"
+        newelem = HtmlElement()
+        newelem.tag = 'div'
+        newelem.attrib['class'] = 'melem'
+        newelem.append(elem)
+        elems[ii] = newelem

@@ -5,9 +5,7 @@
     <meta http-equiv="HandheldFriendly" content="True" />
   </head>
   <body>
-    {% for element in elements %}<div>
-    {{element|safe}}
-    </div>
+    {% for element in elements %}{{element|safe}}
     {% endfor %}
   </body>
 </html>
