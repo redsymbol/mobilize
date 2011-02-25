@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <meta http-equiv="HandheldFriendly" content="True" />
+  </head>
+  <body>
+    {% for element in elements %}<div>
+    {{element|safe}}
+    </div>
+    {% endfor %}
+  </body>
+</html>
