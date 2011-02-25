@@ -58,6 +58,7 @@ def noevents(elem):
 
 COMMON_FILTERS = [
     noinlinestyles,
+    noevents,
     ]
 
 def apply(htmlstr, filters=COMMON_FILTERS):

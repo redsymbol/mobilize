@@ -42,3 +42,19 @@ class TestFilters(TestCase):
         assert noinlinestyles in COMMON_FILTERS # a known filter api function
         assert apply not in COMMON_FILTERS # a known non-filter-api function
         
+    def test_chain_filters(self):
+        '''test that apply() correctly chains filters'''
+        htmlin = '''<div class="foo" style="color: blue">
+<h1 style="font-size: large;">The Headline</h1>
+<a href="#" onclick="alert('Good Job!');">Click Here</a>
+</div>'''
+        htmlout = '''<div class="foo">
+<h1>The Headline</h1>
+<a href="#">Click Here</a>
+</div>'''
+        from mobilize.filters import apply, noinlinestyles, noevents
+        my_filters = [
+            noinlinestyles,
+            noevents,
+            ]
+        self.assertEquals(apply(htmlin, my_filters), htmlout)
