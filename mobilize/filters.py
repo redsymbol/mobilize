@@ -41,6 +41,25 @@ def noinlinestyles(elem):
         del elem.attrib['style']
 
 @filterapi
+def nomiscattrib(elem):
+    '''
+    Remove certain miscellaneous unwanted attributes
+    
+    As a side effect, if the passed element has any of the following
+    attributes, then that attribute is removed:
+    
+     * align
+    
+    @param elem : Element representing an html tag
+    @type  elem : lxml.html.HTMLElement
+
+    '''
+    unwanteds = ('align',)
+    for unwanted in unwanteds:
+        if unwanted in elem.attrib:
+            del elem.attrib[unwanted]
+
+@filterapi
 def noevents(elem):
     '''
     Removes "onSOMETHING" events
@@ -59,6 +78,7 @@ def noevents(elem):
 COMMON_FILTERS = [
     noinlinestyles,
     noevents,
+    nomiscattrib,
     ]
 
 def apply(htmlstr, filters=COMMON_FILTERS):
