@@ -342,6 +342,7 @@ def process_elements(elems):
 
     Modifies elements in place
     '''
+    from filters import COMMON_FILTERS
     import types
     from lxml.html import HtmlElement
     from django.utils.safestring import SafeUnicode
@@ -351,6 +352,9 @@ def process_elements(elems):
         assert type(elem) in allowed_types, type(elem)
         if type(elem) in string_types:
             continue
+        # apply common filters
+        for filt in COMMON_FILTERS:
+            filt(elem)
         # wrap in div class="melem"
         newelem = HtmlElement()
         newelem.tag = 'div'
