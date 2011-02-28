@@ -54,7 +54,14 @@ def nomiscattrib(elem):
     @type  elem : lxml.html.HTMLElement
 
     '''
-    unwanteds = ('align',)
+    unwanteds = (
+        'align',
+        'border',
+        'cellspacing',
+        'cellpadding',
+        'width',
+        'valign',
+        )
     for unwanted in unwanteds:
         if unwanted in elem.attrib:
             del elem.attrib[unwanted]
