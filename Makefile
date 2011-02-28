@@ -10,3 +10,6 @@ doc-api:
 	rm -rf $(API_DOC_DIR)
 	mkdir -p $(API_DOC_DIR)
 	epydoc -v --output $(API_DOC_DIR) mobilize
+
+devpublish:
+	scp -P 2222 -pr mobilize default@localhost:/var/www/share/mobilize-libs/dev/
