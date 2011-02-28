@@ -355,7 +355,7 @@ def process_elements(elems):
         # apply common filters
         for filt in COMMON_FILTERS:
             filt(elem)
-        # wrap in div class="melem"
+        # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = 'div'
         newelem.attrib['class'] = 'mwu-melem'
