@@ -241,12 +241,10 @@ def extract_celems(body, xpath_selectors):
     '''
     from lxml import html, etree
     doc = html.fromstring(body)
-    def text(selector):
-        elems = doc.xpath(selector)
-        assert elems, 'No elements matched for selector: "%s"' % selector
-        assert len(elems) == 1 , 'Multiple (%d) elements matched for selector: "%s"' % (len(elems), selector)
-        return elems[0]
-    return [text(selector) for selector in xpath_selectors]
+    celems = []
+    for selector in xpath_selectors:
+        celems += doc.xpath(selector)
+    return celems
 
 def elements(full_body, selectors):
     '''

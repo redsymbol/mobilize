@@ -281,6 +281,10 @@ class TestUtil(unittest.TestCase):
              'selectors' : ['p.graceful'],
              'extracted' : ['<p class="skipping graceful enthusiastic">laughing</p>'],
              },
+            {'datafile' : 'e.xml',
+             'selectors' : ['p.graceful'],
+             'extracted' : ['<p class="skipping graceful enthusiastic">laughing</p>', '<p class="graceful">enthusiastic</p>'],
+             },
             ]
         from mobilize.base import extract_celems, elem2str
         for ii, td in enumerate(testdata):
