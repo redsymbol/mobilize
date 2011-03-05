@@ -1,12 +1,9 @@
 import unittest
 import os
 import mobilize
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
+from ordereddict import OrderedDict
+from utils4test import data_file_path, DATA_DIR
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 TEMPLATE_DIR = os.path.join(DATA_DIR, 'templates')
 MINIMAL_HTML_DOCUMENT = '''<!doctype html>
 <html>
@@ -37,13 +34,6 @@ class _FakeHTTPResponse(object):
         for k, v in attributes.iteritems():
             setattr(self, k, v)
         self.msg = _FakeMsg(content_type=attributes['_content-type'])
-
-def data_file_path(*components):
-    '''
-    path to test data file
-    '''
-    parts = [os.path.dirname(__file__), 'data'] + list(components)
-    return os.path.join(*parts)
 
 def norm_html(s):
     '''
@@ -249,40 +239,6 @@ class TestMobileSite(unittest.TestCase):
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
-    def test_extract_csspath(self):
-        from mobilize.refineclass import CssPath
-        from lxml import html
-        testdata = [
-            {'datafile' : 'a.xml',
-             'selectors' : [CssPath('div#happy')],
-             'extracted' : ['<div id="happy">lucky</div>'],
-             },
-            {'datafile' : 'b.xml',
-             'selectors' : [CssPath('div#joyful')],
-             'extracted' : ['<div id="joyful">fun</div>'],
-             },
-            {'datafile' : 'c.xml',
-             'selectors' : [CssPath('p.graceful')],
-             'extracted' : ['<p class="graceful">laughing</p>'],
-             },
-            {'datafile' : 'd.xml',
-             'selectors' : [CssPath('p.graceful')],
-             'extracted' : ['<p class="skipping graceful enthusiastic">laughing</p>'],
-             },
-            # {'datafile' : 'e.xml',
-            #  'selectors' : [CssPath('p.graceful')],
-            #  'extracted' : ['<p class="skipping graceful enthusiastic">laughing</p>', '<p class="graceful">enthusiastic</p>'],
-            #  },
-            ]
-        for ii, td in enumerate(testdata):
-            doc = html.fromstring(open(data_file_path('extract_celems', td['datafile'])).read())
-            for sel in td['selectors']:
-                sel.extract(doc)
-            expected = td['extracted']
-            actual = [sel.html() for sel in td['selectors']]
-            msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
-            self.assertEqual(expected, actual, msg)
-
     def test_mobilize(self):
         testdata = [
             {'is_m' : False,
