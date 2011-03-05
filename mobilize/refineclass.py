@@ -67,6 +67,33 @@ class Extracted(RefineClassBase):
         return html.tostring(self.elem, method='xml').strip()
 
     def process(self, classname, idname, filters):
+        '''
+        Process the extracted element, before rendering as a string
+
+        This is for an HTML element that has been extracted and parsed
+        from the document source.  We apply certain transformations and
+        mods needed before it can be rendered into a string.
+
+        Operates on self.elem, replacing it as a side effect.
+
+        The element will be wrapped in a new div, which are given the class and ID indicated.
+
+        @param elem      : HTML element to process
+        @type  elem      : lxml.html.HtmlElement
+
+        @param classname : CSS class attribute to apply to the enclosing div
+        @type  classname : str
+        
+        @param idname    : ID attribute to apply to the enclosing div
+        @type  idname    : str
+
+        @param filters   : Filters to apply to the element
+        @type  filters   : list of filterapi functions from mobilize.filter
+
+        @return          : New element with the applied changes
+        @rtype           : lxml.html.HtmlElement
+        
+        '''
         from lxml.html import HtmlElement
         assert type(self.elem) is HtmlElement
         # apply common filters
