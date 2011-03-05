@@ -1,11 +1,8 @@
 import types
 import re
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
+from ordereddict import OrderedDict
 import exceptions
+
 class MobileSite(object):
     '''
     Represents a mobile website
