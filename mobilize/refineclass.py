@@ -17,8 +17,8 @@ class Extracted(RefineClassBase):
     '''abstract base of all refinements that are extracted from the source HTML page'''
     extracted = True
 
-    #: The extracted element. type: lxml.html.HtmlElement
-    elem = None
+    #: The extracted elements. type: list of lxml.html.HtmlElement
+    elems = None
 
     def __init__(self, selector):
         '''
@@ -53,18 +53,13 @@ class Extracted(RefineClassBase):
 
     def extract(self, source):
         '''
-        Extracts content from the source, sets to self.elem
+        Extracts content from the source, sets to self.elems
 
         Relies on self._extract, which should be implemented by the subclass.
         
         '''
-        self.elem = self._extract(source)[0]
-        return self.elem
-
-    def html(self):
-        from lxml import html
-        assert self.elem is not None, 'Must invoke self.extract() before rendering to html'
-        return html.tostring(self.elem, method='xml').strip()
+        self.elems = self._extract(source)
+        return self.elems
 
     def process(self, classname, idname, filters):
         '''
@@ -95,19 +90,26 @@ class Extracted(RefineClassBase):
         
         '''
         from lxml.html import HtmlElement
-        assert type(self.elem) is HtmlElement, self.elem
+        assert type(self.elems) is list, self.elems
         # apply common filters
-        for filt in filters:
-            filt(self.elem)
+        for elem in self.elems:
+            for filt in filters:
+                filt(elem)
         # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = 'div'
         newelem.attrib['class'] = classname
         newelem.attrib['id'] = idname
-        newelem.append(self.elem)
+        for elem in self.elems:
+            newelem.append(elem)
         self.elem = newelem
         return newelem
         
+    def html(self):
+        from lxml import html
+        assert self.elem is not None, 'Must invoke self.extract() and self.process() before rendering to html'
+        return html.tostring(self.elem, method='xml').strip()
+
 
 class Unextracted(RefineClassBase):
     '''abstract base of all refinements that are independent of the source HTML page'''
