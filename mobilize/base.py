@@ -134,7 +134,7 @@ class Template(object):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         doc = html.fromstring(full_body)
-        elements = self.selectors#extract_elements(full_body, self.selectors)
+        elements = self.selectors
         for ii, elem in enumerate(elements):
             if elem.extracted:
                 elem.extract(doc)
@@ -229,75 +229,6 @@ def _regex(re_or_str):
     if type(re_or_str) in types.StringTypes:
         return re.compile(r'^' + re_or_str)
     return re_or_str
-
-def extract_celems(body, xpath_selectors):
-    '''
-    Extract the content elements ("celems") from the destination URL
-
-    Selectors must be valid xpath expressions. They can be created
-    from simple selectors using xpathsel().
-
-    @param body            : Source HTML body to extract content from
-    @type  body            : str
-
-    @param xpath_selectors : Xpath expressions selecting HTML snippets
-    @type  xpath_selectors : list of str (valid xpath expressions)
-
-    @return                : Selected HTML snippets
-    @rtype                 : list of str
-    
-    '''
-    from lxml import html
-    doc = html.fromstring(body)
-    celems = []
-    for selector in xpath_selectors:
-        celems += doc.xpath(selector)
-    return celems
-
-def extract_elements(full_body, selectors):
-    '''
-    Extract elements (HTML snippets) from a source text
-
-    The selectors argument is a list.  The item in the list can be
-    either a string, or a kind of tuple.  If a string, it's assumed to
-    be either a simple selector or xpath expression (automatically
-    determined/guessed), and used to extract a portion of HTML from
-    the source (full_body).
-
-    If a tuple, the item should have a refinement function as its
-    first member, followed by 0 or more arguments for it.  The
-    refinement function is invoked to get the element text.
-
-    This function returns a list of HTML snippets, in the same order
-    as the corresponding selectors.
-
-    @param full_body : Source HTML used for extraction
-    @type  full_body : str
-
-    @param selectors : Selectors of content
-    @type  selectors : list of (str or tuple(function, args ...))
-
-    @return          : List of extracted HTML snippets
-    @rtype           : list of str
-    
-    '''
-    from mobilize.refineclass import RefineClassBase
-    elements = [None for nn in range(len(selectors))]
-    to_extract = []
-    lookup = {}
-    for ii, selector in enumerate(selectors):
-        if type(selector) in types.StringTypes:
-            selector = (auto, selector)
-        assert isinstance(selector, RefineClassBase), selector
-        if selector.extracted:
-            lookup[len(to_extract)] = ii
-            to_extract.append(refinefunc(*args))
-        else:
-            elements[ii] = refinefunc(*args)
-    extracted = extract_celems(full_body, to_extract)
-    for jj, item in enumerate(extracted):
-        elements[lookup[jj]] = item
-    return elements
 
 def elem2str(elem):
     '''

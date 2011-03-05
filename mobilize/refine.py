@@ -22,11 +22,6 @@ extracted = mark_extracted(True)
 #: Marks a refinement as independent of the full page's body
 unextracted = mark_extracted(False)
 
-@extracted
-def auto(selector):
-    # calculate/guess what kind of selector this is
-    return xpathsel(selector)
-
 @unextracted
 def raw_template(template_name, params=None):
     # load content from template
