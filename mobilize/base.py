@@ -340,7 +340,6 @@ def process_elements(elems):
 
     Modifies elements in place
     '''
-    from filters import COMMON_FILTERS
     import types
     from lxml.html import HtmlElement
     from django.utils.safestring import SafeUnicode
@@ -350,13 +349,41 @@ def process_elements(elems):
         assert type(elem) in allowed_types, type(elem)
         if type(elem) in string_types:
             continue
-        # apply common filters
-        for filt in COMMON_FILTERS:
-            filt(elem)
-        # wrap in special mobilize class, id
-        newelem = HtmlElement()
-        newelem.tag = 'div'
-        newelem.attrib['class'] = 'mwu-melem'
-        newelem.attrib['id'] = 'mwu-melem-%d' % ii
-        newelem.append(elem)
-        elems[ii] = newelem
+        elems[ii] = process_elem(elem, classname='mwu-melem', idname='mwu-melem-%d' % ii)
+
+def process_elem(elem, classname, idname):
+    '''
+    Process a single extracted element, before rendering as a string
+
+    This is for an HTML element that has been extracted and parsed
+    from the document source.  We apply certain transformations and
+    mods needed before it can be rendered into a string.
+
+    The element will be wrapped in a new div, which are given the class and ID indicated.
+
+    @param elem      : HTML element to process
+    @type  elem      : lxml.html.HtmlElement
+
+    @param classname : CSS class attribute to apply to the enclosing div
+    @type  classname : str
+    
+    @param idname    : ID attribute to apply to the enclosing div
+    @type  idname    : str
+
+    @return          : New element with the applied changes
+    @rtype           : lxml.html.HtmlElement
+   
+    '''
+    from lxml.html import HtmlElement
+    from filters import COMMON_FILTERS
+    assert type(elem) is HtmlElement
+    # apply common filters
+    for filt in COMMON_FILTERS:
+        filt(elem)
+    # wrap in special mobilize class, id
+    newelem = HtmlElement()
+    newelem.tag = 'div'
+    newelem.attrib['class'] = classname
+    newelem.attrib['id'] = idname
+    newelem.append(elem)
+    return newelem
