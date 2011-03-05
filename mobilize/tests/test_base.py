@@ -249,23 +249,6 @@ class TestMobileSite(unittest.TestCase):
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
-    def test_process_elem(self):
-        from lxml import html
-        from mobilize.base import process_elem
-        testdata = [
-            {'elem_str'    : '<p>Hello</p>',
-             'classname'   : 'alpha',
-             'idname'      : 'beta',
-             'newelem_str' : '<div class="alpha" id="beta"><p>Hello</p></div>',
-             },
-            ]
-        for ii, td in enumerate(testdata):
-            elem = html.fromstring(td['elem_str'])
-            newelem = process_elem(elem, td['classname'], td['idname'])
-            self.assertEqual(html.HtmlElement, type(newelem))
-            self.assertSequenceEqual(td['newelem_str'], html.tostring(newelem))
-
-
     def test_xpathsel(self):
         from mobilize.refine import xpathsel
         testdata = [

@@ -127,6 +127,7 @@ class Template(object):
         @rtype              : str
 
         '''
+        from filters import COMMON_FILTERS
         params = dict(self.params)
         if extra_params:
             params.update(extra_params)
@@ -136,7 +137,7 @@ class Template(object):
             if elem.extracted:
                 classname='mwu-melem'
                 idname='mwu-melem-%d' % ii
-                process_element(raw_elements, classname, idname)
+                elem.process(classname, idname, COMMON_FILTERS)
         params['elements'] = render_elements(raw_elements)
         return self._render(params)
 
@@ -337,57 +338,3 @@ def render_elements(elems):
             elem_str = elem2str(elem)
         return elem_str
     return map(render, elems)
-    
-def process_elements(elems):
-    '''
-    Additional annotation and processing as needed of elements
-
-    Modifies elements in place
-    '''
-    import types
-    from lxml.html import HtmlElement
-    from django.utils.safestring import SafeUnicode
-    string_types = types.StringTypes + (SafeUnicode,)
-    allowed_types = string_types + (HtmlElement,)
-    for ii, elem in enumerate(elems):
-        assert type(elem) in allowed_types, type(elem)
-        if type(elem) in string_types:
-            continue
-        elems[ii] = process_elem(elem, classname='mwu-melem', idname='mwu-melem-%d' % ii)
-
-def process_elem(elem, classname, idname):
-    '''
-    Process a single extracted element, before rendering as a string
-
-    This is for an HTML element that has been extracted and parsed
-    from the document source.  We apply certain transformations and
-    mods needed before it can be rendered into a string.
-
-    The element will be wrapped in a new div, which are given the class and ID indicated.
-
-    @param elem      : HTML element to process
-    @type  elem      : lxml.html.HtmlElement
-
-    @param classname : CSS class attribute to apply to the enclosing div
-    @type  classname : str
-    
-    @param idname    : ID attribute to apply to the enclosing div
-    @type  idname    : str
-
-    @return          : New element with the applied changes
-    @rtype           : lxml.html.HtmlElement
-   
-    '''
-    from lxml.html import HtmlElement
-    from filters import COMMON_FILTERS
-    assert type(elem) is HtmlElement
-    # apply common filters
-    for filt in COMMON_FILTERS:
-        filt(elem)
-    # wrap in special mobilize class, id
-    newelem = HtmlElement()
-    newelem.tag = 'div'
-    newelem.attrib['class'] = classname
-    newelem.attrib['id'] = idname
-    newelem.append(elem)
-    return newelem
