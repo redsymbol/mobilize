@@ -239,7 +239,7 @@ def extract_celems(body, xpath_selectors):
     @rtype                 : list of str
     
     '''
-    from lxml import html, etree
+    from lxml import html
     doc = html.fromstring(body)
     celems = []
     for selector in xpath_selectors:
