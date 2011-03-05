@@ -142,8 +142,8 @@ class RawTemplate(Unextracted):
         self.params = params
 
     def html(self):
-        from refine import raw_template
-        return raw_template(self.template, self.params)
+        from django.template.loader import render_to_string
+        return render_to_string(self.template, self.params)
 
 class RawString(Unextracted):
     def __init__(self, rawstring):

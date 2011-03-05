@@ -249,19 +249,6 @@ class TestMobileSite(unittest.TestCase):
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
-    def test_xpathsel(self):
-        from mobilize.refine import xpathsel
-        testdata = [
-            {'selector' : 'div#joyful',
-             'xpath'    : r'//div[@id="joyful"]',
-             },
-            ]
-        for ii, td in enumerate(testdata):
-            expected = td['xpath']
-            actual = xpathsel(td['selector'])
-            msg = 'e: "%s", a: "%s" [%d]' % (expected, actual, ii)
-            self.assertEqual(expected, actual, msg)
-        
     def test_extract_csspath(self):
         from mobilize.refineclass import CssPath
         from lxml import html
