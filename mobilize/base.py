@@ -1,6 +1,6 @@
 import types
 import re
-from ordereddict import OrderedDict
+from collections import OrderedDict
 import exceptions
 
 class MobileSite(object):
