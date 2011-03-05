@@ -2,11 +2,23 @@
 
 class RefineClassBase(object):
     '''abstract base of all refinement classes'''
-    pass
+    def html(self):
+        '''
+        Render the element content HTML
+
+        @return : html snippet/content
+        @rtype  : str
+        
+        '''
+        assert False, 'Subclass must implement'
+
 
 class Extracted(RefineClassBase):
     '''abstract base of all refinements that are extracted from the source HTML page'''
     extracted = True
+
+    #: The extracted element. type: lxml.html.HtmlElement
+    elem = None
 
     def __init__(self, selector):
         '''
@@ -23,7 +35,7 @@ class Extracted(RefineClassBase):
         '''
         self.selector = selector
 
-    def elem(self, source):
+    def _extract(self, source):
         '''
         Extract an HTML element from the source
 
@@ -39,19 +51,24 @@ class Extracted(RefineClassBase):
         '''
         assert False, 'Subclass must implement'
 
+    def extract(self, source):
+        '''
+        Extracts content from the source, sets to self.elem
+
+        Relies on self._extract, which should be implemented by the subclass.
+        
+        '''
+        self.elem = self._extract(source)
+        return self.elem
+
+    def html(self):
+        from lxml import html
+        assert self.elem, 'Must invoke self.extract() before rendering to html'
+        return html.tostring(self.elem, method='xml').strip()
+
 class Unextracted(RefineClassBase):
     '''abstract base of all refinements that are independent of the source HTML page'''
     extracted = False
-
-    def html(self):
-        '''
-        Render the element content HTML
-
-        @return : html snippet/content
-        @rtype  : str
-        
-        '''
-        assert False, 'Subclass must implement'
 
 def XPath(Extracted):
     def elem(self, source):
