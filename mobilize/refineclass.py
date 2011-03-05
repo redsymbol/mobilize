@@ -66,16 +66,32 @@ class Extracted(RefineClassBase):
         assert self.elem, 'Must invoke self.extract() before rendering to html'
         return html.tostring(self.elem, method='xml').strip()
 
+    def process(self, classname, idname, filters):
+        from lxml.html import HtmlElement
+        assert type(self.elem) is HtmlElement
+        # apply common filters
+        for filt in filters:
+            filt(self.elem)
+        # wrap in special mobilize class, id
+        newelem = HtmlElement()
+        newelem.tag = 'div'
+        newelem.attrib['class'] = classname
+        newelem.attrib['id'] = idname
+        newelem.append(self.elem)
+        self.elem = newelem
+        return newelem
+        
+
 class Unextracted(RefineClassBase):
     '''abstract base of all refinements that are independent of the source HTML page'''
     extracted = False
 
 def XPath(Extracted):
-    def elem(self, source):
+    def _extract(self, source):
         return source.xpath(self.selector)
 
 class CssPath(Extracted):
-    def elem(self, source):
+    def _extract(self, source):
         from lxml.cssselect import CSSSelector
         css_sel = CSSSelector(self.selector)
         return source.xpath(css_sel.path)
