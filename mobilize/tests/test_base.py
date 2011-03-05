@@ -229,13 +229,13 @@ class TestMobileSite(unittest.TestCase):
   </body>
 </html>
 '''
-        from mobilize.refine import raw_template, xpath, simple, raw_string
+        from mobilize.refineclass import RawTemplate, XPath, CssPath, RawString
         selectors = [
-            xpath(r'//*[@id="header"]'),
-            simple('ul.navigation'),
-            'div#main-content',
-            (raw_string, '<div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
-            (raw_template, 'footer1.html', {'full_site_url' : 'http://www.example.com'}),
+            XPath(r'//*[@id="header"]'),
+            CssPath('ul.navigation'),
+            CssPath('div#main-content'),
+            RawString('<div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
+            RawTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}),
             ]
         params = {
             'title' : '<Mobile Test One>',

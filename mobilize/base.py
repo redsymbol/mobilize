@@ -127,18 +127,21 @@ class Template(object):
         @rtype              : str
 
         '''
+        from lxml import html
         from filters import COMMON_FILTERS
         params = dict(self.params)
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        raw_elements = extract_elements(full_body, self.selectors)
-        for ii, elem in enumerate(raw_elements):
+        doc = html.fromstring(full_body)
+        elements = self.selectors#extract_elements(full_body, self.selectors)
+        for ii, elem in enumerate(elements):
             if elem.extracted:
+                elem.extract(doc)
                 classname='mwu-melem'
                 idname='mwu-melem-%d' % ii
                 elem.process(classname, idname, COMMON_FILTERS)
-        params['elements'] = [elem.html() for elem in raw_elements]
+        params['elements'] = [elem.html() for elem in elements]
         return self._render(params)
 
     def _render(self, params):
@@ -278,16 +281,15 @@ def extract_elements(full_body, selectors):
     @rtype           : list of str
     
     '''
-    from mobilize.refine import auto
+    from mobilize.refineclass import RefineClassBase
     elements = [None for nn in range(len(selectors))]
     to_extract = []
     lookup = {}
     for ii, selector in enumerate(selectors):
         if type(selector) in types.StringTypes:
             selector = (auto, selector)
-        assert type(selector) in (tuple, list)
-        refinefunc, args = selector[0], selector[1:]
-        if refinefunc.extracted:
+        assert isinstance(selector, RefineClassBase), selector
+        if selector.extracted:
             lookup[len(to_extract)] = ii
             to_extract.append(refinefunc(*args))
         else:

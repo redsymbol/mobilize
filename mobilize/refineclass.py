@@ -58,12 +58,12 @@ class Extracted(RefineClassBase):
         Relies on self._extract, which should be implemented by the subclass.
         
         '''
-        self.elem = self._extract(source)
+        self.elem = self._extract(source)[0]
         return self.elem
 
     def html(self):
         from lxml import html
-        assert self.elem, 'Must invoke self.extract() before rendering to html'
+        assert self.elem is not None, 'Must invoke self.extract() before rendering to html'
         return html.tostring(self.elem, method='xml').strip()
 
     def process(self, classname, idname, filters):
@@ -95,7 +95,7 @@ class Extracted(RefineClassBase):
         
         '''
         from lxml.html import HtmlElement
-        assert type(self.elem) is HtmlElement
+        assert type(self.elem) is HtmlElement, self.elem
         # apply common filters
         for filt in filters:
             filt(self.elem)
@@ -113,7 +113,7 @@ class Unextracted(RefineClassBase):
     '''abstract base of all refinements that are independent of the source HTML page'''
     extracted = False
 
-def XPath(Extracted):
+class XPath(Extracted):
     def _extract(self, source):
         return source.xpath(self.selector)
 
