@@ -132,7 +132,11 @@ class Template(object):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         raw_elements = elements(full_body, self.selectors)
-        process_elements(raw_elements)
+        for ii, elem in enumerate(raw_elements):
+            if elem.extracted:
+                classname='mwu-melem'
+                idname='mwu-melem-%d' % ii
+                process_element(raw_elements, classname, idname)
         params['elements'] = render_elements(raw_elements)
         return self._render(params)
 
