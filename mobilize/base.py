@@ -132,7 +132,7 @@ class Template(object):
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        raw_elements = elements(full_body, self.selectors)
+        raw_elements = extract_elements(full_body, self.selectors)
         for ii, elem in enumerate(raw_elements):
             if elem.extracted:
                 classname='mwu-melem'
@@ -251,7 +251,7 @@ def extract_celems(body, xpath_selectors):
         celems += doc.xpath(selector)
     return celems
 
-def elements(full_body, selectors):
+def extract_elements(full_body, selectors):
     '''
     Extract elements (HTML snippets) from a source text
 
