@@ -138,7 +138,7 @@ class Template(object):
                 classname='mwu-melem'
                 idname='mwu-melem-%d' % ii
                 elem.process(classname, idname, COMMON_FILTERS)
-        params['elements'] = render_elements(raw_elements)
+        params['elements'] = [elem.html() for elem in raw_elements]
         return self._render(params)
 
     def _render(self, params):
@@ -310,31 +310,3 @@ def elem2str(elem):
     '''
     from lxml import html
     return html.tostring(elem, method='xml').strip()
-
-def render_elements(elems):
-    '''
-    Render elements as strings
-
-    This function accepts a lists of objects.  Each object must be either a string,
-    or an lxml Element instance.  If it's the latter, the object is converted to a string.
-
-    @param elems : Objects representing HTML elements
-    @type  elems : list of (Element, str)
-
-    @return : Rendered HTML snippets
-    @rtype  : list of str
-    
-    '''
-    import types
-    from lxml.html import HtmlElement
-    from django.utils.safestring import SafeUnicode
-    string_types = types.StringTypes + (SafeUnicode,)
-    allowed_types = string_types + (HtmlElement,)
-    def render(elem):
-        assert type(elem) in allowed_types, type(elem)
-        if type(elem) in string_types:
-            elem_str = elem
-        else:
-            elem_str = elem2str(elem)
-        return elem_str
-    return map(render, elems)

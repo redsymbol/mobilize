@@ -7,7 +7,6 @@ class DummyExtracted(Extracted):
 class TestRefine(unittest.TestCase):
     def test_process(self):
         from lxml import html
-        from mobilize.base import process_elem
         testdata = [
             {'elem_str'    : '<p>Hello</p>',
              'classname'   : 'alpha',
