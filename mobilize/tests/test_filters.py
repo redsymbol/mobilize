@@ -1,9 +1,32 @@
 from unittest import TestCase
 from mobilize.base import elem2str
 
+def apply_filters(htmlstr, filters):
+    '''
+    Apply filters to an HTML snippet
+    
+    @param htmlstr : An HTML snippet
+    @type  htmlstr : str
+
+    @param filters : Filters to apply to the snippet
+    @type  filters : list of functions (each conforming to filter API)
+
+    @return        : The same HTML snippet with the indicated filters applied
+    @rtype         : str
+    
+    '''
+    from lxml import html
+    doc = html.fragment_fromstring(htmlstr, create_parent=False)
+    for elem in doc.iter():
+        for filt in filters:
+            assert filt.is_filter
+            filt(elem)
+    return doc
+    
+
 class TestFilters(TestCase):
     def test_noinlinestyles(self):
-        from mobilize.filters import applyone, noinlinestyles
+        from mobilize.filters import noinlinestyles
         testdata = [
             {'in'  : '''<div class="foo" style="background-color: red;">Hello.</div>''',
              'out' :  '''<div class="foo">Hello.</div>''',
@@ -16,10 +39,10 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], elem2str(applyone(td['in'], noinlinestyles)))
+            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noinlinestyles])))
             
     def test_noevents(self):
-        from mobilize.filters import applyone, noevents
+        from mobilize.filters import noevents
         testdata = [
             {'in'  : '''<a href="#" id="makeHPLink" onclick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
              'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
@@ -35,16 +58,15 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], elem2str(applyone(td['in'], noevents)))
+            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noevents])))
             
     def test_calculate_common_filters(self):
         '''A crude test to at least partly validate the filterapi decorator'''
-        from mobilize.filters import apply, noinlinestyles, COMMON_FILTERS
+        from mobilize.filters import noinlinestyles, COMMON_FILTERS
         assert noinlinestyles in COMMON_FILTERS # a known filter api function
-        assert apply not in COMMON_FILTERS # a known non-filter-api function
         
     def test_chain_filters(self):
-        '''test that apply() correctly chains filters'''
+        '''test that filters can be chained'''
         htmlin = '''<div class="foo" style="color: blue">
 <h1 style="font-size: large;">The Headline</h1>
 <a href="#" onclick="alert('Good Job!');">Click Here</a>
@@ -53,9 +75,9 @@ class TestFilters(TestCase):
 <h1>The Headline</h1>
 <a href="#">Click Here</a>
 </div>'''
-        from mobilize.filters import apply, noinlinestyles, noevents
+        from mobilize.filters import noinlinestyles, noevents
         my_filters = [
             noinlinestyles,
             noevents,
             ]
-        self.assertEquals(elem2str(apply(htmlin, my_filters)), htmlout)
+        self.assertEquals(elem2str(apply_filters(htmlin, my_filters)), htmlout)
