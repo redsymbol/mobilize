@@ -13,3 +13,11 @@ doc-api:
 
 devpublish:
 	scp -P 2222 -pr mobilize default@localhost:/var/www/share/mobilize-libs/dev/
+
+co:
+	rm -rf pack pack.tgz
+	git checkout-index -a --prefix=pack/
+
+pack: co
+	tar zcf pack.tgz pack
+	rm -rf pack
