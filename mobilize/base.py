@@ -137,7 +137,7 @@ class Template(object):
                 elem.extract(doc)
                 classname='mwu-melem'
                 idname='mwu-melem-%d' % ii
-                elem.process(classname, idname, COMMON_FILTERS)
+                elem.process(classname, idname)
         params['elements'] = [elem.html() for elem in elements]
         return self._render(params)
 

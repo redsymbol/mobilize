@@ -1,5 +1,7 @@
 # TODO: use abc
 
+from mobilize.filters import COMMON_FILTERS
+
 class RefineClassBase(object):
     '''abstract base of all refinement classes'''
     def html(self):
@@ -20,7 +22,7 @@ class Extracted(RefineClassBase):
     #: The extracted elements. type: list of lxml.html.HtmlElement
     elems = None
 
-    def __init__(self, selector):
+    def __init__(self, selector, filters=None, prefilters=None, postfilters=None):
         '''
         ctor
 
@@ -29,11 +31,48 @@ class Extracted(RefineClassBase):
         depends on the subclass.  For example, it could be an xpath
         expression, a CSS "path", etc.
 
-        @param selector : What part of the document to extract
-        @type  selector : str
+        Before final rendering, zero or more filters will be applied
+        to the extracted content. Since each filter may transform the
+        HTML snippet in an arbitrary way, the order matters.
+
+        The filters, prefilters, and postfilters arguments all allow
+        you to control what filters are applied to the extracted
+        content. Each argument, if supplied, must be a list of filter
+        functions. By default, filters.COMMON_FILTERS are set to be
+        applied.  If you specify prefilters, that list is prepended to
+        the default list; likewise, postfilters is appended to the
+        default.  If you specificy filters, that will *replace* the
+        default.
+
+        If you use filters, you cannot specify prefilters or
+        postfilters.  You can use one or both of prefilters or
+        postfilters, but then cannot use filters.  To specify that no
+        filters are to be used at all, pass filters=[].
+
+        @param selector    : What part of the document to extract
+        @type  selector    : str
+
+        @param filters     : Absolute list of filters to use
+        @type  filters     : list of function
+
+        @param prefilters  : Filters to prepend to default list
+        @type  prefilters  : list of function
+        
+        @param postfilters : Filters to append to default list
+        @type  postfilters : list of function
         
         '''
         self.selector = selector
+        if filters is None:
+            these_filters = list(COMMON_FILTERS)
+        else:
+            assert (prefilters is None) and (postfilters is None),  'If you specify filters, you cannot specify either prefilters or postfilters'
+            these_filters = list(filters)
+        if prefilters is not None:
+            these_filters = prefilters + these_filters
+        if postfilters is not None:
+            these_filters += postfilters
+        self.filters = these_filters
 
     def _extract(self, source):
         '''
@@ -61,7 +100,7 @@ class Extracted(RefineClassBase):
         self.elems = self._extract(source)
         return self.elems
 
-    def process(self, classname, idname, filters):
+    def process(self, classname, idname):
         '''
         Process the extracted element, before rendering as a string
 
@@ -93,7 +132,7 @@ class Extracted(RefineClassBase):
         assert type(self.elems) is list, self.elems
         # apply common filters
         for elem in self.elems:
-            for filt in filters:
+            for filt in self.filters:
                 filt(elem)
         # wrap in special mobilize class, id
         newelem = HtmlElement()

@@ -17,9 +17,9 @@ class TestRefine(unittest.TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            refinement = DummyExtracted('')
+            refinement = DummyExtracted('', filters=[])
             refinement.elems = [html.fromstring(td['elem_str'])]
-            newelem = refinement.process(td['classname'], td['idname'], {})
+            newelem = refinement.process(td['classname'], td['idname'])
             self.assertEqual(newelem, refinement.elem)
             self.assertEqual(html.HtmlElement, type(refinement.elem))
             self.assertSequenceEqual(td['newelem_str'], html.tostring(refinement.elem))
@@ -54,9 +54,31 @@ class TestRefine(unittest.TestCase):
             doc = html.fromstring(open(data_file_path('extract_celems', td['datafile'])).read())
             for sel in td['selectors']:
                 sel.extract(doc)
-                sel.process('some-class', 'some-id', {})
+                sel.process('some-class', 'some-id')
             expected = map(normxml, td['extracted'])
             actual = [normxml(sel.html()) for sel in td['selectors']]
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
             self.assertEqual(expected, actual, msg)
+
+    def test_Extracted_filtersetup(self):
+        '''test that filters are set up properly'''
+        def foo(elem):
+            pass
+        def bar(elem):
+            pass
+        def baz(elem):
+            pass
+        from mobilize.filters import COMMON_FILTERS
+        extracted = DummyExtracted('')
+        self.assertEquals(extracted.filters, COMMON_FILTERS)
+        extracted = DummyExtracted('', filters=[])
+        self.assertEquals(extracted.filters, [])
+        extracted = DummyExtracted('', prefilters=[foo], postfilters=[bar])
+        self.assertEquals(extracted.filters, [foo] + COMMON_FILTERS + [bar])
+        ok = False
+        try:
+            extracted = DummyExtracted('', filters=[baz], prefilters=[foo], postfilters=[bar])
+        except AssertionError:
+            ok = True
+        self.assertTrue(ok)
 
