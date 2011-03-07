@@ -14,18 +14,8 @@ A function conforms to the filter API if it:
   * does not return any value, and
   * operates by making any changes directly on the element as a side effect.
 
-Such a function is used as a primitive when iterating through a DOM tree.
-
 '''
 
-def filterapi(f):
-    '''
-    Marks a function as belonging to the filter API.  Decorator.
-    '''
-    f.is_filter = True
-    return f
-
-@filterapi
 def noinlinestyles(elem):
     '''
     Remove any inline styles on a tag
@@ -40,7 +30,6 @@ def noinlinestyles(elem):
     if 'style' in elem.attrib:
         del elem.attrib['style']
 
-@filterapi
 def nomiscattrib(elem):
     '''
     Remove certain miscellaneous unwanted attributes
@@ -67,7 +56,6 @@ def nomiscattrib(elem):
         if unwanted in elem.attrib:
             del elem.attrib[unwanted]
 
-@filterapi
 def noevents(elem):
     '''
     Removes "onSOMETHING" events
@@ -83,7 +71,6 @@ def noevents(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
-@filterapi
 def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
@@ -181,7 +168,6 @@ def table2divs(elem, omit_whitespace=True):
 
     '''
 
-@filterapi
 def table2divrows(elem, omit_whitespace=True):
     '''
     like table2divs, but rows are organized into their own divs

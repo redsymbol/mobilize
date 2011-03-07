@@ -19,7 +19,6 @@ def apply_filters(htmlstr, filters):
     doc = html.fragment_fromstring(htmlstr, create_parent=False)
     for elem in doc.iter():
         for filt in filters:
-            assert filt.is_filter
             filt(elem)
     return doc
     
@@ -60,11 +59,6 @@ class TestFilters(TestCase):
         for ii, td in enumerate(testdata):
             self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noevents])))
             
-    def test_calculate_common_filters(self):
-        '''A crude test to at least partly validate the filterapi decorator'''
-        from mobilize.filters import noinlinestyles, COMMON_FILTERS
-        assert noinlinestyles in COMMON_FILTERS # a known filter api function
-        
     def test_chain_filters(self):
         '''test that filters can be chained'''
         htmlin = '''<div class="foo" style="color: blue">
