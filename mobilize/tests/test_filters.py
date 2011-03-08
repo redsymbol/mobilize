@@ -107,9 +107,22 @@ class TestFilters(TestCase):
 <embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"/>
 </object>''',
              },
-            # {'object_str' : '''<p>Nothing to see here.</p>''',
-            #  'resized_str' : '''<p>Nothing to see here.</p>''',
-            #  },
+            {'object_str' : '''<OBJECT width="800" height="344">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
+<param name="allowFullScreen" value="true"/>
+<param name="allowscriptaccess" value="always"/>
+<EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
+</OBJECT>''',
+             'resized_str' : '''<object width="280">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
+<param name="allowFullScreen" value="true"/>
+<param name="allowscriptaccess" value="always"/>
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"/>
+</object>''',
+             },
+            {'object_str' : '''<p>Nothing to see here.</p>''',
+             'resized_str' : '''<p>Nothing to see here.</p>''',
+             },
             ]
         for ii, td in enumerate(testdata):
             object_elem = html.fragment_fromstring(td['object_str'], create_parent=False)
