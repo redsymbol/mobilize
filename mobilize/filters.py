@@ -71,6 +71,29 @@ def noevents(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
+def resizeobject(elem, width=280):
+    '''
+    Resize something embedded in an object tag to have a mobile-friendly width
+
+    This is handled by deleting the height attribute, if it is
+    present; and setting or adding a width attribute with the
+    indicated value.  This is done for both the "object" tag, and any
+    "embed" tag that may be present.
+    '''
+    def setwh(e):
+        if 'height' in e.attrib:
+            del e.attrib['height']
+        e.attrib['width'] = str(width)
+    if 'object' == elem.tag:
+        object_elem = elem
+    else:
+        object_elem = elem.find('.//object')
+    if object_elem is not None:
+        setwh(object_elem)
+        embed_elem = object_elem.find('.//embed')
+        if embed_elem is not None:
+            setwh(embed_elem)
+
 def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
