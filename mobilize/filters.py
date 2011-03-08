@@ -75,10 +75,16 @@ def resizeobject(elem, width=280):
     '''
     Resize something embedded in an object tag to have a mobile-friendly width
 
-    This is handled by deleting the height attribute, if it is
-    present; and setting or adding a width attribute with the
-    indicated value.  This is done for both the "object" tag, and any
-    "embed" tag that may be present.
+    If elem contains (or is) a OBJECT element, set its width to a
+    mobile-friendly value.  This is handled by deleting the height
+    attribute, if it is present; and setting or adding a width
+    attribute with the indicated value.  This is done for both the
+    "object" tag, and also any "embed" tag that may be present inside.
+
+    TODO: This will operate on only the first object; if there are
+    several object elements within, those beyond the first will be
+    ignored.  Best thing is probably to just find and operate on all
+    of them.
     '''
     def setwh(e):
         if 'height' in e.attrib:
