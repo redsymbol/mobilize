@@ -11,8 +11,9 @@ FILTER API
 
 A function conforms to the filter API if it:
   * accepts an lxml.html.HTMLElement instance as an argument, and
-  * does not return any value, and
-  * operates by making any changes directly on the element as a side effect.
+  * does not return any value,
+  * operates by making any changes directly on the element as a side effect, and
+  * is a no-op if the passed element is somehow not relevant to the particular filter.
 
 '''
 
