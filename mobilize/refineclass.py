@@ -20,8 +20,11 @@ class Extracted(RefineClassBase):
     '''abstract base of all refinements that are extracted from the source HTML page'''
     extracted = True
 
-    #: The extracted elements. type: list of lxml.html.HtmlElement
+    #: The raw extracted elements. type: list of lxml.html.HtmlElement
     elems = None
+
+    #: What becomes the processed element for the mobile page
+    elem = None
 
     def __init__(self, selector, filters=None, prefilters=None, postfilters=None, classvalue=None, idname=None):
         '''
