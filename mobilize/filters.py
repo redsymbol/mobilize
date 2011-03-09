@@ -226,7 +226,10 @@ def table2divs(elem, omit_whitespace=True):
     container_elem = HtmlElement()
     container_elem.tag = 'div'
     container_elem.attrib['class'] = MARKER_BASE
-    table_elem = elem.find('table')
+    if 'table' == elem.tag:
+        table_elem = elem
+    else:
+        table_elem = elem.find('table')
     if table_elem is not None:
         tbody_elem = table_elem.find('tbody')
         if tbody_elem is not None:
@@ -247,7 +250,18 @@ def table2divs(elem, omit_whitespace=True):
                         rcmarker(row=rownum),
                         rcmarker(col=colnum),])
                 container_elem.append(cell_elem)
-        table_elem.getparent().replace(table_elem, container_elem)
+        if elem == table_elem:
+            # Table is the root element, so we need to do a dance to replace it
+            table_elem.clear()
+            table_elem.tag = container_elem.tag
+            table_elem.text = container_elem.text
+            for k, v in container_elem.attrib.iteritems():
+                table_elem.attrib[k] = v
+            for child in container_elem:
+                table_elem.append(child)
+        else:
+            table_elem.getparent().replace(table_elem, container_elem)
+            
                 
 
 def table2divrows(elem, omit_whitespace=True):

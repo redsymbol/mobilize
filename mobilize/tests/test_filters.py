@@ -218,6 +218,23 @@ here's some extra trailing text for you too
     </div>
 </div>''',
              },
+            {'in_str' : '''<table>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </table>
+''',
+             'out_str' : '''<div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div>
+''',
+             },
             ]
         from mobilize.filters import table2divs
         for ii, td in enumerate(testdata):
