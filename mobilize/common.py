@@ -69,3 +69,25 @@ def _csslabel(suffix=None):
     if suffix is not None:
         return '%s-%s' % (ELEMENT_NAME, suffix)
     return ELEMENT_NAME
+
+def findonetag(elem, tagname):
+    '''
+    Finds the first tag within an element
+
+    This returns the element, if it has the given tag name; or its
+    first found child of that tag name.  If no such element is within,
+    return None.
+
+    @param elem : Element to search within
+    @type  elem : lxml.html.HtmlElement
+
+    @param tagname : Name of tag to find
+    @type  tagname : str
+    
+    '''
+    if tagname == elem.tag:
+        found = elem
+    else:
+        found = elem.find('.//' + tagname)
+    return found
+        

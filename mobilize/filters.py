@@ -17,6 +17,8 @@ A function conforms to the filter API if it:
 
 '''
 
+from common import findonetag
+
 def noinlinestyles(elem):
     '''
     Remove any inline styles on a tag
@@ -72,6 +74,25 @@ def noevents(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
+def noimgsize(elem):
+    '''
+    Strip the height and width attributes from the first child img tag
+
+    This filter searches for the first img in the element, and removes
+    any sizing attributes.  This is useful if you have a large source
+    image, and want to use a "width: 100%" trick in CSS to make it
+    span any device.
+
+    @param elem : Element representing an html tag
+    @type  elem : lxml.html.HTMLElement
+    
+    '''
+    img_elem = findonetag(elem, 'img')
+    if img_elem is not None:
+        for a in ('height', 'width'):
+            if a in img_elem.attrib:
+                del img_elem.attrib[a]
+
 def resizeobject(elem, width=280):
     '''
     Resize something embedded in an object tag to have a mobile-friendly width
@@ -91,10 +112,7 @@ def resizeobject(elem, width=280):
         if 'height' in e.attrib:
             del e.attrib['height']
         e.attrib['width'] = str(width)
-    if 'object' == elem.tag:
-        object_elem = elem
-    else:
-        object_elem = elem.find('.//object')
+    object_elem = findonetag(elem, 'object')
     if object_elem is not None:
         setwh(object_elem)
         embed_elem = object_elem.find('.//embed')

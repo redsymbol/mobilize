@@ -41,7 +41,17 @@ class TestFilters(TestCase):
             ]
         for ii, td in enumerate(testdata):
             self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noinlinestyles])))
-            
+
+    def test_noimgsize(self):
+        from mobilize.filters import noimgsize
+        testdata = [
+            {'in'  : '''<div><img src="http://example.com/booger.png" width="1920" height="1280" alt=""/></div>''',
+             'out' :  '''<div><img src="http://example.com/booger.png" alt=""/></div>''',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            self.assertSequenceEqual(td['out'], elem2str(apply_filters(td['in'], [noimgsize])))
+        
     def test_noevents(self):
         from mobilize.filters import noevents
         testdata = [
