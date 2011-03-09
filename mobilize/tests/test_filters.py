@@ -175,6 +175,9 @@ class TestFilters(TestCase):
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div></div>
 ''',
              },
+            {'in_str' : '''<div><p>Nothing here.</p></div>''',
+             'out_str' : '''<div><p>Nothing here.</p></div>''',
+             },
             ]
         from mobilize.filters import table2divs
         for ii, td in enumerate(testdata):

@@ -245,7 +245,7 @@ def table2divs(elem, omit_whitespace=True):
                         rcmarker(row=rownum),
                         rcmarker(col=colnum),])
                 container_elem.append(cell_elem)
-    table_elem.getparent().replace(table_elem, container_elem)
+        table_elem.getparent().replace(table_elem, container_elem)
                 
 
 def table2divrows(elem, omit_whitespace=True):
