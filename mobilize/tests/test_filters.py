@@ -152,10 +152,10 @@ class TestFilters(TestCase):
       </tr>
     </table></div>
 ''',
-             'out_str' : '''<div><div><div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0">Eggs</div>
-    <div class="mwu-table2div-row0-col1 mwu-table2div-row0 mwu-table2div-col1">Ham</div>
-    <div class="mwu-table2div-row1-col0 mwu-table2div-row1 mwu-table2div-col0">Beer</div>
-    <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div></div></div>
+             'out_str' : '''<div><div><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div></div>
 ''',
              },
             {'in_str' : '''<div><table><tbody>
@@ -169,10 +169,10 @@ class TestFilters(TestCase):
       </tr>
     </tbody></table></div>
 ''',
-             'out_str' : '''<div><div><div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0">Eggs</div>
-    <div class="mwu-table2div-row0-col1 mwu-table2div-row0 mwu-table2div-col1">Ham</div>
-    <div class="mwu-table2div-row1-col0 mwu-table2div-row1 mwu-table2div-col0">Beer</div>
-    <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div></div></div>
+             'out_str' : '''<div><div><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div></div>
 ''',
              },
             ]

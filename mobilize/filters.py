@@ -149,16 +149,16 @@ def table2divs(elem, omit_whitespace=True):
     The divs will have the following class attributes set, where R and
     C are the zero-based row and column numbers of the source TD tag:
     
-      * mwu-table2div-rowR-colC
-      * mwu-table2div-rowR
-      * mwu-table2div-colC
+      * mwu-table2divs-rowR-colC
+      * mwu-table2divs-rowR
+      * mwu-table2divs-colC
 
     So the above example would actually render out something like:
     
-    <div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0">Eggs</div>
-    <div class="mwu-table2div-row0-col1 mwu-table2div-row0 mwu-table2div-col1">Ham</div>
-    <div class="mwu-table2div-row1-col0 mwu-table2div-row1 mwu-table2div-col0">Beer</div>
-    <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div>
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div>
 
     These css class "hooks" are meant to help with styling of the mobile page.
 
@@ -177,8 +177,8 @@ def table2divs(elem, omit_whitespace=True):
 
     ... will render as this:
 
-    <div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0"><table id="foobar">...</table></div>
-    <div class="mwu-table2div-row0-col1 mwu-table2div-row0 mwu-table2div-col1">Key Lime Pie</div>
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0"><table id="foobar">...</table></div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Key Lime Pie</div>
 
     If future need justifies it, we may add a "depth" argument to this
     filter, to allow recursive table-to-div conversion.
@@ -210,13 +210,13 @@ def table2divs(elem, omit_whitespace=True):
 
     ... will render like this:
     
-    <div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0">Eggs</div>
-    <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div>
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div>
 
     '''
     from lxml.html import HtmlElement
     def rcmarker(row=None, col=None):
-        s = 'mwu-table2div'
+        s = 'mwu-table2divs'
         if row is not None:
             s += '-row%s' % row
         if col is not None:
