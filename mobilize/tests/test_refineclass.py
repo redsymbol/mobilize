@@ -11,15 +11,14 @@ class TestRefine(unittest.TestCase):
         from lxml import html
         testdata = [
             {'elem_str'    : '<p>Hello</p>',
-             'classname'   : 'alpha',
              'idname'      : 'beta',
              'newelem_str' : '<div class="alpha" id="beta"><p>Hello</p></div>',
              },
             ]
         for ii, td in enumerate(testdata):
-            refinement = DummyExtracted('', filters=[])
+            refinement = DummyExtracted('', filters=[], classvalue='alpha')
             refinement.elems = [html.fromstring(td['elem_str'])]
-            newelem = refinement.process(td['classname'], td['idname'])
+            newelem = refinement.process(td['idname'])
             self.assertEqual(newelem, refinement.elem)
             self.assertEqual(html.HtmlElement, type(refinement.elem))
             self.assertSequenceEqual(td['newelem_str'], html.tostring(refinement.elem))
@@ -30,23 +29,23 @@ class TestRefine(unittest.TestCase):
 
         testdata = [
             {'datafile' : 'a.xml',
-             'selectors' : [CssPath('div#happy')],
+             'selectors' : [CssPath('div#happy', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><div id="happy">lucky</div></div>'],
              },
             {'datafile' : 'b.xml',
-             'selectors' : [CssPath('div#joyful')],
+             'selectors' : [CssPath('div#joyful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><div id="joyful">fun</div></div>'],
              },
             {'datafile' : 'c.xml',
-             'selectors' : [CssPath('p.graceful')],
+             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="graceful">laughing</p></div>'],
              },
             {'datafile' : 'd.xml',
-             'selectors' : [CssPath('p.graceful')],
+             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="skipping graceful enthusiastic">laughing</p></div>'],
              },
             {'datafile' : 'e.xml',
-             'selectors' : [CssPath('p.graceful')],
+             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="skipping graceful enthusiastic">laughing</p><p class="graceful">enthusiastic</p></div>'],
              },
             ]
@@ -54,7 +53,7 @@ class TestRefine(unittest.TestCase):
             doc = html.fromstring(open(data_file_path('extract_celems', td['datafile'])).read())
             for sel in td['selectors']:
                 sel.extract(doc)
-                sel.process('some-class', 'some-id')
+                sel.process('some-id')
             expected = map(normxml, td['extracted'])
             actual = [normxml(sel.html()) for sel in td['selectors']]
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])

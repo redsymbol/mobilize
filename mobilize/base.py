@@ -135,9 +135,7 @@ class Template(object):
         for ii, elem in enumerate(elements):
             if elem.extracted:
                 elem.extract(doc)
-                classname = common.classvalue()
-                idname = common.idname(ii)
-                elem.process(classname, idname)
+                elem.process(common.idname(ii))
         params['elements'] = [elem.html() for elem in elements]
         return self._render(params)
 

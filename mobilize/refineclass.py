@@ -1,6 +1,7 @@
 # TODO: use abc
 
 from mobilize.filters import COMMON_FILTERS
+from mobilize import common
 
 class RefineClassBase(object):
     '''abstract base of all refinement classes'''
@@ -22,7 +23,7 @@ class Extracted(RefineClassBase):
     #: The extracted elements. type: list of lxml.html.HtmlElement
     elems = None
 
-    def __init__(self, selector, filters=None, prefilters=None, postfilters=None, extra_classname=None, ):
+    def __init__(self, selector, filters=None, prefilters=None, postfilters=None, classvalue=None, idname=None):
         '''
         ctor
 
@@ -73,6 +74,10 @@ class Extracted(RefineClassBase):
         if postfilters is not None:
             these_filters += postfilters
         self.filters = these_filters
+        if classvalue is None:
+            classvalue = common.classvalue()
+        self.classvalue = classvalue
+        self.idname = idname
 
     def _extract(self, source):
         '''
@@ -100,7 +105,7 @@ class Extracted(RefineClassBase):
         self.elems = self._extract(source)
         return self.elems
 
-    def process(self, classname, idname):
+    def process(self, default_idname):
         '''
         Process the extracted element, before rendering as a string
 
@@ -110,16 +115,16 @@ class Extracted(RefineClassBase):
 
         Operates on self.elem, replacing it as a side effect.
 
-        The element will be wrapped in a new div, which are given the class and ID indicated.
+        The element will be wrapped in a new div, which are given the
+        class and ID according to the classvalue and idname member
+        variables.  default_idname is used as a fallback idname; If
+        self.idname has already been set, that will be used instead.
 
         @param elem      : HTML element to process
         @type  elem      : lxml.html.HtmlElement
 
-        @param classname : CSS class attribute to apply to the enclosing div
-        @type  classname : str
-        
-        @param idname    : ID attribute to apply to the enclosing div
-        @type  idname    : str
+        @param default_idname    : ID attribute to apply to the enclosing div
+        @type  default_idname    : str
 
         @param filters   : Filters to apply to the element
         @type  filters   : list of filterapi functions from mobilize.filter
@@ -130,6 +135,10 @@ class Extracted(RefineClassBase):
         '''
         from lxml.html import HtmlElement
         assert type(self.elems) is list, self.elems
+        if self.idname is None:
+            idname = default_idname
+        else:
+            idname = self.idname
         # apply common filters
         for elem in self.elems:
             for filt in self.filters:
@@ -137,7 +146,7 @@ class Extracted(RefineClassBase):
         # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = 'div'
-        newelem.attrib['class'] = classname
+        newelem.attrib['class'] = self.classvalue
         newelem.attrib['id'] = idname
         for elem in self.elems:
             newelem.append(elem)
