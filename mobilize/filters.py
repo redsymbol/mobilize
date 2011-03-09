@@ -214,6 +214,7 @@ def table2divs(elem, omit_whitespace=True):
     <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div>
 
     '''
+    from lxml.html import HtmlElement
     def rcmarker(row=None, col=None):
         s = 'mwu-table2div'
         if row is not None:
@@ -221,12 +222,16 @@ def table2divs(elem, omit_whitespace=True):
         if col is not None:
             s += '-col%s' % col
         return s
-    from lxml.html import HtmlElement
-    table_elem = elem.find('table')
     container_elem = HtmlElement()
     container_elem.tag = 'div'
+    table_elem = elem.find('table')
     if table_elem is not None:
-        rows = table_elem.findall('./tr')
+        tbody_elem = table_elem.find('tbody')
+        if tbody_elem is not None:
+            root_elem = tbody_elem
+        else:
+            root_elem = table_elem
+        rows = root_elem.findall('./tr')
         for rownum, row in enumerate(rows):
             cols = row.findall('./td')
             for colnum, col in enumerate(cols):
