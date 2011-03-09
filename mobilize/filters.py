@@ -240,6 +240,8 @@ def table2divs(elem, omit_whitespace=True):
                 cell_elem = HtmlElement()
                 cell_elem.tag = 'div'
                 cell_elem.text = col.text
+                for colchild in col:
+                    cell_elem.append(colchild)
                 cell_elem.attrib['class'] = ' '.join([
                         rcmarker(row=rownum, col=colnum),
                         rcmarker(row=rownum),

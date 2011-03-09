@@ -178,6 +178,20 @@ class TestFilters(TestCase):
             {'in_str' : '''<div><p>Nothing here.</p></div>''',
              'out_str' : '''<div><p>Nothing here.</p></div>''',
              },
+            {'in_str' : '''<div><table>
+      <tr>
+        <td><table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table></td>
+        <td>Key Lime Pie</td>
+      </tr>
+    </table></div>''',
+             'out_str' : '''<div><div class="mwu-table2divs">
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">
+      <table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+    </div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Key Lime Pie</div>
+    </div>
+</div>''',
+             },
             ]
         from mobilize.filters import table2divs
         for ii, td in enumerate(testdata):
