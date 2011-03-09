@@ -52,7 +52,6 @@ def nomiscattrib(elem):
         'border',
         'cellspacing',
         'cellpadding',
-        'width',
         'valign',
         )
     for unwanted in unwanteds:
@@ -215,6 +214,32 @@ def table2divs(elem, omit_whitespace=True):
     <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div>
 
     '''
+    def rcmarker(row=None, col=None):
+        s = 'mwu-table2div'
+        if row is not None:
+            s += '-row%s' % row
+        if col is not None:
+            s += '-col%s' % col
+        return s
+    from lxml.html import HtmlElement
+    table_elem = elem.find('table')
+    container_elem = HtmlElement()
+    container_elem.tag = 'div'
+    if table_elem is not None:
+        rows = table_elem.findall('./tr')
+        for rownum, row in enumerate(rows):
+            cols = row.findall('./td')
+            for colnum, col in enumerate(cols):
+                cell_elem = HtmlElement()
+                cell_elem.tag = 'div'
+                cell_elem.text = col.text
+                cell_elem.attrib['class'] = ' '.join([
+                        rcmarker(row=rownum, col=colnum),
+                        rcmarker(row=rownum),
+                        rcmarker(col=colnum),])
+                container_elem.append(cell_elem)
+    table_elem.getparent().replace(table_elem, container_elem)
+                
 
 def table2divrows(elem, omit_whitespace=True):
     '''

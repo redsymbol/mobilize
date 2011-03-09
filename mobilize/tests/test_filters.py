@@ -138,3 +138,29 @@ class TestFilters(TestCase):
             object_elem = html.fragment_fromstring(td['object_str'], create_parent=False)
             resizeobject(object_elem)
             self.assertSequenceEqual(normxml(td['resized_str']), normxml(elem2str(object_elem)))
+
+    def test_table2divs(self):
+        testdata = [
+            {'in_str' : '''<div><table>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </table></div>
+''',
+             'out_str' : '''<div><div><div class="mwu-table2div-row0-col0 mwu-table2div-row0 mwu-table2div-col0">Eggs</div>
+    <div class="mwu-table2div-row0-col1 mwu-table2div-row0 mwu-table2div-col1">Ham</div>
+    <div class="mwu-table2div-row1-col0 mwu-table2div-row1 mwu-table2div-col0">Beer</div>
+    <div class="mwu-table2div-row1-col1 mwu-table2div-row1 mwu-table2div-col1">Milk</div></div></div>
+''',
+             },
+            ]
+        from mobilize.filters import table2divs
+        for ii, td in enumerate(testdata):
+            in_elem = html.fragment_fromstring(td['in_str'], create_parent=False)
+            table2divs(in_elem)
+            self.assertSequenceEqual(normxml(td['out_str']), normxml(elem2str(in_elem)))
