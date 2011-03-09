@@ -192,6 +192,32 @@ class TestFilters(TestCase):
     </div>
 </div>''',
              },
+            {'in_str' : '''<div><table>
+      <tr>
+        <td>
+Does html like this exist somewhere in the wild?
+<table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+<p>yeah, I bet somewhere it does</p>
+(probably on some website that gets 10K hits on a slow day)
+<table id="foobar"><tr><td>Game</td><td>Over Man</td></tr></table>
+here's some extra trailing text for you too
+</td>
+        <td>Key Lime Pie</td>
+      </tr>
+    </table></div>''',
+             'out_str' : '''<div><div class="mwu-table2divs">
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">
+Does html like this exist somewhere in the wild?
+<table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+<p>yeah, I bet somewhere it does</p>
+(probably on some website that gets 10K hits on a slow day)
+<table id="foobar"><tr><td>Game</td><td>Over Man</td></tr></table>
+here's some extra trailing text for you too
+    </div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Key Lime Pie</div>
+    </div>
+</div>''',
+             },
             ]
         from mobilize.filters import table2divs
         for ii, td in enumerate(testdata):
