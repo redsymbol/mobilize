@@ -1,7 +1,7 @@
 import types
 import re
 from collections import OrderedDict
-import exceptions
+import exceptions, common
 
 class MobileSite(object):
     '''
@@ -135,8 +135,8 @@ class Template(object):
         for ii, elem in enumerate(elements):
             if elem.extracted:
                 elem.extract(doc)
-                classname='mwu-melem'
-                idname='mwu-melem-%d' % ii
+                classname = common.classvalue()
+                idname = common.idname(ii)
                 elem.process(classname, idname)
         params['elements'] = [elem.html() for elem in elements]
         return self._render(params)

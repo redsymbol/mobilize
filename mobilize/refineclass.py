@@ -22,7 +22,7 @@ class Extracted(RefineClassBase):
     #: The extracted elements. type: list of lxml.html.HtmlElement
     elems = None
 
-    def __init__(self, selector, filters=None, prefilters=None, postfilters=None):
+    def __init__(self, selector, filters=None, prefilters=None, postfilters=None, extra_classname=None, ):
         '''
         ctor
 
