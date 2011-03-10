@@ -26,7 +26,14 @@ class Extracted(RefineClassBase):
     #: What becomes the processed element for the mobile page
     elem = None
 
-    def __init__(self, selector, filters=None, prefilters=None, postfilters=None, classvalue=None, idname=None):
+    def __init__(self, selector,
+                 filters=None,
+                 prefilters=None,
+                 postfilters=None,
+                 classvalue=None,
+                 idname=None,
+                 style='',
+                 ):
         '''
         ctor
 
@@ -64,6 +71,15 @@ class Extracted(RefineClassBase):
         
         @param postfilters : Filters to append to default list
         @type  postfilters : list of function
+
+        @param classvalue  : Value of "class" attribute for containing div
+        @type  classvalue  : str or None (indicating use default)
+        
+        @param idname      : Value of "id" attribute for containing div
+        @type  idname      : str or None (indicating use default)
+
+        @param style       : Value for "style" attribute for containing div
+        @type  style       : str
         
         '''
         self.selector = selector
@@ -81,6 +97,7 @@ class Extracted(RefineClassBase):
             classvalue = common.classvalue()
         self.classvalue = classvalue
         self.idname = idname
+        self.style = style
 
     def _extract(self, source):
         '''
@@ -151,6 +168,8 @@ class Extracted(RefineClassBase):
         newelem.tag = 'div'
         newelem.attrib['class'] = self.classvalue
         newelem.attrib['id'] = idname
+        if bool(self.style):
+            newelem.attrib['style'] = self.style
         for elem in self.elems:
             newelem.append(elem)
         self.elem = newelem

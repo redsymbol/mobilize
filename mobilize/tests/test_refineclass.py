@@ -1,14 +1,18 @@
 import unittest
 from utils4test import data_file_path, DATA_DIR, normxml
 from mobilize.refineclass import Extracted
+from lxml import html
 
 class DummyExtracted(Extracted):
     def _extract(self, source):
         assert self.elem, 'You must set the elem property manually in this test class'
 
-class TestRefine(unittest.TestCase):
+class DirectExtracted(Extracted):
+    def _extract(self, source):
+        return [source]
+
+class TestExtracted(unittest.TestCase):
     def test_process(self):
-        from lxml import html
         testdata = [
             {'elem_str'    : '<p>Hello</p>',
              'idname'      : 'beta',
@@ -25,7 +29,6 @@ class TestRefine(unittest.TestCase):
 
     def test_extract_csspath(self):
         from mobilize.refineclass import CssPath
-        from lxml import html
 
         testdata = [
             {'datafile' : 'a.xml',
@@ -59,7 +62,7 @@ class TestRefine(unittest.TestCase):
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
             self.assertEqual(expected, actual, msg)
 
-    def test_Extracted_filtersetup(self):
+    def test_filtersetup(self):
         '''test that filters are set up properly'''
         def foo(elem):
             pass
@@ -81,3 +84,25 @@ class TestRefine(unittest.TestCase):
             ok = True
         self.assertTrue(ok)
 
+    def test_style(self):
+        '''test that style attribute is set properly'''
+        style = 'background-color: red; font-size: large;'
+        sourcestr = '''<ul>
+  <li>Dre</li>
+  <li>Snoop</li>
+  <li>Thug Life</li>
+</ul>'''
+        extracted = DirectExtracted('', style=style)
+        extracted._sourcestr = sourcestr
+        extracted.extract(html.fromstring(sourcestr))
+        extracted.process('foo')
+        rendered = extracted.elem
+        # verify that the first child is the source string...
+        firstchild_elem = rendered[0]
+        self.assertSequenceEqual(normxml(sourcestr), normxml(html.tostring(firstchild_elem)))
+        # check the style attribute
+        self.assertEqual(style, rendered.attrib['style'])
+        
+        
+        
+        
