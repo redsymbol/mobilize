@@ -1,7 +1,6 @@
 import unittest
 import os
 import mobilize
-from ordereddict import OrderedDict
 from utils4test import data_file_path, DATA_DIR
 
 TEMPLATE_DIR = os.path.join(DATA_DIR, 'templates')
@@ -119,12 +118,12 @@ class TestTemplateMap(unittest.TestCase):
         t_c = DjangoTemplate('c.html', [])
         t_d = DjangoTemplate('d.html', [])
 
-        mapping = OrderedDict([
+        mapping = [
             (r'/alpha/',    t_a),
             (r'/beta/$',    t_b),
             (r'/beta/',     t_c),
             (r'/\w+$',      t_d),
-            ])
+            ]
         tmap = mobilize.TemplateMap(mapping)
         def matching(url):
             # the name of the template actually matched
@@ -141,9 +140,9 @@ class TestMobileSite(unittest.TestCase):
     maxDiff = None
     def test_no_match(self):
         t_a = mobilize.DjangoTemplate('a.html', [])
-        mapping = OrderedDict([
+        mapping = [
             (r'/alpha/$',    t_a),
-            ])
+            ]
         tmap = mobilize.TemplateMap(mapping)
         msite = mobilize.MobileSite('example.com', tmap)
         self.assertTrue(msite.has_match('/alpha/'))
@@ -151,7 +150,7 @@ class TestMobileSite(unittest.TestCase):
 
     def test_has_match(self):
         full_body = 'veggies are good for you<br/>' * 5
-        msite = mobilize.MobileSite('example.com', mobilize.TemplateMap(OrderedDict()))
+        msite = mobilize.MobileSite('example.com', mobilize.TemplateMap([]))
         rendered = msite.render_body('/someurl', full_body)
         
     def test_render(self):
@@ -231,7 +230,7 @@ class TestMobileSite(unittest.TestCase):
             'title' : '<Mobile Test One>',
             }
         template = DjangoTemplate('one.html', selectors, params)
-        tmap = mobilize.TemplateMap(OrderedDict([('/foo$', template)]))
+        tmap = mobilize.TemplateMap([('/foo$', template)])
         msite = mobilize.MobileSite('example.com', tmap)
 
         expected = mobile_body

@@ -173,9 +173,11 @@ class TemplateMap(object):
         '''
         ctor
 
-        The mapping object is an ordered dictionary.  Each entry
-        represents a possible template match.
+        The mapping object is a list of tuples, each representing a
+        possible template match.  The order matters; templates will
+        match the first URL in the list.
 
+        Each element of the mapping list is a (key, value) 2-tuple.
         The keys can be either raw strings, or Python regular
         expression objects.  If the former, the key will be internally
         converted to a Python regex object, after prepending with
@@ -184,11 +186,11 @@ class TemplateMap(object):
         The values of the mapping object are Template instances.
 
         @param mapping : The mobile domain mapping
-        @type  mapping : OrderedDict: regex -> Template
+        @type  mapping : list of tuple(key, value)
         
         '''
         self._mapping = OrderedDict()
-        for k, v in mapping.iteritems():
+        for k, v in iter(mapping):
             self._mapping[_regex(k)] = v
 
     def get_template_for(self, url):
