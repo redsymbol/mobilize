@@ -190,7 +190,7 @@ class TemplateMap(object):
         
         '''
         self._mapping = OrderedDict()
-        for k, v in iter(mapping):
+        for k, v in mapping:
             self._mapping[_regex(k)] = v
 
     def get_template_for(self, url):
