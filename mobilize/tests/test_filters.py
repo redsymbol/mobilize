@@ -255,7 +255,7 @@ here's some extra trailing text for you too
              'ignore_whitespace' : False,
              'isempty' : False,
              },
-            {'in_str' : '''<div> &nbsp;	&nbsp;&#160;           </div>''',
+            {'in_str' : '''<div> &nbsp;	&nbsp;&#160;     </div>''',
              'ignore_whitespace' : True,
              'isempty' : True,
              },

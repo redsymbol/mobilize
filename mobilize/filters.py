@@ -119,7 +119,7 @@ def resizeobject(elem, width=280):
         if embed_elem is not None:
             setwh(embed_elem)
 
-def table2divs(elem, omit_whitespace=False):
+def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
 
@@ -189,8 +189,7 @@ def table2divs(elem, omit_whitespace=False):
     If omit_whitespace is True, then any TD cells that render as empty
     whitespace will be omitted from the resulting sequence of divs.
     That means any TD whose content consists of whitespace, &nbsp;
-    entities, HTML comments, etc., as well as cells that are
-    completely empty.
+    entities, etc., as well as cells that are completely empty.
 
     Note that the mapping of specific TD cells to the numbering div
     classes, as described in ATTRIBUTES above, isn't affected by this;
@@ -204,7 +203,7 @@ def table2divs(elem, omit_whitespace=False):
         <td></td>
       </tr>
       <tr>
-        <td>     &nbsp; &nbsp; &nbsp; <!-- where's my beer?!? --> </td>
+        <td>     &nbsp; &#160; &nbsp; </td>
         <td>Milk</td>
       </tr>
     </table>    
@@ -215,7 +214,6 @@ def table2divs(elem, omit_whitespace=False):
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div>
 
     '''
-    assert not omit_whitespace, 'omit_whitespace not implemented yet'
     from lxml.html import HtmlElement
     MARKER_BASE = 'mwu-table2divs'
     def rcmarker(row=None, col=None):
@@ -241,16 +239,15 @@ def table2divs(elem, omit_whitespace=False):
         rows = root_elem.findall('./tr')
         for rownum, row in enumerate(rows):
             cols = row.findall('./td')
-            for colnum, col in enumerate(cols):
+            for colnum, tdelem in enumerate(cols):
+                if omit_whitespace and elementempty(tdelem):
+                    continue # skip over this empty cell
                 cell_elem = HtmlElement()
                 cell_elem.tag = 'div'
-                cell_elem.text = col.text
-                anychildren = False
-                for colchild in col:
+                cell_elem.text = tdelem.text
+                for colchild in tdelem:
                     anychildren = True
                     cell_elem.append(colchild)
-                if not bool(cell_elem.text) and not anychildren:
-                    cell_elem.text = ' ;' # HACK.  Because otherwise it renders as <div class="..."/>, which is invalid html. Better to just delete this cell
                 cell_elem.attrib['class'] = ' '.join([
                         rcmarker(row=rownum, col=colnum),
                         rcmarker(row=rownum),
