@@ -247,6 +247,22 @@ here's some extra trailing text for you too
             {'in_str' : '''<div></div>''',
              'isempty' : True,
              },
+            {'in_str' : '''<div> </div>''',
+             'ignore_whitespace' : True,
+             'isempty' : True,
+             },
+            {'in_str' : '''<div> </div>''',
+             'ignore_whitespace' : False,
+             'isempty' : False,
+             },
+            {'in_str' : '''<div> &nbsp;	&nbsp;&#160;           </div>''',
+             'ignore_whitespace' : True,
+             'isempty' : True,
+             },
+            {'in_str' : '''<div> &nbsp;	&nbsp;&#160;           </div>''',
+             'ignore_whitespace' : False,
+             'isempty' : False,
+             },
             {'in_str' : '''<div>hey</div>''',
              'isempty' : False,
              },
@@ -260,4 +276,8 @@ here's some extra trailing text for you too
         from mobilize.filters import elementempty
         for ii, td in enumerate(testdata):
             elem = html.fromstring(td['in_str'])
-            self.assertEqual(td['isempty'], elementempty(elem), td['in_str'])
+            ignore_whitespace = td.get('ignore_whitespace', False)
+            expected = td['isempty']
+            actual = elementempty(elem, ignore_whitespace)
+            msg = 'e: %s, a: %s [%d]' % (expected, actual, ii)
+            self.assertEqual(expected, actual, msg)

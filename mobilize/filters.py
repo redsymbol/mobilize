@@ -17,6 +17,7 @@ A function conforms to the filter API if it:
 
 '''
 
+import re
 from common import findonetag
 
 def noinlinestyles(elem):
@@ -272,7 +273,8 @@ def table2divrows(elem, omit_whitespace=True):
     like table2divs, but rows are organized into their own divs
     '''
 
-def elementempty(elem, ignore_whitespace = False):
+_ELEMENTEMPTY_WS_RE = re.compile(r'(?:\s|\n|&nbsp;|&#160;)*$', re.UNICODE | re.I)
+def elementempty(elem, ignore_whitespace = True):
     '''
     True iff an element is empty.
 
@@ -283,12 +285,14 @@ def elementempty(elem, ignore_whitespace = False):
     includes entities like &nbsp;, &#160;, etc.
 
     '''
-    assert not ignore_whitespace, 'ignore_whitespace not supported yet'
-    isempty = True
-    if elem.text not in ('', None):
-        isempty = False
-    if len(elem) > 0:
-        isempty = False
+    def is_ws(s):
+        return _ELEMENTEMPTY_WS_RE.match(s) is not None
+    isempty = False
+    if len(elem) == 0:
+        if elem.text in ('', None):
+            isempty = True
+        elif ignore_whitespace and is_ws(elem.text):
+            isempty = True
     return isempty
 
 COMMON_FILTERS = [
