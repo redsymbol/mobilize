@@ -1,7 +1,7 @@
 API_DOC_DIR=doc/api
 
 clean:
-	rm $$(find . -name '*.pyc' -o -name '*~')
+	rm -f $$(find . -name '*.pyc' -o -name '*~')
 test:
 	nosetests
 test-pdb:
