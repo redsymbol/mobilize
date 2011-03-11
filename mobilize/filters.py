@@ -118,7 +118,7 @@ def resizeobject(elem, width=280):
         if embed_elem is not None:
             setwh(embed_elem)
 
-def table2divs(elem, omit_whitespace=True):
+def table2divs(elem, omit_whitespace=False):
     '''
     Transform a table into a one-dimensional sequence of DIVs
 
@@ -214,6 +214,7 @@ def table2divs(elem, omit_whitespace=True):
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div>
 
     '''
+    assert not omit_whitespace, 'omit_whitespace not implemented yet'
     from lxml.html import HtmlElement
     MARKER_BASE = 'mwu-table2divs'
     def rcmarker(row=None, col=None):
