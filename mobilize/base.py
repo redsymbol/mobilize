@@ -183,15 +183,31 @@ class TemplateMap(object):
         converted to a Python regex object, after prepending with
         start-of-line match (i.e. the "^" character).
 
-        The values of the mapping object are Template instances.
+        TEMPLATE RESOLUTION
+        
+        The values of the mapping object specify a mobilize template.
+        This can be either:
+          1) a Template instance
+          2) a string
+          3) a tuple of two strings
 
+        If a string, this is assumed to be an template module that has
+        a 'template' attribute.
+
+        If a tuple of two strings, this is assumed to be an template
+        module (first string) that has a attribute (second string)
+        that is the template to import.
+
+        The mechanics of this resolution are handled with the
+        find_template and import_template functions in this module.
+          
         @param mapping : The mobile domain mapping
         @type  mapping : list of tuple(key, value)
         
         '''
         self._mapping = OrderedDict()
         for k, v in mapping:
-            self._mapping[_regex(k)] = v
+            self._mapping[_regex(k)] = find_template(v)
 
     def get_template_for(self, url):
         '''
@@ -241,7 +257,7 @@ def elem2str(elem):
     from lxml import html
     return html.tostring(elem, method='xml').strip()
 
-def T(pagemodule, template_object='template'):
+def import_template(pagemodule, template_object='template'):
     '''
     Imports a mobilize template
 
@@ -264,4 +280,31 @@ def T(pagemodule, template_object='template'):
     '''
     import importlib
     mod = importlib.import_module('.' + pagemodule, 'msiteconf.mtemplates')
-    return getattr(mod, template_object)
+    template = getattr(mod, template_object)
+    assert isinstance(template, Template), type(template)
+    return template
+
+def find_template(arg):
+    '''
+    Find a mobile template
+
+    arg is some piece of data that specifies a mobile template, in one
+    of a number of different ways.  See the documentation of
+    TemplateMap.__init__ for details.  This function essentially
+    handles the template resolution process described there.
+
+    @param arg : Some data that specifies a template to import
+    @type  arg : mixed
+
+    @return    : mobilize template
+    @rtype     : mobilize.Template
+    
+    '''
+    if type(arg) in types.StringTypes:
+        template = import_template(arg)
+    elif type(arg) is tuple:
+        template = import_template(*arg)
+    else:
+        template = arg
+    return template
+    
