@@ -240,3 +240,28 @@ def elem2str(elem):
     '''
     from lxml import html
     return html.tostring(elem, method='xml').strip()
+
+def T(pagemodule, template_object='template'):
+    '''
+    Imports a mobilize template
+
+    pagemodule is the module name under msiteconf.mtemplates, i.e. there
+    should be an object named "template" in
+    msiteconf/mtemplates/${pagemodule}.py (or
+    msiteconf/mtemplates/${pagemodule}/__init__.py).
+
+    @param pagemodule : Name of module under msiteconf.mtemplates
+    @type  pagemodule : str
+
+    @param template_object : Name of template object to import from module
+    @type  template_object : str
+
+    @return : Mobilize template
+    @rtype  : mobilize.Template
+
+    @raise ImportError: page module not found
+    
+    '''
+    import importlib
+    mod = importlib.import_module('.' + pagemodule, 'msiteconf.mtemplates')
+    return getattr(mod, template_object)
