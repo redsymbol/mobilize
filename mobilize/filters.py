@@ -267,12 +267,29 @@ def table2divs(elem, omit_whitespace=False):
         else:
             table_elem.getparent().replace(table_elem, container_elem)
             
-                
-
 def table2divrows(elem, omit_whitespace=True):
     '''
     like table2divs, but rows are organized into their own divs
     '''
+
+def elementempty(elem, ignore_whitespace = False):
+    '''
+    True iff an element is empty.
+
+    "Emtpy" means that it has no children, including no inner text.
+
+    If ignore_whitespace is True, then count the cell as "empty" even
+    if it has text that *renders* as whitespace in the browser.  This
+    includes entities like &nbsp;, &#160;, etc.
+
+    '''
+    assert not ignore_whitespace, 'ignore_whitespace not supported yet'
+    isempty = True
+    if elem.text not in ('', None):
+        isempty = False
+    if len(elem) > 0:
+        isempty = False
+    return isempty
 
 COMMON_FILTERS = [
     noinlinestyles,

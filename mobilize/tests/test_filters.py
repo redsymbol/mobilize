@@ -241,3 +241,23 @@ here's some extra trailing text for you too
             in_elem = html.fragment_fromstring(td['in_str'], create_parent=False)
             table2divs(in_elem)
             self.assertSequenceEqual(normxml(td['out_str']), normxml(elem2str(in_elem)))
+
+    def test_elementempty(self):
+        testdata = [
+            {'in_str' : '''<div></div>''',
+             'isempty' : True,
+             },
+            {'in_str' : '''<div>hey</div>''',
+             'isempty' : False,
+             },
+            {'in_str' : '''<div><span></span></div>''',
+             'isempty' : False,
+             },
+            {'in_str' : '''<div><p>alpha</p><p>beta</p></div>''',
+             'isempty' : False,
+             },
+            ]
+        from mobilize.filters import elementempty
+        for ii, td in enumerate(testdata):
+            elem = html.fromstring(td['in_str'])
+            self.assertEqual(td['isempty'], elementempty(elem), td['in_str'])
