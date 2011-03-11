@@ -244,8 +244,12 @@ def table2divs(elem, omit_whitespace=False):
                 cell_elem = HtmlElement()
                 cell_elem.tag = 'div'
                 cell_elem.text = col.text
+                anychildren = False
                 for colchild in col:
+                    anychildren = True
                     cell_elem.append(colchild)
+                if not bool(cell_elem.text) and not anychildren:
+                    cell_elem.text = ' ;' # HACK.  Because otherwise it renders as <div class="..."/>, which is invalid html. Better to just delete this cell
                 cell_elem.attrib['class'] = ' '.join([
                         rcmarker(row=rownum, col=colnum),
                         rcmarker(row=rownum),
