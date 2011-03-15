@@ -91,3 +91,17 @@ def findonetag(elem, tagname):
         found = elem.find('.//' + tagname)
     return found
         
+def elem2str(elem):
+    '''
+    Render an HTML element as a string
+
+    @param elem : element
+    @type  elem : lxml.htmlHtmlElement
+
+    @return : HTML snippet
+    @rtype  : str
+    
+    '''
+    from lxml import html
+    return html.tostring(elem, method='html')
+

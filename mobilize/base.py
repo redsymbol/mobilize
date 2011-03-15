@@ -243,20 +243,6 @@ def _regex(re_or_str):
         return re.compile(r'^' + re_or_str)
     return re_or_str
 
-def elem2str(elem):
-    '''
-    Render an HTML element as a string
-
-    @param elem : element
-    @type  elem : lxml.htmlHtmlElement
-
-    @return : HTML snippet
-    @rtype  : str
-    
-    '''
-    from lxml import html
-    return html.tostring(elem, method='xml').strip()
-
 def import_template(pagemodule, template_object='template'):
     '''
     Imports a mobilize template

@@ -192,7 +192,7 @@ class TestMobileSite(unittest.TestCase):
   <body>
     <div class="mwu-melem" id="mwu-melem-0">
       <div id="header">
-        <img src="/logo.png" alt="Acme"/>
+        <img src="/logo.png" alt="Acme">
         <h1>Acme Services</h1>
       </div>
     </div>

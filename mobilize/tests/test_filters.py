@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mobilize.base import elem2str
+from mobilize.common import elem2str
 from lxml import html
 from utils4test import normxml
 
@@ -46,7 +46,7 @@ class TestFilters(TestCase):
         from mobilize.filters import noimgsize
         testdata = [
             {'in'  : '''<div><img src="http://example.com/booger.png" width="1920" height="1280" alt=""/></div>''',
-             'out' :  '''<div><img src="http://example.com/booger.png" alt=""/></div>''',
+             'out' :  '''<div><img src="http://example.com/booger.png" alt=""></div>''',
              },
             ]
         for ii, td in enumerate(testdata):
@@ -64,8 +64,8 @@ class TestFilters(TestCase):
             {'in'  : '''<a href="#" id="makeHPLink" onClick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
              'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
              },
-            {'in'  : '''<img src="http://example.com/boo.gif" alt="boo!" onmouseover="alert('boo!');"/>''',
-             'out' : '''<img src="http://example.com/boo.gif" alt="boo!"/>''',
+            {'in'  : '''<img src="http://example.com/boo.gif" alt="boo!" onmouseover="alert('boo!');">''',
+             'out' : '''<img src="http://example.com/boo.gif" alt="boo!">''',
              },
             ]
         for ii, td in enumerate(testdata):
@@ -98,23 +98,23 @@ class TestFilters(TestCase):
 <embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
 </object></li></ul></div>''',
              'resized_str' : '''<div class="foobar"><ul><li><object width="280">
-<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
-<param name="allowFullScreen" value="true"/>
-<param name="allowscriptaccess" value="always"/>
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"/>
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
 </object></li></ul></div>''',
              },
             {'object_str' : '''<object width="800" height="344">
-<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
-<param name="allowFullScreen" value="true"/>
-<param name="allowscriptaccess" value="always"/>
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"></embed>
 </object>''',
              'resized_str' : '''<object width="280">
-<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
-<param name="allowFullScreen" value="true"/>
-<param name="allowscriptaccess" value="always"/>
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"/>
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
 </object>''',
              },
             {'object_str' : '''<OBJECT width="800" height="344">
@@ -124,10 +124,10 @@ class TestFilters(TestCase):
 <EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
 </OBJECT>''',
              'resized_str' : '''<object width="280">
-<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
-<param name="allowFullScreen" value="true"/>
-<param name="allowscriptaccess" value="always"/>
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"/>
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
 </object>''',
              },
             {'object_str' : '''<p>Nothing to see here.</p>''',

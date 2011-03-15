@@ -176,10 +176,8 @@ class Extracted(RefineClassBase):
         return newelem
         
     def html(self):
-        from lxml import html
         assert self.elem is not None, 'Must invoke self.extract() and self.process() before rendering to html'
-        return html.tostring(self.elem, method='xml').strip()
-
+        return common.elem2str(self.elem)
 
 class Unextracted(RefineClassBase):
     '''abstract base of all refinements that are independent of the source HTML page'''
