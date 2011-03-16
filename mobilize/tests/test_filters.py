@@ -139,6 +139,28 @@ class TestFilters(TestCase):
             resizeobject(object_elem)
             self.assertSequenceEqual(normxml(td['resized_str']), normxml(elem2str(object_elem)))
 
+    def test_resizeiframe(self):
+        from mobilize.filters import resizeiframe
+        testdata = [
+            {'iframe_str' : '''<p>
+<iframe width="533" height="330" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>
+</p>''',
+             'resized_str' : '''<p>
+<iframe width="280" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>
+</p>''',
+             },
+            {'iframe_str' : '''<iframe width="533" height="330" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>''',
+             'resized_str' : '''<iframe width="280" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>''',
+             },
+            {'iframe_str' : '''<p>Nothing to see here.</p>''',
+             'resized_str' : '''<p>Nothing to see here.</p>''',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            iframe_elem = html.fragment_fromstring(td['iframe_str'], create_parent=False)
+            resizeiframe(iframe_elem)
+            self.assertSequenceEqual(normxml(td['resized_str']), normxml(elem2str(iframe_elem)))
+
     def test_table2divs(self):
         testdata = [
             {'in_str' : '''<div><table>
