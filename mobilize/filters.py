@@ -93,6 +93,11 @@ def noimgsize(elem):
             if a in img_elem.attrib:
                 del img_elem.attrib[a]
 
+def _setwidth(elem, width):
+    if 'height' in elem.attrib:
+        del elem.attrib['height']
+    elem.attrib['width'] = str(width)
+
 def resizeobject(elem, width=280):
     '''
     Resize something embedded in an object tag to have a mobile-friendly width
@@ -108,16 +113,12 @@ def resizeobject(elem, width=280):
     ignored.  Best thing is probably to just find and operate on all
     of them.
     '''
-    def setwh(e):
-        if 'height' in e.attrib:
-            del e.attrib['height']
-        e.attrib['width'] = str(width)
     object_elem = findonetag(elem, 'object')
     if object_elem is not None:
-        setwh(object_elem)
+        _setwidth(object_elem, width)
         embed_elem = object_elem.find('.//embed')
         if embed_elem is not None:
-            setwh(embed_elem)
+            _setwidth(embed_elem, width)
 
 def table2divs(elem, omit_whitespace=True):
     '''
