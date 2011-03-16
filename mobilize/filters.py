@@ -120,6 +120,11 @@ def resizeobject(elem, width=280):
         if embed_elem is not None:
             _setwidth(embed_elem, width)
 
+def resizeiframe(elem, width=280):
+    iframe_elem = findonetag(elem, 'iframe')
+    if iframe_elem is not None:
+        _setwidth(iframe_elem, width)
+
 def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
