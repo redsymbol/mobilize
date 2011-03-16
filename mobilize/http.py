@@ -28,11 +28,12 @@ def get_request_headers(environ):
     
     '''
     from headers import get_request_xform
+    method = get_method(environ)
     headers = {}
     for key, val in environ.iteritems():
         if key.startswith('HTTP_'):
             httpname = _name2field(key)
-            xformer = get_request_xform(httpname.lower())
+            xformer = get_request_xform(httpname.lower(), method)
             val = xformer(environ, val)
             headers[httpname] = val
     return headers
@@ -156,6 +157,9 @@ def todesktop(environ, start_response, full_domain):
     start_response('302 Found', headers)
     return ['']
 
+def get_method(environ):
+    return environ['REQUEST_METHOD'].upper()
+
 def mk_wsgi_application(msite):
     '''
     Create the WSGI application
@@ -172,7 +176,7 @@ def mk_wsgi_application(msite):
         uri = environ['REQUEST_URI']
         if uri.startswith('/todesktop/'):
             return todesktop(environ, start_response, msite.fullsite)
-        method = environ['REQUEST_METHOD'].upper()
+        method = get_method(environ)
         environ['HTTP_ACCEPT_ENCODING'] = 'identity' # We need an uncompressed response
         req_body = None
         full_host, full_port = srchostport(environ)

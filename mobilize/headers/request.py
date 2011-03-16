@@ -10,6 +10,5 @@ def referer(environ, value):
 request_xforms = {
     'host'   : host,
     'cookie' : cookie,
-    'referer' : referer,
     }
 
