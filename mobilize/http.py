@@ -168,7 +168,6 @@ def mk_wsgi_application(msite):
     
     '''
     from httplib import HTTPConnection
-    #from mobilize.http import get_request_headers, get_response_headers, mobilizeable, srchostport
     def application(environ, start_response):
         uri = environ['REQUEST_URI']
         if uri.startswith('/todesktop/'):
