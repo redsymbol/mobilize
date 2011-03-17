@@ -354,10 +354,10 @@ def omit(elem, xpaths=None, csspaths=None):
     assert len(xpaths) > 0 or len(csspaths) > 0, 'You must specify at least one XPath or CSS path expression'
     for xpath in xpaths:
         for child in elem.xpath(xpath):
-            elem.remove(child)
+            child.drop_tree()
     for csspath in csspaths:
         sel = CSSSelector(csspath)
         for child in sel(elem):
-            elem.remove(child)
+            child.drop_tree()
     
         

@@ -395,8 +395,8 @@ here's some extra trailing text for you too
         for ii, td in enumerate(testdata):
             elem = html.fromstring(td['elem_str'])
             omit(elem, xpaths=td['xpaths'], csspaths=td['csspaths'])
-            expected = td['out_str']
-            actual = html.tostring(elem)
+            expected = normxml(td['out_str'])
+            actual = normxml(html.tostring(elem))
             self.assertSequenceEqual(expected, actual)
 
         # check that an arg is required
