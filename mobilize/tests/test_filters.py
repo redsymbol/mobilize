@@ -303,3 +303,105 @@ here's some extra trailing text for you too
             actual = elementempty(elem, ignore_whitespace)
             msg = 'e: %s, a: %s [%d]' % (expected, actual, ii)
             self.assertEqual(expected, actual, msg)
+
+    def test_omit(self):
+        from lxml import html
+        from mobilize.filters import omit
+        ELEMSTR1 = '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<p id="child2">Child Numero Dos</p>
+<div id="child3">Child Numero Tres</div>
+</div>
+'''
+        testdata = [
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['div#child1'],
+             'out_str' : '''<div class="foo">
+<p id="child2">Child Numero Dos</p>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['div#child2'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<p id="child2">Child Numero Dos</p>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['p#child2'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['p'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['p#child2', 'div#child3'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : None,
+             'csspaths' : ['div#child3', 'p#child2'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : ['./p'],
+             'csspaths' : None,
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : ['.//p'],
+             'csspaths' : None,
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+<div id="child3">Child Numero Tres</div>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : ['./div'],
+             'csspaths' : None,
+             'out_str' : '''<div class="foo">
+<p id="child2">Child Numero Dos</p>
+</div>''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'xpaths' : ['./p'],
+             'csspaths' : ['div#child3'],
+             'out_str' : '''<div class="foo">
+<div id="child1">Child Numero Uno</div>
+</div>''',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            elem = html.fromstring(td['elem_str'])
+            omit(elem, xpaths=td['xpaths'], csspaths=td['csspaths'])
+            expected = td['out_str']
+            actual = html.tostring(elem)
+            self.assertSequenceEqual(expected, actual)
+
+        # check that an arg is required
+        testelem = html.fromstring(ELEMSTR1)
+        #self.assertRaises(AssertionError, omit, testelem)
+        #self.assertRaises(AssertionError, omit, testelem, [], [])
+            
+            

@@ -324,3 +324,40 @@ COMMON_FILTERS = [
     noevents,
     nomiscattrib,
     ]
+
+def omit(elem, xpaths=None, csspaths=None):
+    '''
+    Omit child element(s), identified by XPath or CSS path
+
+    The elements identified will be removed if they exist in as a
+    child of the element.  If the do not exist, this filter will
+    silently do nothing.
+
+    xpaths and csspaths are each a list of 0 or more strings.  Each
+    string specifies a child element to omit, identified by their
+    xpath expression, or their css path, respectively.  If either
+    argument is unspecified, the default is an empty list.  You have
+    to supply at least one string between the two.
+
+    @param xpaths : XPath expressions defining elements to omit
+    @type  xpaths : list of str
+
+    @param csspaths : CSS path expressions defining elements to omit
+    @type  csspaths : list of str
+    
+    '''
+    from lxml.cssselect import CSSSelector
+    if xpaths is None:
+        xpaths = []
+    if csspaths is None:
+        csspaths = []
+    assert len(xpaths) > 0 or len(csspaths) > 0, 'You must specify at least one XPath or CSS path expression'
+    for xpath in xpaths:
+        for child in elem.xpath(xpath):
+            elem.remove(child)
+    for csspath in csspaths:
+        sel = CSSSelector(csspath)
+        for child in sel(elem):
+            elem.remove(child)
+    
+        
