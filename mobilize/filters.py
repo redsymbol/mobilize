@@ -280,17 +280,7 @@ def table2divs(elem, omit_whitespace=True):
                         rcmarker(row=rownum),
                         rcmarker(col=colnum),])
                 container_elem.append(cell_elem)
-        if elem == table_elem:
-            # Table is the root element, so we need to do a dance to replace it
-            table_elem.clear()
-            table_elem.tag = container_elem.tag
-            table_elem.text = container_elem.text
-            for k, v in container_elem.attrib.iteritems():
-                table_elem.attrib[k] = v
-            for child in container_elem:
-                table_elem.append(child)
-        else:
-            table_elem.getparent().replace(table_elem, container_elem)
+        replace_child(elem, table_elem, container_elem)
             
 def table2divrows(elem, omit_whitespace=True):
     '''
@@ -361,3 +351,156 @@ def omit(elem, xpaths=None, csspaths=None):
             child.drop_tree()
     
         
+def table2divgroups(elem, spec, omit_whitespace=True):
+    '''
+    Extract blocks arranged in a table grid as more semantic elements
+
+    Table based layouts sometimes lead to a grid of elements
+    semantically spanning some set of rows and columns.  This filter
+    helps extract them into a clearer semantic organization.
+
+    Let's try to make this concrete.  Consider this html:
+
+    <table>
+      <tbody>
+        <tr>
+          <td>CONTACT US</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        <tr>
+        <tr>
+          <td>123 Main Str</td>
+          <td>&nbsp;</td>
+          <td>OUR TEAM</td>
+          <td>&nbsp;</td>
+        <tr>
+        <tr>
+          <td>Springfield, IL</td>
+          <td>&nbsp;</td>
+          <td>Mike Smith</td>
+          <td><img src="/mike-smith.jpg"/></td>
+        <tr>
+        <tr>
+          <td>1-800-BUY-DUFF</td>
+          <td>&nbsp;</td>
+          <td>Jen Jones</td>
+          <td><img src="/jen-jones.jpg"/></td>
+        <tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Scruffy</td>
+          <td><img src="/scruffy-the-dog.jpg"/></td>
+        <tr>
+      </tbody>
+    </table>
+
+    Schematically, this would render as something like this (with ___
+    indicating a content-free TD cell):
+
+    CONTACT US       ___  ___         ___
+    123 Main Str     ___  OUR TEAM    ___
+    Springfield, IL  ___  Mike Smith  <img src="/mike-smith.jpg"/>
+    1-800-BUY-DUFF   ___  Jen Jones   <img src="/jen-jones.jpg"/>
+    ___              ___  Scruffy     <img src="/scruffy-the-dog.jpg"/>
+
+    There are two clear semantic elements here.  From a mobile design
+    perspective, it would be great to parse them more like this:
+    
+    <div class="mwu-melem-table2divgroups-group" id="mwu-melem-contact">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+    </div>
+
+    ... and:
+    
+    <div class="mwu-melem-table2divgroups-group" id="mwu-melem-ourteam">
+      <div>
+        <div>OUR TEAM</div>
+      </div>
+      <div>
+        <div>Mike Smith</div>
+        <div><img src="/mike-smith.jpg"/></div>
+      </div>
+      <div>
+        <div>Jen Jones</div>
+        <div><img src="/jen-jones.jpg"/></div>
+      </div>
+      <div>
+        <div>Scruffy</div>
+        <div><img src="/scruffy-the-dog.jpg"/></div>
+      </div>
+    </div>
+
+    That's exactly what this filter can do.
+
+    You'll need to specify what the semantic groups are, and how to
+    extract them from a grid.  The spec argument is a dictionary whose
+    keys are DOM ID names ('mwu-melem-contact' and
+    'mwu-melem-ourteam') above.  The value of each key is a tuple of
+    four integers, specifying the "rectangle" in the table grid to
+    extract:
+    
+      (tr_start, td_start, tr_end, td_end)
+
+    These integers are 0-based indices of the row and column.  So a
+    spec for the above would read:
+
+    spec = {
+      idname('contact') : (0, 0, 3, 0),
+      idname('ourteam') : (1, 2, 4, 3),
+    }
+
+    By default, any TD cells that would render as whitespace in the
+    browser are omitted. Set omit_whitespace=False if you don't want
+    these cells discarded.
+
+    If the extracted cells are one-dimensional (i.e. a single column
+    or row), the group will be a list of DIVs (as in the "contact us"
+    example). But if the cells extend over more than one row and
+    column in the source table, they will be organized in divs by row,
+    as in the "our team" example.
+
+    @param elem            : Element to operate on
+    @type  elem            : lxml.html.HtmlElement
+
+    @param spec            : Specification of what groups of cells to extract
+    @type  spec            : dict
+
+    @param omit_whitespace : Whether to omit cells just containing content that would render as whitespace in the browser
+    @type  omit_whitespace : bool
+    
+    '''
+    from lxml import html
+    table_elem = findonetag(elem, 'table')
+    if table_elem is not None:
+        groups_elem = html.HtmlElement()
+        groups_elem.tag = 'div'
+        groups_elem.attrib['class'] = 'mwu-melem-table2divgroups'
+
+        replace_child(elem, table_elem, groups_elem)
+        
+        
+def replace_child(parent, oldchild, newchild):
+    '''
+    swap out an element
+
+    This works even if parent and oldchild are the same element.
+    parent is modified in in place so that the oldchild element is
+    removed entirely, and newchild is put in its place.
+    
+    '''
+    if parent == oldchild:
+        # This is the root element, so we need to do a dance to replace it
+        oldchild.clear()
+        oldchild.tag = newchild.tag
+        oldchild.text = newchild.text
+        for k, v in newchild.attrib.iteritems():
+            oldchild.attrib[k] = v
+        for child in newchild:
+            oldchild.append(child)
+    else:
+        oldchild.getparent().replace(oldchild, newchild)

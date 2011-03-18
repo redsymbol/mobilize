@@ -403,3 +403,61 @@ here's some extra trailing text for you too
         testelem = html.fromstring(ELEMSTR1)
         self.assertRaises(AssertionError, omit, testelem)
         self.assertRaises(AssertionError, omit, testelem, [], [])
+            
+            
+    def test_table2divgroups(self):
+        ELEMSTR1 = '''<div id="some-container">
+<table>
+      <tbody>
+        <tr>
+          <td>CONTACT US</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        <tr>
+        <tr>
+          <td>123 Main Str</td>
+          <td>&nbsp;</td>
+          <td>OUR TEAM</td>
+          <td>&nbsp;</td>
+        <tr>
+        <tr>
+          <td>Springfield, IL</td>
+          <td>&nbsp;</td>
+          <td>Mike Smith</td>
+          <td><img src="/mike-smith.jpg"/></td>
+        <tr>
+        <tr>
+          <td>1-800-BUY-DUFF</td>
+          <td>&nbsp;</td>
+          <td>Jen Jones</td>
+          <td><img src="/jen-jones.jpg"/></td>
+        <tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Scruffy</td>
+          <td><img src="/scruffy-the-dog.jpg"/></td>
+        <tr>
+      </tbody>
+    </table>
+</div>
+'''
+        testdata = [
+            {'elem_str' : ELEMSTR1,
+             'spec' : {},
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+  </div>
+</div>
+''',
+             },
+            ]
+        from mobilize.filters import table2divgroups
+        for ii, td in enumerate(testdata):
+            elem = html.fromstring(td['elem_str'])
+            table2divgroups(elem, td['spec'])
+            expected = normxml(td['out_str'])
+            actual = normxml(elem2str(elem))
+            self.assertSequenceEqual(expected, actual)
