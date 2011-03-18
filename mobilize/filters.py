@@ -369,24 +369,20 @@ def table2divgroups(elem, spec, omit_whitespace=True):
           <td>&nbsp;</td>
           <td>&nbsp;</td>
         <tr>
-        <tr>
           <td>123 Main Str</td>
           <td>&nbsp;</td>
           <td>OUR TEAM</td>
           <td>&nbsp;</td>
-        <tr>
         <tr>
           <td>Springfield, IL</td>
           <td>&nbsp;</td>
           <td>Mike Smith</td>
           <td><img src="/mike-smith.jpg"/></td>
         <tr>
-        <tr>
           <td>1-800-BUY-DUFF</td>
           <td>&nbsp;</td>
           <td>Jen Jones</td>
           <td><img src="/jen-jones.jpg"/></td>
-        <tr>
         <tr>
           <td>&nbsp;</td>
           <td>&nbsp;</td>
@@ -487,7 +483,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
         rowstart, colstart, rowend, colend = coords
         for ii in xrange(rowstart, rowend+1):
             for jj in xrange(colstart, colend+1):
-                cell_elem = cells[(ii, jj)] # Note this is destructive to the original element.  If it proves problematic, may need to rely on copy.deepcopy() instead
+                cell_elem = copy.deepcopy(cells[(ii, jj)])
                 for k in cell_elem.attrib:
                     del cell_elem.attrib[k]
                 cell_elem.tag = 'div'

@@ -415,24 +415,20 @@ here's some extra trailing text for you too
           <td>&nbsp;</td>
           <td>&nbsp;</td>
         <tr>
-        <tr>
           <td>123 Main Str</td>
           <td>&nbsp;</td>
           <td>OUR TEAM</td>
           <td>&nbsp;</td>
-        <tr>
         <tr>
           <td>Springfield, IL</td>
           <td>&nbsp;</td>
           <td>Mike Smith</td>
           <td><img src="/mike-smith.jpg"/></td>
         <tr>
-        <tr>
           <td>1-800-BUY-DUFF</td>
           <td>&nbsp;</td>
           <td>Jen Jones</td>
           <td><img src="/jen-jones.jpg"/></td>
-        <tr>
         <tr>
           <td>&nbsp;</td>
           <td>&nbsp;</td>
@@ -460,6 +456,42 @@ here's some extra trailing text for you too
   <div class="mwu-melem-table2divgroups">
     <div class="mwu-melem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'spec' : {'idname1' : (0, 0, 3, 0)},
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'spec' : {
+                    'idname1' : (0, 0, 0, 0),
+                    'idname2' : (0, 0, 3, 0),
+                    },
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+    </div>
+    <div class="mwu-melem-table2divgroups-group" id="idname2">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
     </div>
   </div>
 </div>
