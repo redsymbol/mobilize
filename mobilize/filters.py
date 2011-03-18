@@ -518,7 +518,7 @@ def replace_child(parent, oldchild, newchild):
     swap out an element
 
     This works even if parent and oldchild are the same element.
-    parent is modified in in place so that the oldchild element is
+    parent is modified in place so that the oldchild element is
     removed entirely, and newchild is put in its place.
     
     '''
