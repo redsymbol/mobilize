@@ -168,6 +168,10 @@ class Extracted(RefineClassBase):
         newelem.tag = 'div'
         newelem.attrib['class'] = self.classvalue
         newelem.attrib['id'] = idname
+        newelem = common.htmlelem(attrib = {
+                'class' : self.classvalue,
+                'id'    : idname,
+                })
         if bool(self.style):
             newelem.attrib['style'] = self.style
         for elem in self.elems:

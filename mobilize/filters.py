@@ -18,7 +18,10 @@ A function conforms to the filter API if it:
 '''
 
 import re
-from common import findonetag
+from common import (
+    findonetag,
+    htmlelem,
+    )
 
 def noinlinestyles(elem):
     '''
@@ -250,9 +253,7 @@ def table2divs(elem, omit_whitespace=True):
         if col is not None:
             s += '-col%s' % col
         return s
-    container_elem = HtmlElement()
-    container_elem.tag = 'div'
-    container_elem.attrib['class'] = MARKER_BASE
+    container_elem = htmlelem(attrib={'class' : MARKER_BASE})
     if 'table' == elem.tag:
         table_elem = elem
     else:
@@ -269,9 +270,7 @@ def table2divs(elem, omit_whitespace=True):
             for colnum, tdelem in enumerate(cols):
                 if omit_whitespace and elementempty(tdelem):
                     continue # skip over this empty cell
-                cell_elem = HtmlElement()
-                cell_elem.tag = 'div'
-                cell_elem.text = tdelem.text
+                cell_elem = htmlelem(text=tdelem.text)
                 for colchild in tdelem:
                     anychildren = True
                     cell_elem.append(colchild)
@@ -476,10 +475,10 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     cells = _cell_lookup(table_elem)
     groups = []
     for groupid, coords in spec:
-        group_elem = html.HtmlElement()
-        group_elem.tag = 'div'
-        group_elem.attrib['class'] = "mwu-melem-table2divgroups-group"
-        group_elem.attrib['id'] = groupid
+        group_elem = htmlelem(attrib={
+                'class' : 'mwu-melem-table2divgroups-group',
+                'id'    : groupid,
+                })
         rowstart, colstart, rowend, colend = coords
         assert rowend >= rowstart
         assert colend >= colstart
@@ -496,8 +495,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
                 cell_elem.tag = 'div'
                 cell_elems.append(cell_elem)
             if wrap_rows:
-                append_elem = html.HtmlElement()
-                append_elem.tag = 'div'
+                append_elem = htmlelem()
                 group_elem.append(append_elem)
             else:
                 append_elem = group_elem # meaning, we'll just append the contents of cell_elem directly, not wrapping them in a div
@@ -506,9 +504,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
         if not elementempty(group_elem):
             groups.append(group_elem)
     if table_elem is not None:
-        groups_elem = html.HtmlElement()
-        groups_elem.tag = 'div'
-        groups_elem.attrib['class'] = 'mwu-melem-table2divgroups'
+        groups_elem = htmlelem(attrib={'class' : 'mwu-melem-table2divgroups'})
         for group_elem in groups:
             groups_elem.append(group_elem)
         replace_child(elem, table_elem, groups_elem)

@@ -1,3 +1,5 @@
+from lxml import html
+
 MWU_PREFIX = 'mwu-'
 ELEMENT_NAME = MWU_PREFIX + 'melem'
 
@@ -102,6 +104,43 @@ def elem2str(elem):
     @rtype  : str
     
     '''
-    from lxml import html
     return html.tostring(elem, method='html')
+
+def htmlelem(tag='div',
+             children=None,
+             attrib=None,
+             text=None,
+             ):
+    '''
+    Create a new HTML element
+
+    Every argument is optional, with sensible defaults.
+
+    @param tag      : The element's tag
+    @type  tag      : str
+
+    @param children : Children of the created element
+    @type  children : list of 0 or more HtmlElement instances
+
+    @param attrib   : Attributes of the created element (such as "class" and "id")
+    @type  attrib   : dict
+
+    @param text     : Child text
+    @type  text     : str
+
+    @return         : Created HTML element
+    @rtype          : lxml.html.HtmlElement
+    
+    '''
+    elem = html.HtmlElement()
+    elem.tag = tag
+    if children is not None:
+        for child in children:
+            elem.append(child)
+    if attrib is not None:
+        for k, v in attrib.iteritems():
+            elem.attrib[k] = v
+    if text is not None:
+        elem.text = text
+    return elem
 
