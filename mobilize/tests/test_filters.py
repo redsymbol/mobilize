@@ -401,7 +401,5 @@ here's some extra trailing text for you too
 
         # check that an arg is required
         testelem = html.fromstring(ELEMSTR1)
-        #self.assertRaises(AssertionError, omit, testelem)
-        #self.assertRaises(AssertionError, omit, testelem, [], [])
-            
-            
+        self.assertRaises(AssertionError, omit, testelem)
+        self.assertRaises(AssertionError, omit, testelem, [], [])
