@@ -434,21 +434,21 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     That's exactly what this filter can do.
 
     You'll need to specify what the semantic groups are, and how to
-    extract them from a grid.  The spec argument is a dictionary whose
-    keys are DOM ID names ('mwu-melem-contact' and
-    'mwu-melem-ourteam') above.  The value of each key is a tuple of
-    four integers, specifying the "rectangle" in the table grid to
-    extract:
+    extract them from a table grid.  The spec argument is a list of
+    (key, value) tuples.  The keys are DOM ID names
+    ('mwu-melem-contact' and 'mwu-melem-ourteam') above.  The value
+    for each key is a tuple of four integers, specifying the
+    "rectangle" in the table grid to extract:
     
       (tr_start, td_start, tr_end, td_end)
 
     These integers are 0-based indices of the row and column.  So a
     spec for the above would read:
 
-    spec = {
-      idname('contact') : (0, 0, 3, 0),
-      idname('ourteam') : (1, 2, 4, 3),
-    }
+    spec = [
+      (idname('contact'), (0, 0, 3, 0)),
+      (idname('ourteam'), (1, 2, 4, 3)),
+    ]
 
     By default, any TD cells that would render as whitespace in the
     browser are omitted. Set omit_whitespace=False if you don't want
@@ -464,7 +464,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     @type  elem            : lxml.html.HtmlElement
 
     @param spec            : Specification of what groups of cells to extract
-    @type  spec            : dict
+    @type  spec            : list of (key, value) tuples
 
     @param omit_whitespace : Whether to omit cells just containing content that would render as whitespace in the browser
     @type  omit_whitespace : bool
@@ -475,7 +475,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     table_elem = findonetag(elem, 'table')
     cells = _cell_lookup(table_elem)
     groups = []
-    for groupid, coords in spec.iteritems():
+    for groupid, coords in spec:
         group_elem = html.HtmlElement()
         group_elem.tag = 'div'
         group_elem.attrib['class'] = "mwu-melem-table2divgroups-group"

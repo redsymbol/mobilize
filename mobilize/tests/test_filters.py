@@ -441,7 +441,7 @@ here's some extra trailing text for you too
 '''
         testdata = [
             {'elem_str' : ELEMSTR1,
-             'spec' : {},
+             'spec' : [],
              'out_str' : '''
 <div id="some-container">
   <div class="mwu-melem-table2divgroups">
@@ -450,7 +450,9 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : {'idname1' : (0, 0, 0, 0)},
+             'spec' : [
+                    ('idname1', (0, 0, 0, 0)),
+                    ],
              'out_str' : '''
 <div id="some-container">
   <div class="mwu-melem-table2divgroups">
@@ -462,7 +464,9 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : {'idname1' : (0, 0, 3, 0)},
+             'spec' : [
+                    ('idname1', (0, 0, 3, 0)),
+                    ],
              'out_str' : '''
 <div id="some-container">
   <div class="mwu-melem-table2divgroups">
@@ -477,10 +481,10 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : {
-                    'idname1' : (0, 0, 0, 0),
-                    'idname2' : (0, 0, 3, 0),
-                    },
+             'spec' : [
+                    ('idname1', (0, 0, 0, 0)),
+                    ('idname2', (0, 0, 3, 0)),
+                    ],
              'out_str' : '''
 <div id="some-container">
   <div class="mwu-melem-table2divgroups">
@@ -492,6 +496,48 @@ here's some extra trailing text for you too
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
       <div>1-800-BUY-DUFF</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'spec' : [
+                    ('idname2', (0, 0, 3, 0)),
+                    ('idname1', (0, 0, 0, 0)),
+                    ],
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname2">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+    </div>
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'spec' : [
+                    ('idname2', (0, 0, 3, 0)),
+                    ('idname1', (0, 0, 0, 0)),
+                    ],
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname2">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+    </div>
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
     </div>
   </div>
 </div>
