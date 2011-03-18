@@ -474,16 +474,33 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     @type  omit_whitespace : bool
     
     '''
+    import copy
     from lxml import html
     table_elem = findonetag(elem, 'table')
+    cells = _cell_lookup(table_elem)
+    groups = []
+    for groupid, coords in spec.iteritems():
+        group_elem = html.HtmlElement()
+        group_elem.tag = 'div'
+        group_elem.attrib['class'] = "mwu-melem-table2divgroups-group"
+        group_elem.attrib['id'] = groupid
+        rowstart, colstart, rowend, colend = coords
+        for ii in xrange(rowstart, rowend+1):
+            for jj in xrange(colstart, colend+1):
+                cell_elem = cells[(ii, jj)] # Note this is destructive to the original element.  If it proves problematic, may need to rely on copy.deepcopy() instead
+                for k in cell_elem.attrib:
+                    del cell_elem.attrib[k]
+                cell_elem.tag = 'div'
+                group_elem.append(cell_elem)
+        groups.append(group_elem)
     if table_elem is not None:
         groups_elem = html.HtmlElement()
         groups_elem.tag = 'div'
         groups_elem.attrib['class'] = 'mwu-melem-table2divgroups'
-
+        for group_elem in groups:
+            groups_elem.append(group_elem)
         replace_child(elem, table_elem, groups_elem)
-        
-        
+
 def replace_child(parent, oldchild, newchild):
     '''
     swap out an element
@@ -504,3 +521,22 @@ def replace_child(parent, oldchild, newchild):
             oldchild.append(child)
     else:
         oldchild.getparent().replace(oldchild, newchild)
+
+def _cell_lookup(table_elem):
+    '''
+    Builds a lookup mapping of cells in an TABLE element
+
+    Returns a dictionary mapping zero-based (rownum, colnum) pairs to
+    TD HtmlElement instances.
+
+    TODOL This algorithm is O(num_rows*num_cols), in time and space, so it'd be good to substitute a more scaleable approach at some point
+
+    '''
+    cells = {}
+    assert 'table' == table_elem.tag, table_elem.tag
+    rownum, colnum = 0, 0
+    base_elem = table_elem.find('./tbody')
+    for rownum, row_elem in enumerate(base_elem.findall('./tr')):
+        for colnum, cell_elem in enumerate(row_elem.findall('./td')):
+            cells[(rownum, colnum)] = cell_elem
+    return cells

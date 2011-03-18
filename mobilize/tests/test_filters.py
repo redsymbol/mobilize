@@ -453,6 +453,18 @@ here's some extra trailing text for you too
 </div>
 ''',
              },
+            {'elem_str' : ELEMSTR1,
+             'spec' : {'idname1' : (0, 0, 0, 0)},
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+    </div>
+  </div>
+</div>
+''',
+             },
             ]
         from mobilize.filters import table2divgroups
         for ii, td in enumerate(testdata):
