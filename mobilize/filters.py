@@ -483,12 +483,16 @@ def table2divgroups(elem, spec, omit_whitespace=True):
         rowstart, colstart, rowend, colend = coords
         for ii in xrange(rowstart, rowend+1):
             for jj in xrange(colstart, colend+1):
-                cell_elem = copy.deepcopy(cells[(ii, jj)])
+                td_elem = cells[(ii, jj)]
+                if omit_whitespace and elementempty(td_elem):
+                    continue # skip over this empty cell
+                cell_elem = copy.deepcopy(td_elem)
                 for k in cell_elem.attrib:
                     del cell_elem.attrib[k]
                 cell_elem.tag = 'div'
                 group_elem.append(cell_elem)
-        groups.append(group_elem)
+        if not elementempty(group_elem):
+            groups.append(group_elem)
     if table_elem is not None:
         groups_elem = html.HtmlElement()
         groups_elem.tag = 'div'

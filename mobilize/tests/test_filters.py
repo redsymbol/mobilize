@@ -543,11 +543,48 @@ here's some extra trailing text for you too
 </div>
 ''',
              },
+            {'elem_str' : ELEMSTR1,
+             'spec' : [
+                    ('idname1', (0, 0, 4, 0)),
+                    ],
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'elem_str' : ELEMSTR1,
+             'omit_whitespace' : False,
+             'spec' : [
+                    ('idname1', (0, 0, 4, 0)),
+                    ],
+             'out_str' : '''
+<div id="some-container">
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div>CONTACT US</div>
+      <div>123 Main Str</div>
+      <div>Springfield, IL</div>
+      <div>1-800-BUY-DUFF</div>
+      <div>&#160;</div>
+    </div>
+  </div>
+</div>
+''',
+             },
             ]
         from mobilize.filters import table2divgroups
         for ii, td in enumerate(testdata):
+            omit_whitespace = td.get('omit_whitespace', True)
             elem = html.fromstring(td['elem_str'])
-            table2divgroups(elem, td['spec'])
+            table2divgroups(elem, td['spec'], omit_whitespace=omit_whitespace)
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)
