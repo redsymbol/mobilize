@@ -481,7 +481,11 @@ def table2divgroups(elem, spec, omit_whitespace=True):
         group_elem.attrib['class'] = "mwu-melem-table2divgroups-group"
         group_elem.attrib['id'] = groupid
         rowstart, colstart, rowend, colend = coords
+        assert rowend >= rowstart
+        assert colend >= colstart
+        wrap_rows = (colend > colstart) and (rowend > rowstart) # whether to wrap cells from the same TR tag in their own DIV
         for ii in xrange(rowstart, rowend+1):
+            cell_elems = []
             for jj in xrange(colstart, colend+1):
                 td_elem = cells[(ii, jj)]
                 if omit_whitespace and elementempty(td_elem):
@@ -490,7 +494,15 @@ def table2divgroups(elem, spec, omit_whitespace=True):
                 for k in cell_elem.attrib:
                     del cell_elem.attrib[k]
                 cell_elem.tag = 'div'
-                group_elem.append(cell_elem)
+                cell_elems.append(cell_elem)
+            if wrap_rows:
+                append_elem = html.HtmlElement()
+                append_elem.tag = 'div'
+                group_elem.append(append_elem)
+            else:
+                append_elem = group_elem # meaning, we'll just append the contents of cell_elem directly, not wrapping them in a div
+            for cell_elem in cell_elems:
+                append_elem.append(cell_elem)
         if not elementempty(group_elem):
             groups.append(group_elem)
     if table_elem is not None:
