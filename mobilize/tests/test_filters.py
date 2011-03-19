@@ -616,3 +616,46 @@ here's some extra trailing text for you too
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)
+
+    def test_noattribs(self):
+        ELEMSTR1 = '''<table width="600" style="color: fuscia;">
+<tr><td>one</td><td>two</td></tr>
+<tr><td>three</td><td>four</td></tr>
+</table>
+'''
+        ELEMSTR2 = '''<div>
+<table width="600" style="color: fuscia;">
+<tr><td>one</td><td>two</td></tr>
+<tr><td>three</td><td>four</td></tr>
+</table>
+</div>
+'''
+        testdata = [
+            {'in_str' : ELEMSTR1,
+             'tag' : 'table',
+             'attribs' : ['width', 'style'],
+             'out_str' : '''<table>
+<tr><td>one</td><td>two</td></tr>
+<tr><td>three</td><td>four</td></tr>
+</table>
+'''
+             },
+            {'in_str' : ELEMSTR2,
+             'tag' : 'table',
+             'attribs' : ['width', 'style'],
+             'out_str' : '''<div>
+<table>
+<tr><td>one</td><td>two</td></tr>
+<tr><td>three</td><td>four</td></tr>
+</table>
+</div>
+'''
+             },
+            ]
+        from mobilize.filters import noattribs
+        for ii, td in enumerate(testdata):
+            elem = html.fragment_fromstring(td['in_str'], create_parent=False)
+            noattribs(elem, td['tag'], td['attribs'])
+            expected = normxml(td['out_str'])
+            actual = normxml(elem2str(elem))
+            self.assertSequenceEqual(expected, actual)
