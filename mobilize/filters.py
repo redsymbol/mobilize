@@ -283,11 +283,7 @@ def table2divs(elem, omit_whitespace=True):
     else:
         table_elem = elem.find('table')
     if table_elem is not None:
-        tbody_elem = table_elem.find('tbody')
-        if tbody_elem is not None:
-            root_elem = tbody_elem
-        else:
-            root_elem = table_elem
+        root_elem = _rowsparent(table_elem)
         rows = root_elem.findall('./tr')
         for rownum, row in enumerate(rows):
             cols = row.findall('./td')
@@ -473,6 +469,8 @@ def table2divgroups(elem, spec, omit_whitespace=True):
       (idname('ourteam'), (1, 2, 4, 3)),
     ]
 
+    TODO: would like to be able to specify 'grab all cells in columns 0 and 2' without specifying the exact number of rows; makes for faster development, and a more robust filter if the desktop site adds or deletes rows.  Sanity probably requries a Spec class to encapsulate all the possibilities
+    
     By default, any TD cells that would render as whitespace in the
     browser are omitted. Set omit_whitespace=False if you don't want
     these cells discarded.
@@ -567,8 +565,32 @@ def _cell_lookup(table_elem):
     cells = {}
     assert 'table' == table_elem.tag, table_elem.tag
     rownum, colnum = 0, 0
-    base_elem = table_elem.find('./tbody')
+    base_elem = _rowsparent(table_elem)
     for rownum, row_elem in enumerate(base_elem.findall('./tr')):
         for colnum, cell_elem in enumerate(row_elem.findall('./td')):
             cells[(rownum, colnum)] = cell_elem
     return cells
+
+def _rowsparent(table_elem):
+    '''
+    Finds the content root of a table element, i.e. immediate parent of first TR tag
+    
+    This handles an ambiguitiy in real-world HTML, where TABLE tags
+    are supposed to contain a TBODY element, but often do not.  If the
+    table_elem directly contains the TR lists, then return table_elem.
+    If not, and these are contained by a tbody child, return that
+    element instead.
+
+    @param table_elem : Table element
+    @type  table_elem : HtmlElement
+
+    @return           : immediate parent of TR elements
+    @rtype            : HtmlElement
+    
+    '''
+    assert table_elem.tag == 'table', table_elem.tag
+    tbody_elem = table_elem.find('tbody')
+    if tbody_elem is not None:
+        return tbody_elem
+    return table_elem
+    
