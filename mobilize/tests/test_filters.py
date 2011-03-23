@@ -295,7 +295,7 @@ here's some extra trailing text for you too
              'isempty' : False,
              },
             ]
-        from mobilize.filters import elementempty
+        from mobilize.filters.tables import elementempty
         for ii, td in enumerate(testdata):
             elem = html.fromstring(td['in_str'])
             ignore_whitespace = td.get('ignore_whitespace', False)
