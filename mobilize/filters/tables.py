@@ -253,7 +253,9 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
         for ii in xrange(spec.rowstart, spec.rowend+1):
             cell_elems = []
             for jj in xrange(spec.colstart, spec.colend+1):
-                td_elem = cells[(ii, jj)]
+                td_elem = cells.get((ii, jj), None)
+                if td_elem is None: #TODO: unit test for this
+                    continue # Could be a colspan issue.  Just skip over to next found cell
                 if omit_whitespace and elementempty(td_elem):
                     continue # skip over this empty cell
                 cell_elem = copy.deepcopy(td_elem)
