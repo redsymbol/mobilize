@@ -406,6 +406,7 @@ here's some extra trailing text for you too
             
             
     def test_table2divgroups(self):
+        from mobilize.filters.tables import Spec
         ELEMSTR1 = '''<div id="some-container">
 <table>
       <tbody>
@@ -441,7 +442,7 @@ here's some extra trailing text for you too
 '''
         testdata = [
             {'elem_str' : ELEMSTR1,
-             'spec' : [],
+             'specmap' : [],
              'out_str' : '''
 <div id="some-container">
   <div class="mwu-melem-table2divgroups">
@@ -450,8 +451,8 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname1', (0, 0, 0, 0)),
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -464,8 +465,8 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname1', (0, 0, 3, 0)),
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 3, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -481,9 +482,9 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname1', (0, 0, 0, 0)),
-                    ('idname2', (0, 0, 3, 0)),
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 0, 0)),
+                    ('idname2', Spec(0, 0, 3, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -502,9 +503,9 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname2', (0, 0, 3, 0)),
-                    ('idname1', (0, 0, 0, 0)),
+             'specmap' : [
+                    ('idname2', Spec(0, 0, 3, 0)),
+                    ('idname1', Spec(0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -523,9 +524,9 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname2', (0, 0, 3, 0)),
-                    ('idname1', (0, 0, 0, 0)),
+             'specmap' : [
+                    ('idname2', Spec(0, 0, 3, 0)),
+                    ('idname1', Spec(0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -544,8 +545,8 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname1', (0, 0, 4, 0)),
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 4, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -562,8 +563,8 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'omit_whitespace' : False,
-             'spec' : [
-                    ('idname1', (0, 0, 4, 0)),
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 4, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -580,8 +581,8 @@ here's some extra trailing text for you too
 ''',
              },
             {'elem_str' : ELEMSTR1,
-             'spec' : [
-                    ('idname1', (1, 2, 4, 3)),
+             'specmap' : [
+                    ('idname1', Spec(1, 2, 4, 3)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -612,7 +613,7 @@ here's some extra trailing text for you too
         for ii, td in enumerate(testdata):
             omit_whitespace = td.get('omit_whitespace', True)
             elem = html.fromstring(td['elem_str'])
-            table2divgroups(elem, td['spec'], omit_whitespace=omit_whitespace)
+            table2divgroups(elem, td['specmap'], omit_whitespace=omit_whitespace)
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)

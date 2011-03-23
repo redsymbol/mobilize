@@ -11,6 +11,24 @@ from mobilize.common import (
 
 # Supporting code
 
+class Spec(object):
+    '''
+    A specification of tables cells
+
+    This is used by many of the table filters to define exactly which
+    table cells (TD elements) to operate on.
+    '''
+    def __init__(self,
+                 rowstart=None,
+                 colstart=None,
+                 rowend=None,
+                 colend=None,
+                 ):
+        self.rowstart = rowstart
+        self.colstart = colstart
+        self.rowend = rowend
+        self.colend = colend
+
 def replace_child(parent, oldchild, newchild):
     '''
     swap out an element
@@ -98,7 +116,7 @@ def elementempty(elem, ignore_whitespace = True):
 
 # Filters
 
-def table2divgroups(elem, spec, omit_whitespace=True):
+def table2divgroups(elem, specmap, omit_whitespace=True):
     '''
     Extract blocks arranged in a table grid as more semantic elements
 
@@ -181,7 +199,7 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     That's exactly what this filter can do.
 
     You'll need to specify what the semantic groups are, and how to
-    extract them from a table grid.  The spec argument is a list of
+    extract them from a table grid.  The specmap argument is a list of
     (key, value) tuples.  The keys are DOM ID names
     ('mwu-melem-contact' and 'mwu-melem-ourteam') above.  The value
     for each key is a tuple of four integers, specifying the
@@ -190,9 +208,9 @@ def table2divgroups(elem, spec, omit_whitespace=True):
       (tr_start, td_start, tr_end, td_end)
 
     These integers are 0-based indices of the row and column.  So a
-    spec for the above would read:
+    specmap for the above would read:
 
-    spec = [
+    specmap = [
       (idname('contact'), (0, 0, 3, 0)),
       (idname('ourteam'), (1, 2, 4, 3)),
     ]
@@ -212,8 +230,8 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     @param elem            : Element to operate on
     @type  elem            : lxml.html.HtmlElement
 
-    @param spec            : Specification of what groups of cells to extract
-    @type  spec            : list of (key, value) tuples
+    @param specmap            : Specification of what groups of cells to extract
+    @type  specmap            : list of (key, value) tuples
 
     @param omit_whitespace : Whether to omit cells just containing content that would render as whitespace in the browser
     @type  omit_whitespace : bool
@@ -224,18 +242,17 @@ def table2divgroups(elem, spec, omit_whitespace=True):
     table_elem = findonetag(elem, 'table')
     cells = cell_lookup(table_elem)
     groups = []
-    for groupid, coords in spec:
+    for groupid, spec in specmap:
         group_elem = htmlelem(attrib={
                 'class' : 'mwu-melem-table2divgroups-group',
                 'id'    : groupid,
                 })
-        rowstart, colstart, rowend, colend = coords
-        assert rowend >= rowstart
-        assert colend >= colstart
-        wrap_rows = (colend > colstart) and (rowend > rowstart) # whether to wrap cells from the same TR tag in their own DIV
-        for ii in xrange(rowstart, rowend+1):
+        assert spec.rowend >= spec.rowstart
+        assert spec.colend >= spec.colstart
+        wrap_rows = (spec.colend > spec.colstart) and (spec.rowend > spec.rowstart) # whether to wrap cells from the same TR tag in their own DIV
+        for ii in xrange(spec.rowstart, spec.rowend+1):
             cell_elems = []
-            for jj in xrange(colstart, colend+1):
+            for jj in xrange(spec.colstart, spec.colend+1):
                 td_elem = cells[(ii, jj)]
                 if omit_whitespace and elementempty(td_elem):
                     continue # skip over this empty cell
