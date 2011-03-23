@@ -1,3 +1,8 @@
+'''
+Filters that operate on tables
+
+'''
+
 import re
 from mobilize.common import (
     findonetag,
