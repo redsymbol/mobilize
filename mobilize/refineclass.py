@@ -3,6 +3,11 @@
 from mobilize.filters import COMMON_FILTERS
 from mobilize import common
 
+#: Indicates that filtering should be applied on every extracted element individually
+FILT_EACHELEM = 1
+#: Indicates that filtering should be done on the constructed final single element
+FILT_COLLAPSED = 2
+
 class RefineClassBase(object):
     '''abstract base of all refinement classes'''
     def html(self):
@@ -33,6 +38,7 @@ class Extracted(RefineClassBase):
                  classvalue=None,
                  idname=None,
                  style='',
+                 filtermode=FILT_EACHELEM,
                  ):
         '''
         ctor
@@ -52,13 +58,32 @@ class Extracted(RefineClassBase):
         functions. By default, filters.COMMON_FILTERS are set to be
         applied.  If you specify prefilters, that list is prepended to
         the default list; likewise, postfilters is appended to the
-        default.  If you specificy filters, that will *replace* the
+        default.  If you specify filters, that will *replace* the
         default.
 
-        If you use filters, you cannot specify prefilters or
-        postfilters.  You can use one or both of prefilters or
+        If you use the filters argument, you cannot specify prefilters
+        or postfilters.  You can use one or both of prefilters or
         postfilters, but then cannot use filters.  To specify that no
         filters are to be used at all, pass filters=[].
+
+        filtermode specifies the manner and timing in which filters
+        are applied to matching source elements.  In the process of
+        creating the final HTML used in the mobile web page, the first
+        step is fetching and extracting 0 or more elements from the
+        source page. If filtermode is FILT_EACHELEM, the filters are
+        then applied to each element individually before
+        proceeding. The next stage is to collapse these elements into
+        a single container div element.  If filtermode is
+        FILT_COLLAPSED, the filters are instead applied to this final
+        single element.
+
+        Note the significant complexity difference here: with N
+        filters and M elements matched from the source, the filter
+        application has complexity of no less than \Omega(N*M) with
+        filtermode FILT_EACHELEM, but complexity \Omega(M) for
+        FILT_COLLAPSED.
+
+        TODO: make FILT_COLLAPSED the default filtermode
 
         @param selector    : What part of the document to extract
         @type  selector    : str
@@ -80,6 +105,9 @@ class Extracted(RefineClassBase):
 
         @param style       : Value for "style" attribute for containing div
         @type  style       : str
+
+        @param filtermode  : Filter application mode
+        @type  filtermode  : int
         
         '''
         self.selector = selector
@@ -98,6 +126,7 @@ class Extracted(RefineClassBase):
         self.classvalue = classvalue
         self.idname = idname
         self.style = style
+        self.filtermode = filtermode
 
     def _extract(self, source):
         '''
@@ -159,23 +188,24 @@ class Extracted(RefineClassBase):
             idname = default_idname
         else:
             idname = self.idname
-        # apply common filters
-        for elem in self.elems:
-            for filt in self.filters:
-                filt(elem)
+        if self.filtermode == FILT_EACHELEM:
+            # applying filters to extracted elements individually
+            for elem in self.elems:
+                for filt in self.filters:
+                    filt(elem)
         # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = 'div'
-        newelem.attrib['class'] = self.classvalue
-        newelem.attrib['id'] = idname
-        newelem = common.htmlelem(attrib = {
-                'class' : self.classvalue,
-                'id'    : idname,
-                })
-        if bool(self.style):
-            newelem.attrib['style'] = self.style
         for elem in self.elems:
             newelem.append(elem)
+        if self.filtermode == FILT_COLLAPSED:
+            # applying filters to the single collapsed element
+            for filt in self.filters:
+                filt(newelem)
+        newelem.attrib['class'] = self.classvalue
+        newelem.attrib['id'] = idname
+        if bool(self.style):
+            newelem.attrib['style'] = self.style
         self.elem = newelem
         return newelem
         

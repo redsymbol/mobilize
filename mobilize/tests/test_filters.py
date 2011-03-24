@@ -731,3 +731,53 @@ here's some extra trailing text for you too
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)
+
+    def test_collapse(self):
+        '''
+        Test for collapsing filter application mode
+        '''
+        from mobilize.refineclass import (
+            XPath,
+            FILT_EACHELEM,
+            FILT_COLLAPSED,
+            )
+        def testfilter(elem):
+            if elem.tag == 'a':
+                elem.attrib['class'] = 'foo'
+            for ii, child in enumerate(elem):
+                if 'a' == child.tag:
+                    child.attrib['id'] = 'child-%d' % ii
+            
+        htmlstr1 = '''<a href="/">a</a>
+<a href="/">b</a>
+<a href="/">c</a>
+'''
+        nocollapse = XPath('//a', postfilters=[testfilter])
+        nocollapse.extract(html.fromstring(htmlstr1))
+        actual = nocollapse.process('idname')
+        actual_str = html.tostring(actual)
+        expected_str = '''<div class="mwu-melem" id="idname">
+<a href="/" class="foo">a</a>
+<a href="/" class="foo">b</a>
+<a href="/" class="foo">c</a>
+</div>
+'''
+        self.assertSequenceEqual(normxml(expected_str), normxml(actual_str))
+        
+        expected_str = '''<div id="idname">
+<a href="/">a</a>
+<a href="/">b</a>
+<a href="/">c</a>
+</div>
+'''
+        collapse = XPath('//a', postfilters=[testfilter], filtermode=FILT_COLLAPSED)
+        collapse.extract(html.fromstring(htmlstr1))
+        actual = collapse.process('idname')
+        actual_str = html.tostring(actual)
+        expected_str = '''<div class="mwu-melem" id="idname">
+<a href="/" id="child-0">a</a>
+<a href="/" id="child-1">b</a>
+<a href="/" id="child-2">c</a>
+</div>
+'''
+        self.assertSequenceEqual(normxml(expected_str), normxml(actual_str))
