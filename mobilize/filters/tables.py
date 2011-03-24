@@ -19,11 +19,13 @@ class Spec(object):
     table cells (TD elements) to operate on.
     '''
     def __init__(self,
+                 idname,
                  rowstart=None,
                  colstart=None,
                  rowend=None,
                  colend=None,
                  ):
+        self.idname = idname
         self.rowstart = rowstart
         self.colstart = colstart
         self.rowend = rowend
@@ -246,7 +248,8 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
     assert table_elem.tag == 'table', table_elem.tag
     cells = cell_lookup(table_elem)
     groups = []
-    for groupid, spec in specmap:
+    for spec in specmap:
+        groupid = spec.idname
         group_elem = htmlelem(attrib={
                 'class' : 'mwu-melem-table2divgroups-group',
                 'id'    : groupid,

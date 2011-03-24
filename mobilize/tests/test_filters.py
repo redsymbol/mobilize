@@ -1,4 +1,4 @@
-!from unittest import TestCase
+from unittest import TestCase
 from mobilize.common import elem2str
 from lxml import html
 from utils4test import normxml
@@ -452,7 +452,7 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname1', Spec(0, 0, 0, 0)),
+                    (Spec('idname1', 0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -466,7 +466,7 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname1', Spec(0, 0, 3, 0)),
+                    (Spec('idname1', 0, 0, 3, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -483,8 +483,8 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname1', Spec(0, 0, 0, 0)),
-                    ('idname2', Spec(0, 0, 3, 0)),
+                    (Spec('idname1', 0, 0, 0, 0)),
+                    (Spec('idname2', 0, 0, 3, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -504,8 +504,8 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname2', Spec(0, 0, 3, 0)),
-                    ('idname1', Spec(0, 0, 0, 0)),
+                    (Spec('idname2', 0, 0, 3, 0)),
+                    (Spec('idname1', 0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -525,8 +525,8 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname2', Spec(0, 0, 3, 0)),
-                    ('idname1', Spec(0, 0, 0, 0)),
+                    (Spec('idname2', 0, 0, 3, 0)),
+                    (Spec('idname1', 0, 0, 0, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -546,7 +546,7 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname1', Spec(0, 0, 4, 0)),
+                    (Spec('idname1', 0, 0, 4, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -564,7 +564,7 @@ here's some extra trailing text for you too
             {'elem_str' : ELEMSTR1,
              'omit_whitespace' : False,
              'specmap' : [
-                    ('idname1', Spec(0, 0, 4, 0)),
+                    (Spec('idname1', 0, 0, 4, 0)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -582,7 +582,7 @@ here's some extra trailing text for you too
              },
             {'elem_str' : ELEMSTR1,
              'specmap' : [
-                    ('idname1', Spec(1, 2, 4, 3)),
+                    (Spec('idname1', 1, 2, 4, 3)),
                     ],
              'out_str' : '''
 <div id="some-container">
@@ -620,7 +620,7 @@ here's some extra trailing text for you too
 </table>
 ''',
              'specmap' : [
-                    ('idname1', Spec(0, 0, 1, 1)),
+                    (Spec('idname1', 0, 0, 1, 1)),
                     ],
              'out_str' : '''
 <div>
