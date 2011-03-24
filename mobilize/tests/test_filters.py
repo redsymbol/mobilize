@@ -1,4 +1,4 @@
-from unittest import TestCase
+!from unittest import TestCase
 from mobilize.common import elem2str
 from lxml import html
 from utils4test import normxml
