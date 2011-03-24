@@ -237,9 +237,13 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     @type  omit_whitespace : bool
     
     '''
+    table_elem = findonetag(elem, 'table')
+    return _table2divgroups(elem, table_elem, specmap, omit_whitespace)
+
+def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
     import copy
     from lxml import html
-    table_elem = findonetag(elem, 'table')
+    assert table_elem.tag == 'table', table_elem.tag
     cells = cell_lookup(table_elem)
     groups = []
     for groupid, spec in specmap:
@@ -410,4 +414,28 @@ def table2divrows(elem, omit_whitespace=True):
     '''
     like table2divs, but rows are organized into their own divs
     '''
+
+def table2divgroupsgs(elem, specmapgen, omit_whitespace=True):
+    '''
+    Apply the table2divgroups filter with a dynamically generate a spec map
+
+    This filter is much like table2divgroups.  However, instead of
+    taking a explicit spec map argument, table2divgroupsgs takes a
+    callable that generates the spec map.  This callable, specmapgen,
+    accepts a table element as its single argument, and returns a spec
+    map.
+    
+    @param elem            : Element to operate on
+    @type  elem            : lxml.html.HtmlElement
+
+    @param specmapgen      : Callable that generates a spec map
+    @type  specmapgen      : function: HtmlElemnt -> type(specmap)
+
+    @param omit_whitespace : Whether to omit cells just containing content that would render as whitespace in the browser
+    @type  omit_whitespace : bool
+    
+    '''
+    table_elem = findonetag(elem, 'table')
+    specmap = specmapgen(table_elem)
+    return _table2divgroups(elem, table_elem, specmap, omit_whitespace)
 

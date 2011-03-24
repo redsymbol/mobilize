@@ -35,6 +35,7 @@ from .tables import (
     table2divrows,
     table2divs,
     table2divgroups,
+    table2divgroupsgs,
     Spec,
     )
 
