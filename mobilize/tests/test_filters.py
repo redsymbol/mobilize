@@ -608,6 +608,34 @@ here's some extra trailing text for you too
 </div>
 ''',
              },
+            
+            {'elem_str' : '''<div>
+<table>
+<tr><td colspan="3">a</td></tr>
+<tr>
+  <td>b</td>
+  <td>c</td>
+  <td>d</td>
+</tr>
+</table>
+''',
+             'specmap' : [
+                    ('idname1', Spec(0, 0, 1, 1)),
+                    ],
+             'out_str' : '''
+<div>
+  <div class="mwu-melem-table2divgroups">
+    <div class="mwu-melem-table2divgroups-group" id="idname1">
+      <div><div>a</div></div>
+      <div>
+        <div>b</div>
+        <div>c</div>
+      </div>
+    </div>
+  </div>
+</div>
+''',
+             },
             ]
         from mobilize.filters import table2divgroups
         for ii, td in enumerate(testdata):

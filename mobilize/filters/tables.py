@@ -258,7 +258,7 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
             cell_elems = []
             for jj in xrange(spec.colstart, spec.colend+1):
                 td_elem = cells.get((ii, jj), None)
-                if td_elem is None: #TODO: unit test for this
+                if td_elem is None:
                     continue # Could be a colspan issue.  Just skip over to next found cell
                 if omit_whitespace and elementempty(td_elem):
                     continue # skip over this empty cell
