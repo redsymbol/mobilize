@@ -247,12 +247,12 @@ def import_template(pagemodule, template_object='template'):
     '''
     Imports a mobilize template
 
-    pagemodule is the module name under msiteconf.moplates, i.e. there
+    pagemodule is the module name under msite.moplates, i.e. there
     should be an object named "template" in
-    msiteconf/moplates/${pagemodule}.py (or
-    msiteconf/moplates/${pagemodule}/__init__.py).
+    msite/moplates/${pagemodule}.py (or
+    msite/moplates/${pagemodule}/__init__.py).
 
-    @param pagemodule : Name of module under msiteconf.moplates
+    @param pagemodule : Name of module under msite.moplates
     @type  pagemodule : str
 
     @param template_object : Name of template object to import from module
@@ -265,7 +265,7 @@ def import_template(pagemodule, template_object='template'):
     
     '''
     import importlib
-    mod = importlib.import_module('.' + pagemodule, 'msiteconf.moplates')
+    mod = importlib.import_module('.' + pagemodule, 'msite.moplates')
     template = getattr(mod, template_object)
     assert isinstance(template, Template), type(template)
     return template
