@@ -24,6 +24,7 @@ from .remove import (
     noimgsize,
     noattribs,
     omit,
+    squeezebr,
     )
 
 from .resize import (

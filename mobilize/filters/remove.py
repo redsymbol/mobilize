@@ -142,3 +142,18 @@ def omit(elem, xpaths=None, csspaths=None):
         sel = CSSSelector(csspath)
         for child in sel(elem):
             child.drop_tree()
+
+def squeezebr(elem):
+    '''
+    Filter that collapses several sequential BR tags into a single BR tag
+
+    Anywhere within elem that 2 or more BR tags occur with only
+    whitespace separating them, they will be compressed to a single BR
+    tag.  This can be very useful with HTML that aggresively uses
+    break tags for layout.
+    '''
+    for br_elem in elem.findall('.//br'):
+        if br_elem.tail is None or '' == br_elem.tail.strip():
+            next = br_elem.getnext()
+            if next is not None and 'br' == next.tag:
+                br_elem.drop_tree()

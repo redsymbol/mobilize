@@ -688,3 +688,46 @@ here's some extra trailing text for you too
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)
+
+    def test_squeezebr(self):
+        from mobilize.filters import squeezebr
+        testdata = [
+            {'in_str' : '''<p>Hi.</p>''',
+             'out_str' : '''<p>Hi.</p>''',
+             },
+            {'in_str' : '''<p>Hi.<br>Hey.</p>''',
+             'out_str' : '''<p>Hi.<br>Hey.</p>''',
+             },
+            {'in_str' : '''<p>Hi.<br><br>Hey.</p>''',
+             'out_str' : '''<p>Hi.<br>Hey.</p>''',
+             },
+            {'in_str' : '''<p>Hi.<br/><br/><br/><br/><br/><br/><br/><br/><br/>Hey.</p>''',
+             'out_str' : '''<p>Hi.<br>Hey.</p>''',
+             },
+            {'in_str' : '''<div>
+<p>Hi.<br><br>Hey.</p>
+<p>This is some more text
+<br><br><br><br><br><img src="foo.png" alt="foo"/>
+</p>
+</div>''',
+             'out_str' : '''<div>
+<p>Hi.<br>Hey.</p>
+<p>This is some more text
+<br><img src="foo.png" alt="foo">
+</p>
+</div>
+''',
+             },
+            {'in_str' : '''<p>Hi.<br>    <br>Hey.</p>''',
+             'out_str' : '''<p>Hi.<br>Hey.</p>''',
+             },
+            {'in_str' : '''<p>Hi.<br>How.<br>Hey.</p>''',
+             'out_str' : '''<p>Hi.<br>How.<br>Hey.</p>''',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            elem = html.fragment_fromstring(td['in_str'], create_parent=False)
+            squeezebr(elem)
+            expected = normxml(td['out_str'])
+            actual = normxml(elem2str(elem))
+            self.assertSequenceEqual(expected, actual)
