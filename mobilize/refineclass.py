@@ -256,3 +256,42 @@ class RawString(Unextracted):
     def html(self):
         return self.rawstring
 
+class GoogleAnalytics(Extracted):
+    '''
+    Locates and extracts Google Analytics tracking code from desktop page
+
+    This refinement locates 
+    '''
+    def __init__(self, **kw):
+        assert 'selector' not in kw
+        if 'idname' not in kw:
+            kw['idname'] = common.idname('ga')
+        kw['selector'] = None
+        super(GoogleAnalytics, self).__init__(**kw)
+
+    def _extract(self, source):
+        '''
+        Current implementation is for older two-script-tag synchronous GA tracking
+        TODO: perceive modern single-script-tag, async GA tracking
+        TODO: any others we need to recognize?
+        '''
+        elems = []
+        candidates = []
+        skipone = False
+        for script_elem in source.iterfind('.//script'):
+            if skipone:
+                skipone = False
+                continue
+            next_elem = script_elem.getnext()
+            if next_elem is not None and 'script' == next_elem.tag:
+                candidates.append((script_elem, next_elem))
+                skipone = True
+        for script1, script2 in candidates:
+            if script1.text is not None and script1.text.lstrip().startswith('var gaJsHost'):
+                elems = [
+                    script1,
+                    script2,
+                    ]
+                break
+        return elems
+        

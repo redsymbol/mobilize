@@ -1,5 +1,5 @@
 import unittest
-from utils4test import data_file_path, DATA_DIR, normxml
+from utils4test import data_file_path, normxml
 from mobilize.refineclass import Extracted
 from lxml import html
 
@@ -12,6 +12,7 @@ class DirectExtracted(Extracted):
         return [source]
 
 class TestExtracted(unittest.TestCase):
+    maxDiff = 1024**2
     def test_process(self):
         testdata = [
             {'elem_str'    : '<p>Hello</p>',
@@ -102,7 +103,37 @@ class TestExtracted(unittest.TestCase):
         self.assertSequenceEqual(normxml(sourcestr), normxml(html.tostring(firstchild_elem)))
         # check the style attribute
         self.assertEqual(style, rendered.attrib['style'])
-        
-        
-        
+
+    def test_GoogleAnalytics(self):
+        from mobilize.refineclass import GoogleAnalytics
+        # Check positive case, where we expect to find the GA tracking code
+        doc_str = open(data_file_path('whole-html', 'luxwny.html')).read()
+        doc = html.fromstring(doc_str)
+        ga = GoogleAnalytics()
+        ga.extract(doc)
+        ga.process('nothing')
+        actual = normxml(ga.html())
+        expected = normxml('''<div class="mwu-melem" id="mwu-melem-ga">
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-7559570-4");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</div>
+''')
+        self.assertSequenceEqual(expected, actual)
+
+        # Check negative case where we expect to not find any code
+        doc_str = open(data_file_path('whole-html', 'cnn.html')).read()
+        doc = html.fromstring(doc_str)
+        noga = GoogleAnalytics()
+        noga.extract(doc)
+        noga.process('nothing')
+        actual = normxml(noga.html())
+        expected = normxml('''<div class="mwu-melem" id="mwu-melem-ga"></div>''')
+        self.assertSequenceEqual(expected, actual)
         
