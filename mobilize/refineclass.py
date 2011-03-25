@@ -276,22 +276,14 @@ class GoogleAnalytics(Extracted):
         TODO: any others we need to recognize?
         '''
         elems = []
-        candidates = []
-        skipone = False
         for script_elem in source.iterfind('.//script'):
-            if skipone:
-                skipone = False
-                continue
             next_elem = script_elem.getnext()
             if next_elem is not None and 'script' == next_elem.tag:
-                candidates.append((script_elem, next_elem))
-                skipone = True
-        for script1, script2 in candidates:
-            if script1.text is not None and script1.text.lstrip().startswith('var gaJsHost'):
-                elems = [
-                    script1,
-                    script2,
-                    ]
-                break
+                if script_elem.text is not None and script_elem.text.lstrip().startswith('var gaJsHost'):
+                    elems = [
+                        script_elem,
+                        next_elem,
+                        ]
+                    break
         return elems
         
