@@ -158,9 +158,10 @@ class Extracted(RefineClassBase):
         Relies on self._extract, which should be implemented by the subclass.
         
         '''
-        if self.usecopy:
-            source = copy.deepcopy(source)
         self.elems = self._extract(source)
+        if self.usecopy:
+            for ii, elem in enumerate(self.elems):
+                self.elems[ii] = copy.deepcopy(elem)
         return self.elems
 
     def process(self, default_idname):
