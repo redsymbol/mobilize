@@ -17,6 +17,9 @@ class Spec(object):
 
     This is used by many of the table filters to define exactly which
     table cells (TD elements) to operate on.
+
+    TODO: would like to be able to specify 'grab all cells in columns 0 and 2' without specifying the exact number of rows; makes for faster development, and a more robust filter if the desktop site adds or deletes rows
+    
     '''
     def __init__(self,
                  idname,
@@ -202,10 +205,12 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
 
     You'll need to specify what the semantic groups are, and how to
     extract them from a table grid.  The specmap argument is a list of
-    (key, value) tuples.  The keys are DOM ID names
-    ('mwu-melem-contact' and 'mwu-melem-ourteam') above.  The value
-    for each key is a tuple of four integers, specifying the
-    "rectangle" in the table grid to extract:
+    Spec instances.  Each spec object defines a square of cells, from
+    1 or more rows and 1 or more columns in the source table.  It also
+    defines a DOM ID name (equivalent to 'mwu-melem-contact' and
+    'mwu-melem-ourteam') above.  See the Spec class documentation for
+    more details, but briefly, one way to define a group of cells is
+    with these four numbers:
     
       (tr_start, td_start, tr_end, td_end)
 
@@ -213,12 +218,10 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     specmap for the above would read:
 
     specmap = [
-      (idname('contact'), (0, 0, 3, 0)),
-      (idname('ourteam'), (1, 2, 4, 3)),
+      Spec(idname('contact') 0, 0, 3, 0)),
+      Spec(idname('ourteam'), 1, 2, 4, 3)),
     ]
 
-    TODO: would like to be able to specify 'grab all cells in columns 0 and 2' without specifying the exact number of rows; makes for faster development, and a more robust filter if the desktop site adds or deletes rows.  Sanity probably requries a Spec class to encapsulate all the possibilities
-    
     By default, any TD cells that would render as whitespace in the
     browser are omitted. Set omit_whitespace=False if you don't want
     these cells discarded.
@@ -420,7 +423,7 @@ def table2divrows(elem, omit_whitespace=True):
 
 def table2divgroupsgs(elem, specmapgen, omit_whitespace=True):
     '''
-    Apply the table2divgroups filter with a dynamically generate a spec map
+    Apply the table2divgroups filter with a dynamically generated spec map
 
     This filter is much like table2divgroups.  However, instead of
     taking a explicit spec map argument, table2divgroupsgs takes a
