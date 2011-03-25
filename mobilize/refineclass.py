@@ -1,5 +1,7 @@
 # TODO: use abc
 
+import copy
+
 from mobilize.filters import COMMON_FILTERS
 from mobilize import common
 
@@ -39,6 +41,7 @@ class Extracted(RefineClassBase):
                  idname=None,
                  style='',
                  filtermode=FILT_EACHELEM,
+                 usecopy=False,
                  ):
         '''
         ctor
@@ -108,6 +111,9 @@ class Extracted(RefineClassBase):
 
         @param filtermode  : Filter application mode
         @type  filtermode  : int
+
+        @param usecopy     : Whether to operate on a copy of the source element
+        @type  usecopy     : bool
         
         '''
         self.selector = selector
@@ -127,6 +133,7 @@ class Extracted(RefineClassBase):
         self.idname = idname
         self.style = style
         self.filtermode = filtermode
+        self.usecopy = usecopy
 
     def _extract(self, source):
         '''
@@ -151,6 +158,8 @@ class Extracted(RefineClassBase):
         Relies on self._extract, which should be implemented by the subclass.
         
         '''
+        if self.usecopy:
+            source = copy.deepcopy(source)
         self.elems = self._extract(source)
         return self.elems
 
