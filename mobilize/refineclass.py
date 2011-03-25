@@ -277,9 +277,9 @@ class GoogleAnalytics(Extracted):
         '''
         elems = []
         for script_elem in source.iterfind('.//script'):
-            next_elem = script_elem.getnext()
-            if next_elem is not None and 'script' == next_elem.tag:
-                if script_elem.text is not None and script_elem.text.lstrip().startswith('var gaJsHost'):
+            if script_elem.text is not None and script_elem.text.lstrip().startswith('var gaJsHost'):
+                next_elem = script_elem.getnext()
+                if next_elem is not None and 'script' == next_elem.tag:
                     elems = [
                         script_elem,
                         next_elem,
