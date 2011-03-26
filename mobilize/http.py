@@ -180,6 +180,9 @@ def todesktop(environ, start_response, full_domain):
 def get_method(environ):
     return environ['REQUEST_METHOD'].upper()
 
+def get_uri(environ):
+    return environ['REQUEST_URI']
+
 def mk_wsgi_application(msite):
     '''
     Create the WSGI application
@@ -193,7 +196,7 @@ def mk_wsgi_application(msite):
     '''
     from httplib import HTTPConnection
     def application(environ, start_response):
-        uri = environ['REQUEST_URI']
+        uri = get_uri(environ)
         if uri.startswith('/todesktop/'):
             return todesktop(environ, start_response, msite.fullsite)
         method = get_method(environ)
@@ -213,7 +216,7 @@ def mk_wsgi_application(msite):
             start_response(status, resp.getheaders())
             return [src_resp_body]
         mobilized_body = str(msite.render_body(uri, src_resp_body))
-        overrides = msite.response_overrides()
+        overrides = msite.response_overrides(environ)
         overrides['content-length'] = str(len(mobilized_body))
         mobilized_resp_headers = get_response_headers(resp, environ, overrides)
         start_response(status, mobilized_resp_headers)
