@@ -38,7 +38,7 @@ def get_request_headers(environ):
             headers[httpname] = val
     return headers
 
-def get_response_headers(resp, environ, overrides=None):
+def get_response_headers(resp, environ, overrides):
     '''
     @param resp    : Response from target server
     @type  resp    :
@@ -51,12 +51,15 @@ def get_response_headers(resp, environ, overrides=None):
     
     '''
     from headers import get_response_xform
-    if not overrides:
-        overrides = {}
     def hv(pair):
         header, value = pair
         if header in overrides:
-            respheader = (header, overrides[header])
+            override = overrides[header]
+            if callable(override):
+                newvalue = override(value)
+            else:
+                newvalue = override
+            respheader = (header, newvalue)
         else:
             xformer = get_response_xform(header.lower())
             value = xformer(environ, value)
@@ -193,7 +196,9 @@ def mk_wsgi_application(msite):
             start_response(status, resp.getheaders())
             return [src_resp_body]
         mobilized_body = str(msite.render_body(uri, src_resp_body))
-        mobilized_resp_headers = get_response_headers(resp, environ, {'content-length' : str(len(mobilized_body))})
+        overrides = msite.response_overrides()
+        overrides['content-length'] = str(len(mobilized_body))
+        mobilized_resp_headers = get_response_headers(resp, environ, overrides)
         start_response(status, mobilized_resp_headers)
         return [mobilized_body]
     return application

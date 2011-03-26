@@ -63,6 +63,9 @@ class MobileSite(object):
             matched = False
         return matched
 
+    def response_overrides(self):
+        return {}
+
 class Template(object):
     '''
     A mobile web page template (abstract base class)
