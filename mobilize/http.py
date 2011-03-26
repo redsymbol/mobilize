@@ -40,11 +40,28 @@ def get_request_headers(environ):
 
 def get_response_headers(resp, environ, overrides):
     '''
+    Fetch and calculate the mobile response headers
+
+    Overrides is a dictionary mapping response header names
+    (lowercase) to what's called an "override". An override is either
+    a static value, or a callable that accepts one argument.
+
+    If the override is a callable, it is invoked on the header's
+    existing value; the returned is then used as the new value for the
+    header.  This assumes this header already has a value in the
+    response.
+
+    Otherwise, the header is simply set to the override, as a value.
+    If the header wasn't defined before, this creates it.
+    
     @param resp    : Response from target server
     @type  resp    :
 
     @param environ : WSGI environment
     @type  environ : dict
+
+    @param overrides : Additional response transformations
+    @type  overrides : dict: str -> mixed
 
     @return        : transformed response headers
     @rtype         : list of (header, value) tuples
