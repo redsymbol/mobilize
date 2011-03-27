@@ -97,11 +97,11 @@ class TestFilters(TestCase):
 <param name="allowscriptaccess" value="always"/>
 <embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
 </object></li></ul></div>''',
-             'resized_str' : '''<div class="foobar"><ul><li><object width="280">
+             'resized_str' : '''<div class="foobar"><ul><li><object width="280" height="120">
 <param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
 <param name="allowFullScreen" value="true">
 <param name="allowscriptaccess" value="always">
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280" height="120"></embed>
 </object></li></ul></div>''',
              },
             {'object_str' : '''<object width="800" height="344">
@@ -110,11 +110,11 @@ class TestFilters(TestCase):
 <param name="allowscriptaccess" value="always">
 <embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"></embed>
 </object>''',
-             'resized_str' : '''<object width="280">
+             'resized_str' : '''<object width="280" height="120">
 <param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
 <param name="allowFullScreen" value="true">
 <param name="allowscriptaccess" value="always">
-<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280" height="120"></embed>
 </object>''',
              },
             {'object_str' : '''<OBJECT width="800" height="344">
@@ -122,6 +122,46 @@ class TestFilters(TestCase):
 <param name="allowFullScreen" value="true"/>
 <param name="allowscriptaccess" value="always"/>
 <EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="344"/>
+</OBJECT>''',
+             'resized_str' : '''<object width="280" height="120">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280" height="120"></embed>
+</object>''',
+             },
+            # If not height defined, or otherwise can't calculate aspect ratio, just ignore that attribute
+            {'object_str' : '''<OBJECT width="800">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
+<param name="allowFullScreen" value="true"/>
+<param name="allowscriptaccess" value="always"/>
+<EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800"/>
+</OBJECT>''',
+             'resized_str' : '''<object width="280">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
+</object>''',
+             },
+            {'object_str' : '''<OBJECT>
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
+<param name="allowFullScreen" value="true"/>
+<param name="allowscriptaccess" value="always"/>
+<EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true"/>
+</OBJECT>''',
+             'resized_str' : '''<object width="280">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
+<param name="allowFullScreen" value="true">
+<param name="allowscriptaccess" value="always">
+<embed src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="280"></embed>
+</object>''',
+             },
+            {'object_str' : '''<OBJECT width="800" height="beer">
+<param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US"/>
+<param name="allowFullScreen" value="true"/>
+<param name="allowscriptaccess" value="always"/>
+<EMBED src="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="800" height="beer"/>
 </OBJECT>''',
              'resized_str' : '''<object width="280">
 <param name="movie" value="http://www.youtube.com/v/fJ8FGIQG8gM?fs=1&amp;hl=en_US">
@@ -146,11 +186,11 @@ class TestFilters(TestCase):
 <iframe width="533" height="330" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>
 </p>''',
              'resized_str' : '''<p>
-<iframe width="280" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>
+<iframe width="280" height="173" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>
 </p>''',
              },
             {'iframe_str' : '''<iframe width="533" height="330" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>''',
-             'resized_str' : '''<iframe width="280" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>''',
+             'resized_str' : '''<iframe width="280" height="173" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/HE6uqPPrVfo" title="YouTube video player"></iframe>''',
              },
             {'iframe_str' : '''<p>Nothing to see here.</p>''',
              'resized_str' : '''<p>Nothing to see here.</p>''',
