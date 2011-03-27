@@ -46,35 +46,35 @@ def norm_html(s):
 from mobilize.dj import init_django
 init_django([TEMPLATE_DIR])
 
-class TestTemplate(unittest.TestCase):
+class TestMoplate(unittest.TestCase):
     def test_render(self):
         from mobilize.dj import DjangoMoplate
-        template = DjangoMoplate('a.html', [])
+        moplate = DjangoMoplate('a.html', [])
         expected = 'abc xyz'
-        actual = template.render(MINIMAL_HTML_DOCUMENT)
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
 
-        template = DjangoMoplate('b.html', [], {'a' : 42})
+        moplate = DjangoMoplate('b.html', [], {'a' : 42})
         expected = 'a: 42'
-        actual = template.render(MINIMAL_HTML_DOCUMENT)
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
 
         params = {
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        template = DjangoMoplate('c.html', [], params)
+        moplate = DjangoMoplate('c.html', [], params)
         expected = 'a: 42\nX\nY\nZ\n'
-        actual = template.render(MINIMAL_HTML_DOCUMENT)
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
 
         params = {
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        template = DjangoMoplate('c.html', [], params)
+        moplate = DjangoMoplate('c.html', [], params)
         expected = 'a: 84\nX\nY\nZ\n'
-        actual = template.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
 
         # override params with extra_params
@@ -82,9 +82,9 @@ class TestTemplate(unittest.TestCase):
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        template = DjangoMoplate('c.html', [], params)
+        moplate = DjangoMoplate('c.html', [], params)
         expected = 'a: 84\nX\nY\nZ\n'
-        actual = template.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
 
         # add in extra_params (no clobbering)
@@ -93,23 +93,23 @@ class TestTemplate(unittest.TestCase):
             'b' : 21,
             'elems' : ['X', 'Y', 'Z'],
             }
-        template = DjangoMoplate('c.html', [], params)
+        moplate = DjangoMoplate('c.html', [], params)
         expected = 'a: 84\nX\nY\nZ\nb: 21'
-        actual = template.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
 
     def test_params(self):
         from mobilize.dj import DjangoMoplate
-        # Expect the mobilize.Template ctor to loudly fail if we try to pass in controlled parameters
+        # Expect the mobilize.Moplate ctor to loudly fail if we try to pass in controlled parameters
         ok = False
         try:
-            template = DjangoMoplate('a.html', [], {'elements' : ['a', 'b']} )
+            moplate = DjangoMoplate('a.html', [], {'elements' : ['a', 'b']} )
         except AssertionError:
             ok = True
         self.assertTrue(ok)
 
-class TestTemplateMap(unittest.TestCase):
-    def test_get_template_for(self):
+class TestMoplateMap(unittest.TestCase):
+    def test_get_moplate_for(self):
         from mobilize.exceptions import NoMatchingTemplateException
         from mobilize import DjangoMoplate
         # test templates
@@ -124,10 +124,10 @@ class TestTemplateMap(unittest.TestCase):
             (r'/beta/',     t_c),
             (r'/\w+$',      t_d),
             ]
-        tmap = mobilize.TemplateMap(mapping)
+        tmap = mobilize.MoplateMap(mapping)
         def matching(url):
-            # the name of the template actually matched
-            t = tmap.get_template_for(url)
+            # the name of the moplate actually matched
+            t = tmap.get_moplate_for(url)
             return t.template_name
 
         self.assertEqual('a.html', matching('/alpha/'))
@@ -143,14 +143,14 @@ class TestMobileSite(unittest.TestCase):
         mapping = [
             (r'/alpha/$',    t_a),
             ]
-        tmap = mobilize.TemplateMap(mapping)
+        tmap = mobilize.MoplateMap(mapping)
         msite = mobilize.MobileSite('example.com', tmap)
         self.assertTrue(msite.has_match('/alpha/'))
         self.assertFalse(msite.has_match('/beta/'))
 
     def test_has_match(self):
         full_body = 'veggies are good for you<br/>' * 5
-        msite = mobilize.MobileSite('example.com', mobilize.TemplateMap([]))
+        msite = mobilize.MobileSite('example.com', mobilize.MoplateMap([]))
         rendered = msite.render_body('/someurl', full_body)
         
     def test_render(self):
@@ -229,8 +229,8 @@ class TestMobileSite(unittest.TestCase):
         params = {
             'title' : '<Mobile Test One>',
             }
-        template = DjangoMoplate('one.html', selectors, params)
-        tmap = mobilize.TemplateMap([('/foo$', template)])
+        moplate = DjangoMoplate('one.html', selectors, params)
+        tmap = mobilize.MoplateMap([('/foo$', moplate)])
         msite = mobilize.MobileSite('example.com', tmap)
 
         expected = mobile_body

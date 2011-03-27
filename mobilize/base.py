@@ -9,26 +9,26 @@ class MobileSite(object):
 
     '''
     
-    def __init__(self, fullsite, template_map):
+    def __init__(self, fullsite, moplate_map):
         '''
         ctor
         
         @param fullsite     : domain of corresponding full (desktop) website
         @type  fullsite     : str
 
-        @param template_map : Template mapper
-        @type  template_map : TemplateMap
+        @param moplate_map : Moplate mapper
+        @type  moplate_map : MoplateMap
         
         '''
         self.fullsite = fullsite
-        self.template_map = template_map
+        self.moplate_map = moplate_map
     
     def render_body(self, url, full_body):
         '''
         Render the mobile page's body
 
-        If no mobile template exists for the URL, pass the body
-        through unmodified.
+        If no moplate exists for the URL, pass the body through
+        unmodified.
 
         @param url       : relative URL on the mobile site
         @type  url       : str
@@ -46,7 +46,7 @@ class MobileSite(object):
             'request_path' : url,
             }
         try:
-            template = self.template_map.get_template_for(url)
+            template = self.moplate_map.get_moplate_for(url)
             rendered = template.render(full_body, extra_params)
         except exceptions.NoMatchingTemplateException:
             rendered = full_body
@@ -58,7 +58,7 @@ class MobileSite(object):
         '''
         matched = True
         try:
-            template = self.template_map.get_template_for(url)
+            template = self.moplate_map.get_moplate_for(url)
         except exceptions.NoMatchingTemplateException:
             matched = False
         return matched
@@ -204,7 +204,7 @@ class Moplate(object):
         '''
         return self.params
 
-class TemplateMap(object):
+class MoplateMap(object):
     '''
     Represents a mapping between pages (URLs) and their mobile
     templates
@@ -249,7 +249,7 @@ class TemplateMap(object):
         for k, v in mapping:
             self._mapping[_regex(k)] = find_template(v)
 
-    def get_template_for(self, url):
+    def get_moplate_for(self, url):
         '''
         XXX
         Get template for a given URL
@@ -318,7 +318,7 @@ def find_template(arg):
 
     arg is some piece of data that specifies a mobile template, in one
     of a number of different ways.  See the documentation of
-    TemplateMap.__init__ for details.  This function essentially
+    MoplateMap.__init__ for details.  This function essentially
     handles the template resolution process described there.
 
     @param arg : Some data that specifies a template to import
