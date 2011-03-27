@@ -46,22 +46,22 @@ class MobileSite(object):
             'request_path' : url,
             }
         try:
-            template = self.moplate_map.get_moplate_for(url)
-            rendered = template.render(full_body, extra_params)
+            moplate = self.moplate_map.get_moplate_for(url)
+            rendered = moplate.render(full_body, extra_params)
         except exceptions.NoMatchingMoplateException:
             rendered = full_body
         return rendered
 
     def has_match(self, url):
         '''
-        Indicate whether there is a template matching this URL.
+        Indicate whether there is a moplate matching this URL.
         '''
-        matched = True
+        moplate = None
         try:
-            template = self.moplate_map.get_moplate_for(url)
+            moplate = self.moplate_map.get_moplate_for(url)
         except exceptions.NoMatchingMoplateException:
-            matched = False
-        return matched
+            pass
+        return moplate is not None
 
     def request_overrides(self, wsgienviron):
         '''
@@ -105,11 +105,11 @@ class MobileSite(object):
 
 class Moplate(object):
     '''
-    A mobile webpage template with magical powers
+    A kind of mobile webpage template with magical powers
 
     A moplate represents a transformation, from a source (desktop
     page's) body, to the body of the corresponding mobile page.
-    Typically the template can be applied to a group of pages with
+    Typically the moplate can be applied to a group of pages with
     similar DOM structure.
 
     The selectors is an ordered list of objects - strings, or
@@ -134,7 +134,7 @@ class Moplate(object):
         @param selectors     : Selectors of content elements to extract from full body
         @type  selectors     : list
         
-        @param params        : Other template parameters
+        @param params        : Other template rendering parameters
         @type  params        : dict (str -> mixed)
         
         '''
@@ -144,11 +144,11 @@ class Moplate(object):
             self.params = dict(params)
         else:
             self.params = {}
-        assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Template class documention'
+        assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
 
     def render(self, full_body, extra_params=None):
         '''
-        Render the template for a particular HTML document body
+        Render the moplate for a particular HTML document body
 
         extra_params is a dictionary of extra parameters for just this
         rendering, which can be used to override any of the default
@@ -214,7 +214,7 @@ class MoplateMap(object):
         ctor
 
         The mapping object is a list of tuples, each representing a
-        possible template match.  The order matters; templates will
+        possible moplate match.  The order matters; moplates will
         match the first URL in the list.
 
         Each element of the mapping list is a (key, value) 2-tuple.
@@ -223,20 +223,20 @@ class MoplateMap(object):
         converted to a Python regex object, after prepending with
         start-of-line match (i.e. the "^" character).
 
-        TEMPLATE RESOLUTION
+        MOPLATE RESOLUTION
         
-        The values of the mapping object specify a mobilize template.
-        This can be either:
+        The values of the mapping object specify moplates.
+        Each can be either:
           1) a Moplate instance
           2) a string
           3) a tuple of two strings
 
-        If a string, this is assumed to be an template module that has
-        a 'template' attribute.
+        If a string, this is assumed to be a module that has a
+        'moplate' attribute.
 
-        If a tuple of two strings, this is assumed to be an template
-        module (first string) that has a attribute (second string)
-        that is the template to import.
+        If a tuple of two strings, this is assumed to be a module
+        (first string) that has a attribute (second string) that is
+        the moplate to import.
 
         The mechanics of this resolution are handled with the
         find_moplate and import_moplate functions in this module.
@@ -251,7 +251,6 @@ class MoplateMap(object):
 
     def get_moplate_for(self, url):
         '''
-        XXX
         Get moplate for a given URL
 
         @param url : Relative URL to check
@@ -263,10 +262,10 @@ class MoplateMap(object):
         @raises exceptions.NoMatchingMoplateException : No matching template found
 
         '''
-        for pattern, template in self._mapping.iteritems():
+        for pattern, moplate in self._mapping.iteritems():
             if pattern.search(url):
-                return template
-        raise exceptions.NoMatchingMoplateException('no template match found for %s' % url)
+                return moplate
+        raise exceptions.NoMatchingMoplateException('no moplate match found for %s' % url)
 
 def _regex(re_or_str):
     '''
@@ -284,46 +283,50 @@ def _regex(re_or_str):
         return re.compile(r'^' + re_or_str)
     return re_or_str
 
-def import_moplate(pagemodule, template_object='template'):
+def import_moplate(pagemodule, moplate_object='moplate'):
     '''
     Imports a moplate
 
     pagemodule is the module name under msite.moplates, i.e. there
-    should be an object whose name is the value of template_object in
+    should be an object whose name is the value of moplate_object in
     msite/moplates/${pagemodule}.py (or
     msite/moplates/${pagemodule}/__init__.py).
 
-    @param pagemodule : Name of module under msite.moplates
-    @type  pagemodule : str
+    For example, if pagemodule is "contact", there could be a file
+    named msite/moplates/contact.py containing an object named
+    "moplate", which is a Moplate instance.
 
-    @param template_object : Name of template object to import from module
-    @type  template_object : str
+    @param pagemodule     : Name of module under msite.moplates
+    @type  pagemodule     : str
 
-    @return : Moplate
-    @rtype  : mobilize.Moplate
+    @param moplate_object : Name of template object to import from module
+    @type  moplate_object : str
+
+    @return               : Moplate
+    @rtype                : mobilize.Moplate
 
     @raise ImportError: page module not found
     
     '''
     import importlib
     mod = importlib.import_module('.' + pagemodule, 'msite.moplates')
-    template = getattr(mod, template_object)
-    assert isinstance(template, Moplate), type(template)
-    return template
+    moplate = getattr(mod, moplate_object)
+    assert isinstance(moplate, Moplate), type(moplate)
+    return moplate
 
 def find_moplate(arg):
     '''
-    Find a mobile template
+    Find a mobile moplate
 
-    arg is some piece of data that specifies a mobile template, in one
-    of a number of different ways.  See the documentation of
+    arg is some piece of data that specifies a moplate, in one of a
+    number of different ways.  See the documentation of
     MoplateMap.__init__ for details.  This function essentially
-    handles the template resolution process described there.
+    handles the resolution process described there.
 
-    @param arg : Some data that specifies a template to import
+    @param arg : Some data that specifies a moplate to import
     @type  arg : mixed
 
-    @return    : mobilize template
+    @return    : moplate
     @rtype     : mobilize.Moplate
     
     '''
