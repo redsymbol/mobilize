@@ -159,3 +159,24 @@ def fullsiteurl(mobileurl, mobiledomain, fullsitedomain):
         s += '?'
     s += 'mredir=0'
     return s
+
+def replace_child(parent, oldchild, newchild):
+    '''
+    swap out an element
+
+    This works even if parent and oldchild are the same element.
+    parent is modified in place so that the oldchild element is
+    removed entirely, and newchild is put in its place.
+    
+    '''
+    if parent == oldchild:
+        # This is the root element, so we need to do a dance to replace it
+        oldchild.clear()
+        oldchild.tag = newchild.tag
+        oldchild.text = newchild.text
+        for k, v in newchild.attrib.iteritems():
+            oldchild.attrib[k] = v
+        for child in newchild:
+            oldchild.append(child)
+    else:
+        oldchild.getparent().replace(oldchild, newchild)

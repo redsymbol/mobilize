@@ -7,6 +7,7 @@ import re
 from mobilize.common import (
     findonetag,
     htmlelem,
+    replace_child,
     )
 
 # Supporting code
@@ -18,6 +19,11 @@ class Spec(object):
     This is used by many of the table filters to define exactly which
     table cells (TD elements) to operate on.
 
+    If defined, the function lastfilter is applied to the extracted
+    element before it is packed into a div.  lastfilter is a function
+    that takes one argument - an HtmlElement instance - and modifies
+    it in place.
+
     TODO: would like to be able to specify 'grab all cells in columns 0 and 2' without specifying the exact number of rows; makes for faster development, and a more robust filter if the desktop site adds or deletes rows
     
     '''
@@ -27,33 +33,14 @@ class Spec(object):
                  colstart=None,
                  rowend=None,
                  colend=None,
+                 lastfilter=None,
                  ):
         self.idname = idname
         self.rowstart = rowstart
         self.colstart = colstart
         self.rowend = rowend
         self.colend = colend
-
-def replace_child(parent, oldchild, newchild):
-    '''
-    swap out an element
-
-    This works even if parent and oldchild are the same element.
-    parent is modified in place so that the oldchild element is
-    removed entirely, and newchild is put in its place.
-    
-    '''
-    if parent == oldchild:
-        # This is the root element, so we need to do a dance to replace it
-        oldchild.clear()
-        oldchild.tag = newchild.tag
-        oldchild.text = newchild.text
-        for k, v in newchild.attrib.iteritems():
-            oldchild.attrib[k] = v
-        for child in newchild:
-            oldchild.append(child)
-    else:
-        oldchild.getparent().replace(oldchild, newchild)
+        self.lastfilter = lastfilter
 
 def cell_lookup(table_elem):
     '''
@@ -281,6 +268,8 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
             for cell_elem in cell_elems:
                 append_elem.append(cell_elem)
         if not elementempty(group_elem):
+            if spec.lastfilter:
+                spec.lastfilter(group_elem)
             groups.append(group_elem)
     if table_elem is not None:
         groups_elem = htmlelem(attrib={'class' : 'mwu-melem-table2divgroups'})
