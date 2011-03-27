@@ -5,13 +5,32 @@ HTTP and WSGI server utilities
 import re
 
 def _case(s):
-    s = s.lower()
-    if len(s):
+    '''
+    Change a string to have only its first character capitalized
+
+    @param s : string, STRING, or STRing
+    @type  s : str
+    
+    @return : String
+    @rtype  : str
+    
+    '''
+    if '' != s:
         c, tail = s[0], s[1:]
-        s = c.upper() + tail
+        s = c.upper() + tail.lower()
     return s
 
 def _name2field(name):
+    '''
+    Convert HTTP_FOO_BAR_BAZ to Foo-Bar-Baz
+
+    @param name : HTTP_FOO_BAR_BAZ
+    @type  name : str
+
+    @return : Foo-Bar-Baz
+    @rtype  : str
+    
+    '''
     prefix = 'HTTP_'
     assert name.startswith(prefix), 'Keys are all supposed to start with "%s": %s' % (prefix, name)
     parts = name[len(prefix):].split('_')
