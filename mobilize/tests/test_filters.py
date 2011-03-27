@@ -752,7 +752,7 @@ here's some extra trailing text for you too
 <a href="/">b</a>
 <a href="/">c</a>
 '''
-        nocollapse = XPath('//a', postfilters=[testfilter])
+        nocollapse = XPath('//a', postfilters=[testfilter], filtermode=FILT_EACHELEM)
         nocollapse.extract(html.fromstring(htmlstr1))
         actual = nocollapse.process('idname')
         actual_str = html.tostring(actual)

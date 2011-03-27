@@ -40,7 +40,7 @@ class Extracted(RefineClassBase):
                  classvalue=None,
                  idname=None,
                  style='',
-                 filtermode=FILT_EACHELEM,
+                 filtermode=FILT_COLLAPSED,
                  usecopy=False,
                  ):
         '''
