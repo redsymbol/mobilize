@@ -176,53 +176,7 @@ def srchostport(environ):
         else:
             full_port = 80
     return full_host, full_port
-
-
-_DEST_RE = re.compile(r'\bdest=([^&]+)')
-def redir_dest(uri):
-    '''
-    Find the destination URI to redirect to on the desktop site
-
-    Note that this takes in a relative URI, and returns a *different*
-    relative URI.  The input URI is the link the person clicked on the
-    mobile site, to switch to the desktop view.  The returned value is
-    the URI they should be sent do on the desktop site.
-
-    @param uri : URI of the redirecting GET requst
-    @type  uri : str
-
-    @return    : destination URI on the desktop site
-    @rtype     : str
     
-    '''
-    from urllib import unquote
-    match = _DEST_RE.search(uri)
-    if match:
-        dest = unquote(match.group(1))
-    else:
-        dest = '/'
-    return dest
-    
-def todesktop(environ, start_response, full_domain):
-    '''
-    Redirection to desktop view
-
-    This WSGI sub-application will redirect the current page, assumed
-    to be on the mobile view, to the corresponding page on the desktop
-    view (site).
-    '''
-    uri = environ['REQUEST_URI']
-    method = environ['REQUEST_METHOD'].upper()
-    assert 'GET' == method, method
-    dest = redir_dest(uri)
-    assert dest.startswith('/'), dest
-    headers = [
-        ('Location', 'http://%s%s' % (full_domain, dest)),
-        ('Set-Cookie', 'mredir=0; path=/'), # TODO: expires
-        ]
-    start_response('302 Found', headers)
-    return ['']
-
 def get_method(environ):
     return environ['REQUEST_METHOD'].upper()
 
@@ -243,8 +197,6 @@ def mk_wsgi_application(msite):
     from httplib import HTTPConnection
     def application(environ, start_response):
         uri = get_uri(environ)
-        if uri.startswith('/todesktop/'):
-            return todesktop(environ, start_response, msite.fullsite)
         method = get_method(environ)
         environ['HTTP_ACCEPT_ENCODING'] = 'identity' # We need an uncompressed response
         req_body = None
