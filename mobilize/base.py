@@ -63,6 +63,26 @@ class MobileSite(object):
             matched = False
         return matched
 
+    def request_overrides(self, wsgienviron):
+        '''
+        Site-specific HTTP request overrides
+
+        Overriding this method allows custom overrides to the mobile
+        site request headers under particular conditions.  This
+        function must return a dictionary with 0 or more key-value
+        pairs.  The keys are lowercased HTTP response header names.
+        The values are overrides; see
+        mobilize.http.get_response_headers for documentation.
+
+        @param wsgienviron : WSGI environment for this request/response cycle
+        @type  wsgienviron : dict
+
+        @return : Overrides
+        @rtype  : dict
+        
+        '''
+        return {}
+
     def response_overrides(self, wsgienviron):
         '''
         Site-specific HTTP response overrides

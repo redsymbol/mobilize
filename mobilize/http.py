@@ -18,24 +18,46 @@ def _name2field(name):
     field = '-'.join(_case(part) for part in parts)
     return field
 
-def get_request_headers(environ):
+def get_request_headers(environ, overrides):
     '''
-    @param environ : WSGI environment
-    @type  environ : dict
+    get request headers
 
-    @return        : transformed request headers
-    @rtype         : dict
+    See docs of get_response_headers for an explanation of overrides.
+    
+    @param environ   : WSGI environment
+    @type  environ   : dict
+
+    @param overrides : Additional response transformations
+    @type  overrides : dict: str -> mixed
+
+    @return          : transformed request headers
+    @rtype           : dict
     
     '''
     from headers import get_request_xform
     method = get_method(environ)
     headers = {}
-    for key, val in environ.iteritems():
-        if key.startswith('HTTP_'):
-            httpname = _name2field(key)
-            xformer = get_request_xform(httpname.lower(), method)
-            val = xformer(environ, val)
-            headers[httpname] = val
+    for rawkey, value in environ.iteritems():
+        if rawkey.startswith('HTTP_'):
+            # We want to preserve the Camel-Casing of the header names
+            # we're about to send, because who knows what web server
+            # or gateway will randomly go crazy if we don't.  But for
+            # consistency and simplicity, related data
+            # (e.g. overrides) are keyed by their fully-lowercased
+            # equivalents.  These two are labeled "header" and
+            # "headerkey" respectively.
+            header = _name2field(rawkey)
+            headerkey = header.lower()
+            if headerkey in overrides:
+                override = overrides[headerkey]
+                if callable(override):
+                    newvalue = override(environ, value)
+                else:
+                    newvalue = override
+            else:
+                xformer = get_request_xform(headerkey, method)
+                newvalue = xformer(environ, value)
+            headers[header] = newvalue
     return headers
 
 def get_response_headers(resp, environ, overrides):
@@ -53,18 +75,20 @@ def get_response_headers(resp, environ, overrides):
 
     Otherwise, the header is simply set to the override, as a value.
     If the header wasn't defined before, this creates it.
-    
-    @param resp    : Response from target server
-    @type  resp    :
 
-    @param environ : WSGI environment
-    @type  environ : dict
+    TODO: Maybe we should Camel-Case the the header names. currently they are lower-cased
+    
+    @param resp      : Response from target server
+    @type  resp      : ?
+
+    @param environ   : WSGI environment
+    @type  environ   : dict
 
     @param overrides : Additional response transformations
     @type  overrides : dict: str -> mixed
 
-    @return        : transformed response headers
-    @rtype         : list of (header, value) tuples
+    @return          : transformed response headers
+    @rtype           : list of (header, value) tuples
     
     '''
     from headers import get_response_xform
@@ -73,7 +97,7 @@ def get_response_headers(resp, environ, overrides):
         if header in overrides:
             override = overrides[header]
             if callable(override):
-                newvalue = override(value)
+                newvalue = override(environ, value)
             else:
                 newvalue = override
             respheader = (header, newvalue)
@@ -87,6 +111,9 @@ def get_response_headers(resp, environ, overrides):
 def mobilizeable(resp):
     '''
     Indicates whether this response is "mobilizeable" or not.
+
+    (We don't want to try to mobilize images or other binary data, for
+    example - at least at this level.)
 
     @param resp : Response object from source server
     @type  resp : httplib.HTTPResponse
@@ -206,7 +233,8 @@ def mk_wsgi_application(msite):
         conn = HTTPConnection(full_host, full_port)
         if method in ('POST', 'PUT'):
             req_body = environ['wsgi.input'].read()
-        request_headers = get_request_headers(environ)
+        request_overrides = msite.request_overrides(environ)
+        request_headers = get_request_headers(environ, request_overrides)
         conn.request(method, uri, body=req_body, headers=request_headers)
         resp = conn.getresponse()
         src_resp_body = resp.read()
@@ -216,9 +244,9 @@ def mk_wsgi_application(msite):
             start_response(status, resp.getheaders())
             return [src_resp_body]
         mobilized_body = str(msite.render_body(uri, src_resp_body))
-        overrides = msite.response_overrides(environ)
-        overrides['content-length'] = str(len(mobilized_body))
-        mobilized_resp_headers = get_response_headers(resp, environ, overrides)
+        response_overrides = msite.response_overrides(environ)
+        response_overrides['content-length'] = str(len(mobilized_body))
+        mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
         start_response(status, mobilized_resp_headers)
         return [mobilized_body]
     return application
