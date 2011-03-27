@@ -1,7 +1,7 @@
 '''
 Facilities making use of Django
 '''
-from base import Template
+from base import Moplate
 
 def init_django(template_dirs):
     '''
@@ -27,7 +27,7 @@ def init_django(template_dirs):
     except RuntimeError:
         pass
 
-class DjangoTemplate(Template):
+class DjangoMoplate(Moplate):
     '''
     Represents a mobile template rendered via the Django templating system
 

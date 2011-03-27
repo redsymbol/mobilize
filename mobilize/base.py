@@ -103,14 +103,14 @@ class MobileSite(object):
         '''
         return {}
 
-class Template(object):
+class Moplate(object):
     '''
-    A mobile web page template (abstract base class)
+    A mobile webpage template with magical powers
 
-    The mobile template represents a transformation, from a source
-    (desktop page's) body, to the body of the corresponding mobile
-    page.  Typically the template can be applied to a group of pages
-    with similar DOM structure.
+    A moplate represents a transformation, from a source (desktop
+    page's) body, to the body of the corresponding mobile page.
+    Typically the template can be applied to a group of pages with
+    similar DOM structure.
 
     The selectors is an ordered list of objects - strings, or
     refinements - identifying content elements in the full body.  From
@@ -227,7 +227,7 @@ class TemplateMap(object):
         
         The values of the mapping object specify a mobilize template.
         This can be either:
-          1) a Template instance
+          1) a Moplate instance
           2) a string
           3) a tuple of two strings
 
@@ -251,13 +251,14 @@ class TemplateMap(object):
 
     def get_template_for(self, url):
         '''
+        XXX
         Get template for a given URL
 
         @param url : Relative URL to check
         @type  url : str
 
         @return    : The mobile template
-        @rtype     : Template
+        @rtype     : Moplate
         
         @raises exceptions.NoMatchingTemplateException : No matching template found
 
@@ -285,7 +286,8 @@ def _regex(re_or_str):
 
 def import_template(pagemodule, template_object='template'):
     '''
-    Imports a mobilize template
+    XXX
+    Imports a moplate
 
     pagemodule is the module name under msite.moplates, i.e. there
     should be an object named "template" in
@@ -298,8 +300,8 @@ def import_template(pagemodule, template_object='template'):
     @param template_object : Name of template object to import from module
     @type  template_object : str
 
-    @return : Mobilize template
-    @rtype  : mobilize.Template
+    @return : Moplate
+    @rtype  : mobilize.Moplate
 
     @raise ImportError: page module not found
     
@@ -307,7 +309,7 @@ def import_template(pagemodule, template_object='template'):
     import importlib
     mod = importlib.import_module('.' + pagemodule, 'msite.moplates')
     template = getattr(mod, template_object)
-    assert isinstance(template, Template), type(template)
+    assert isinstance(template, Moplate), type(template)
     return template
 
 def find_template(arg):
@@ -323,14 +325,14 @@ def find_template(arg):
     @type  arg : mixed
 
     @return    : mobilize template
-    @rtype     : mobilize.Template
+    @rtype     : mobilize.Moplate
     
     '''
     if type(arg) in types.StringTypes:
-        template = import_template(arg)
+        moplate = import_template(arg)
     elif type(arg) is tuple:
-        template = import_template(*arg)
+        moplate = import_template(*arg)
     else:
-        template = arg
-    return template
+        moplate = arg
+    return moplate
     

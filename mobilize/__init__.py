@@ -9,9 +9,9 @@ extensible features.
 
 '''
 from base import *
-from dj import DjangoTemplate
+from dj import DjangoMoplate
 __all__ = [
     'MobileSite',
     'TemplateMap',
-    'DjangoTemplate',
+    'DjangoMoplate',
     ]
