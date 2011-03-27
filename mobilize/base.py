@@ -48,7 +48,7 @@ class MobileSite(object):
         try:
             template = self.moplate_map.get_moplate_for(url)
             rendered = template.render(full_body, extra_params)
-        except exceptions.NoMatchingTemplateException:
+        except exceptions.NoMatchingMoplateException:
             rendered = full_body
         return rendered
 
@@ -59,7 +59,7 @@ class MobileSite(object):
         matched = True
         try:
             template = self.moplate_map.get_moplate_for(url)
-        except exceptions.NoMatchingTemplateException:
+        except exceptions.NoMatchingMoplateException:
             matched = False
         return matched
 
@@ -252,21 +252,21 @@ class MoplateMap(object):
     def get_moplate_for(self, url):
         '''
         XXX
-        Get template for a given URL
+        Get moplate for a given URL
 
         @param url : Relative URL to check
         @type  url : str
 
-        @return    : The mobile template
+        @return    : The moplate
         @rtype     : Moplate
         
-        @raises exceptions.NoMatchingTemplateException : No matching template found
+        @raises exceptions.NoMatchingMoplateException : No matching template found
 
         '''
         for pattern, template in self._mapping.iteritems():
             if pattern.search(url):
                 return template
-        raise exceptions.NoMatchingTemplateException('no template match found for %s' % url)
+        raise exceptions.NoMatchingMoplateException('no template match found for %s' % url)
 
 def _regex(re_or_str):
     '''

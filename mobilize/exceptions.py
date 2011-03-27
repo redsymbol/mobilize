@@ -4,7 +4,7 @@ class MobilizeException(Exception):
 
     '''
 
-class NoMatchingTemplateException(MobilizeException):
+class NoMatchingMoplateException(MobilizeException):
     '''
     Indicates no mobile template is available that matches the indicated URL
     '''
