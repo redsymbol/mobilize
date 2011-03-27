@@ -239,7 +239,7 @@ class MoplateMap(object):
         that is the template to import.
 
         The mechanics of this resolution are handled with the
-        find_template and import_template functions in this module.
+        find_moplate and import_moplate functions in this module.
           
         @param mapping : The mobile domain mapping
         @type  mapping : list of tuple(key, value)
@@ -247,7 +247,7 @@ class MoplateMap(object):
         '''
         self._mapping = OrderedDict()
         for k, v in mapping:
-            self._mapping[_regex(k)] = find_template(v)
+            self._mapping[_regex(k)] = find_moplate(v)
 
     def get_moplate_for(self, url):
         '''
@@ -284,13 +284,12 @@ def _regex(re_or_str):
         return re.compile(r'^' + re_or_str)
     return re_or_str
 
-def import_template(pagemodule, template_object='template'):
+def import_moplate(pagemodule, template_object='template'):
     '''
-    XXX
     Imports a moplate
 
     pagemodule is the module name under msite.moplates, i.e. there
-    should be an object named "template" in
+    should be an object whose name is the value of template_object in
     msite/moplates/${pagemodule}.py (or
     msite/moplates/${pagemodule}/__init__.py).
 
@@ -312,7 +311,7 @@ def import_template(pagemodule, template_object='template'):
     assert isinstance(template, Moplate), type(template)
     return template
 
-def find_template(arg):
+def find_moplate(arg):
     '''
     Find a mobile template
 
@@ -329,9 +328,9 @@ def find_template(arg):
     
     '''
     if type(arg) in types.StringTypes:
-        moplate = import_template(arg)
+        moplate = import_moplate(arg)
     elif type(arg) is tuple:
-        moplate = import_template(*arg)
+        moplate = import_moplate(*arg)
     else:
         moplate = arg
     return moplate
