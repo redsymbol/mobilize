@@ -648,29 +648,40 @@ here's some extra trailing text for you too
 
     def test_noattribs(self):
         ELEMSTR1 = '''<table width="600" style="color: fuscia;">
-<tr><td>one</td><td>two</td></tr>
+<tr><td width="200">one</td><td>two</td></tr>
 <tr><td>three</td><td>four</td></tr>
 </table>
 '''
         ELEMSTR2 = '''<div>
 <table width="600" style="color: fuscia;">
-<tr><td>one</td><td>two</td></tr>
+<tr><td width="200">one</td><td>two</td></tr>
 <tr><td>three</td><td>four</td></tr>
 </table>
 </div>
 '''
         testdata = [
             {'in_str' : ELEMSTR1,
-             'tag' : 'table',
+             'tags' : ['table'],
              'attribs' : ['width', 'style'],
              'out_str' : '''<table>
-<tr><td>one</td><td>two</td></tr>
+<tr><td width="200">one</td><td>two</td></tr>
 <tr><td>three</td><td>four</td></tr>
 </table>
 '''
              },
             {'in_str' : ELEMSTR2,
-             'tag' : 'table',
+             'tags' : ['table'],
+             'attribs' : ['width', 'style'],
+             'out_str' : '''<div>
+<table>
+<tr><td width="200">one</td><td>two</td></tr>
+<tr><td>three</td><td>four</td></tr>
+</table>
+</div>
+'''
+             },
+            {'in_str' : ELEMSTR2,
+             'tags' : ['table', 'td'],
              'attribs' : ['width', 'style'],
              'out_str' : '''<div>
 <table>
@@ -684,7 +695,7 @@ here's some extra trailing text for you too
         from mobilize.filters import noattribs
         for ii, td in enumerate(testdata):
             elem = html.fragment_fromstring(td['in_str'], create_parent=False)
-            noattribs(elem, td['tag'], td['attribs'])
+            noattribs(elem, td['tags'], td['attribs'])
             expected = normxml(td['out_str'])
             actual = normxml(elem2str(elem))
             self.assertSequenceEqual(expected, actual)

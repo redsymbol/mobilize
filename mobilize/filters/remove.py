@@ -84,16 +84,16 @@ def noimgsize(elem):
             if a in img_elem.attrib:
                 del img_elem.attrib[a]
 
-def noattribs(parent_elem, tag, attribs):
+def noattribs(parent_elem, tags, attribs):
     '''
     Will recursively delete the indicated attributes from elements of
-    the given tag name.
+    the given tag names.
 
     @param parent_elem : Containing element to hunt within
     @type  parent_elem : lxml.html.HtmlElement
     
-    @param tag         : Name of tag (element) to remove attributes from
-    @type  tag         : str
+    @param tag         : Name of tags (elements) to remove attributes from
+    @type  tag         : list of str
 
     @param attribs     : Attributes of the tags to remove
     @type  attribs     : list of str
@@ -103,10 +103,11 @@ def noattribs(parent_elem, tag, attribs):
         for key in attribs:
             if key in elem.attrib:
                 del elem.attrib[key]
-    if tag == parent_elem.tag:
+    if parent_elem.tag in tags:
         delattrib(parent_elem)
-    for elem in parent_elem.iterfind('.//%s' % tag):
-        delattrib(elem)
+    for tag in tags:
+        for elem in parent_elem.iterfind('.//%s' % tag):
+            delattrib(elem)
 
 def omit(elem, xpaths=None, csspaths=None):
     '''
