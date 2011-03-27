@@ -144,3 +144,18 @@ def htmlelem(tag='div',
         elem.text = text
     return elem
 
+def fullsiteurl(mobileurl, mobiledomain, fullsitedomain):
+    '''
+    Generates a full site URL link
+
+    This is the link the mobile site visitor clicks on to specify they
+    prefer the desktop view.
+    
+    '''
+    s = mobileurl.replace(mobiledomain, fullsitedomain, 1)
+    if '?' in s:
+        s += '&'
+    else:
+        s += '?'
+    s += 'mredir=0'
+    return s
