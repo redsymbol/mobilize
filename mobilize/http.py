@@ -234,6 +234,7 @@ def mk_wsgi_application(msite):
         if method in ('POST', 'PUT'):
             req_body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
+        request_overrides['X-MWU-Mobilize'] = '1'
         request_headers = get_request_headers(environ, request_overrides)
         conn.request(method, uri, body=req_body, headers=request_headers)
         resp = conn.getresponse()
