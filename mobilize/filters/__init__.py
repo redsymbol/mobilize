@@ -25,6 +25,7 @@ from .remove import (
     noattribs,
     omit,
     squeezebr,
+    noinputwidth,
     )
 
 from .resize import (

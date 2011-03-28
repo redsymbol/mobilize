@@ -158,3 +158,20 @@ def squeezebr(elem):
             next = br_elem.getnext()
             if next is not None and 'br' == next.tag:
                 br_elem.drop_tree()
+
+def noinputwidth(elem):
+    '''
+    strip the inline size attributes from textual form inputs
+
+    This will remove the following attributes from the following tags:
+
+     - SIZE from INPUT
+     - COLS from TEXTAREA
+    '''
+    for input_elem in elem.findall('.//input'):
+        if 'size' in input_elem.attrib:
+            del input_elem.attrib['size']
+    for textarea_elem in elem.findall('.//textarea'):
+        if 'cols' in textarea_elem.attrib:
+            del textarea_elem.attrib['cols']
+
