@@ -33,6 +33,7 @@ class Spec(object):
                  colstart=None,
                  rowend=None,
                  colend=None,
+                 classname=None,
                  lastfilter=None,
                  ):
         self.idname = idname
@@ -40,6 +41,7 @@ class Spec(object):
         self.colstart = colstart
         self.rowend = rowend
         self.colend = colend
+        self.classname = classname
         self.lastfilter = lastfilter
 
 def cell_lookup(table_elem):
@@ -240,8 +242,11 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
     groups = []
     for spec in specmap:
         groupid = spec.idname
+        classvalue = 'mwu-melem-table2divgroups-group'
+        if spec.classname is not None:
+            classvalue += ' ' + spec.classname
         group_elem = htmlelem(attrib={
-                'class' : 'mwu-melem-table2divgroups-group',
+                'class' : classvalue,
                 'id'    : groupid,
                 })
         assert spec.rowend >= spec.rowstart
