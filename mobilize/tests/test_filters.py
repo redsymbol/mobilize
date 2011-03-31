@@ -485,7 +485,7 @@ here's some extra trailing text for you too
              'specmap' : [],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
+  <div class="mwu-elem-table2divgroups">
   </div>
 </div>
 ''',
@@ -496,8 +496,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
     </div>
   </div>
@@ -510,8 +510,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
@@ -528,11 +528,11 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
     </div>
-    <div class="mwu-melem-table2divgroups-group" id="idname2">
+    <div class="mwu-elem-table2divgroups-group" id="idname2">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
@@ -549,14 +549,14 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname2">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname2">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
       <div>1-800-BUY-DUFF</div>
     </div>
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
     </div>
   </div>
@@ -570,14 +570,14 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname2">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname2">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
       <div>1-800-BUY-DUFF</div>
     </div>
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
     </div>
   </div>
@@ -590,8 +590,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
@@ -608,8 +608,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
@@ -626,8 +626,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div id="some-container">
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div>
         <div>OUR TEAM</div>
       </div>
@@ -664,8 +664,8 @@ here's some extra trailing text for you too
                     ],
              'out_str' : '''
 <div>
-  <div class="mwu-melem-table2divgroups">
-    <div class="mwu-melem-table2divgroups-group" id="idname1">
+  <div class="mwu-elem-table2divgroups">
+    <div class="mwu-elem-table2divgroups-group" id="idname1">
       <div><div>a</div></div>
       <div>
         <div>b</div>
@@ -807,7 +807,7 @@ here's some extra trailing text for you too
         nocollapse.extract(html.fromstring(htmlstr1))
         actual = nocollapse.process('idname')
         actual_str = html.tostring(actual)
-        expected_str = '''<div class="mwu-melem" id="idname">
+        expected_str = '''<div class="mwu-elem" id="idname">
 <a href="/" class="foo">a</a>
 <a href="/" class="foo">b</a>
 <a href="/" class="foo">c</a>
@@ -825,7 +825,7 @@ here's some extra trailing text for you too
         collapse.extract(html.fromstring(htmlstr1))
         actual = collapse.process('idname')
         actual_str = html.tostring(actual)
-        expected_str = '''<div class="mwu-melem" id="idname">
+        expected_str = '''<div class="mwu-elem" id="idname">
 <a href="/" id="child-0">a</a>
 <a href="/" id="child-1">b</a>
 <a href="/" id="child-2">c</a>

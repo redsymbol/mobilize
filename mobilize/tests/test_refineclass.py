@@ -113,7 +113,7 @@ class TestExtracted(unittest.TestCase):
         ga.extract(doc)
         ga.process('nothing')
         actual = normxml(ga.html())
-        expected = normxml('''<div class="mwu-melem" id="mwu-melem-ga">
+        expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga">
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -134,6 +134,6 @@ pageTracker._trackPageview();
         noga.extract(doc)
         noga.process('nothing')
         actual = normxml(noga.html())
-        expected = normxml('''<div class="mwu-melem" id="mwu-melem-ga"></div>''')
+        expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga"></div>''')
         self.assertSequenceEqual(expected, actual)
         

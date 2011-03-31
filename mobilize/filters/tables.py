@@ -163,7 +163,7 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     There are two clear semantic elements here.  From a mobile design
     perspective, it would be great to parse them more like this:
     
-    <div class="mwu-melem-table2divgroups-group" id="mwu-melem-contact">
+    <div class="mwu-elem-table2divgroups-group" id="mwu-elem-contact">
       <div>CONTACT US</div>
       <div>123 Main Str</div>
       <div>Springfield, IL</div>
@@ -172,7 +172,7 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
 
     ... and:
     
-    <div class="mwu-melem-table2divgroups-group" id="mwu-melem-ourteam">
+    <div class="mwu-elem-table2divgroups-group" id="mwu-elem-ourteam">
       <div>
         <div>OUR TEAM</div>
       </div>
@@ -196,8 +196,8 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     extract them from a table grid.  The specmap argument is a list of
     Spec instances.  Each spec object defines a square of cells, from
     1 or more rows and 1 or more columns in the source table.  It also
-    defines a DOM ID name (equivalent to 'mwu-melem-contact' and
-    'mwu-melem-ourteam') above.  See the Spec class documentation for
+    defines a DOM ID name (equivalent to 'mwu-elem-contact' and
+    'mwu-elem-ourteam') above.  See the Spec class documentation for
     more details, but briefly, one way to define a group of cells is
     with these four numbers:
     
@@ -242,7 +242,7 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
     groups = []
     for spec in specmap:
         groupid = spec.idname
-        classvalue = 'mwu-melem-table2divgroups-group'
+        classvalue = 'mwu-elem-table2divgroups-group'
         if spec.classname is not None:
             classvalue += ' ' + spec.classname
         group_elem = htmlelem(attrib={
@@ -277,7 +277,7 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
                 spec.lastfilter(group_elem)
             groups.append(group_elem)
     if table_elem is not None:
-        groups_elem = htmlelem(attrib={'class' : 'mwu-melem-table2divgroups'})
+        groups_elem = htmlelem(attrib={'class' : 'mwu-elem-table2divgroups'})
         for group_elem in groups:
             groups_elem.append(group_elem)
         replace_child(elem, table_elem, groups_elem)

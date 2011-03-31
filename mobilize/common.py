@@ -1,7 +1,7 @@
 from lxml import html
 
 MWU_PREFIX = 'mwu-'
-ELEMENT_NAME = MWU_PREFIX + 'melem'
+ELEMENT_NAME = MWU_PREFIX + 'elem'
 
 def classvalue(*extra_class_suffixes):
     '''
@@ -13,11 +13,11 @@ def classvalue(*extra_class_suffixes):
     By policy, every class name needs to start with
     common.ELEMENT_NAME (see classname() below).
     extra_class_suffixes, will be the suffix of the additional class
-    names.  Examples: (assuming ELEMENT_NAME is "mwu-melem")
+    names.  Examples: (assuming ELEMENT_NAME is "mwu-elem")
 
-    classvalue() -> "mwu-melem"
-    classvalue("alpha") -> "mwu-melem mwu-melem-alpha"
-    classvalue("alpha", "beta") -> "mwu-melem mwu-melem-alpha mwu-melem-beta"
+    classvalue() -> "mwu-elem"
+    classvalue("alpha") -> "mwu-elem mwu-elem-alpha"
+    classvalue("alpha", "beta") -> "mwu-elem mwu-elem-alpha mwu-elem-beta"
 
     @param extra_class_suffixes : Suffixes of any additional CSS classes
     @type  extra_class_suffixes : list of string
