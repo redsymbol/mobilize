@@ -106,7 +106,7 @@ def get_response_headers(resp, environ, overrides):
     Otherwise, the header is simply set to the override, as a value.
     If the header wasn't defined before, this creates it.
 
-    TODO: Maybe we should Camel-Case the the header names. currently they are lower-cased
+    TODO: Maybe we should Camel-Case the header names. currently they are lower-cased
 
     TODO: I think we can replace the "resp" argument with "rawheaders" (which normally will be resp.getheaders()).  That will decouple better, and make unit tests much simpler
     
