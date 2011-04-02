@@ -4,6 +4,7 @@ import copy
 
 from mobilize.filters import COMMON_FILTERS
 from mobilize import common
+from common import RefineClassBase
 
 #: Indicates that filtering should be applied on every extracted element individually
 FILT_EACHELEM = 1
@@ -210,10 +211,6 @@ class Extracted(RefineClassBase):
         assert self.elem is not None, 'Must invoke self.extract() and self.process() before rendering to html'
         return common.elem2str(self.elem)
 
-class Unextracted(RefineClassBase):
-    '''abstract base of all refinements that are independent of the source HTML page'''
-    extracted = False
-
 class XPath(Extracted):
     def _extract(self, source):
         return source.xpath(self.selector)
@@ -224,35 +221,6 @@ class CssPath(Extracted):
         css_sel = CSSSelector(self.selector)
         return source.xpath(css_sel.path)
     
-class RawTemplate(Unextracted):
-    '''
-    Unextracted refinement from a template
-    '''
-    def __init__(self, template, params = None):
-        '''
-        @param template : Path to the template to render
-        @type  template : str
-
-        @param params : Template parameters
-        @type  params : 
-        
-        '''
-        if not params:
-            params = {}
-        self.template = template
-        self.params = params
-
-    def html(self):
-        from django.template.loader import render_to_string
-        return render_to_string(self.template, self.params)
-
-class RawString(Unextracted):
-    def __init__(self, rawstring):
-        self.rawstring = rawstring
-
-    def html(self):
-        return self.rawstring
-
 class GoogleAnalytics(Extracted):
     '''
     Locates and extracts Google Analytics tracking code from desktop page

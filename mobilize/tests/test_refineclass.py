@@ -1,6 +1,6 @@
 import unittest
 from utils4test import data_file_path, normxml
-from mobilize.refineclass import Extracted
+from mobilize.components import Extracted
 from lxml import html
 
 class DummyExtracted(Extracted):
@@ -29,7 +29,7 @@ class TestExtracted(unittest.TestCase):
             self.assertSequenceEqual(td['newelem_str'], html.tostring(refinement.elem))
 
     def test_extract_csspath(self):
-        from mobilize.refineclass import CssPath
+        from mobilize.components import CssPath
 
         testdata = [
             {'datafile' : 'a.xml',
@@ -105,7 +105,7 @@ class TestExtracted(unittest.TestCase):
         self.assertEqual(style, rendered.attrib['style'])
 
     def test_GoogleAnalytics(self):
-        from mobilize.refineclass import GoogleAnalytics
+        from mobilize.components import GoogleAnalytics
         # Check positive case, where we expect to find the GA tracking code
         doc_str = open(data_file_path('whole-html', 'luxwny.html')).read()
         doc = html.fromstring(doc_str)

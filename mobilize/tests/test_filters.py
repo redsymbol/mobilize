@@ -787,7 +787,7 @@ here's some extra trailing text for you too
         '''
         Test for collapsing filter application mode
         '''
-        from mobilize.refineclass import (
+        from mobilize.components import (
             XPath,
             FILT_EACHELEM,
             FILT_COLLAPSED,

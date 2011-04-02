@@ -218,7 +218,7 @@ class TestMobileSite(unittest.TestCase):
   </body>
 </html>
 '''
-        from mobilize.refineclass import RawTemplate, XPath, CssPath, RawString
+        from mobilize.components import RawTemplate, XPath, CssPath, RawString
         selectors = [
             XPath(r'//*[@id="header"]'),
             CssPath('ul.navigation'),
