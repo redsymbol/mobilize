@@ -62,6 +62,8 @@ def choicedata(map_elem, imageformat):
     corresponding to the link.  So the first choice would render as
     "/path/to/foo0.png", then "/path/to/foo1.png", and so on.
 
+    TODO: ideally raise an error if the imageformat string does not include an int-compatible field.  Apparently need to implement a custom string.Formatter subclass that implements the check_unused_args method
+
     @param map_elem    : Map element
     @type  map_elem    : lxml.html.HtmlElement
 
