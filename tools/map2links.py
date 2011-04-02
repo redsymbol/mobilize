@@ -105,8 +105,7 @@ def im_geom(coords):
     @rtype        : str
     
     '''
-    parts = map(int, coords.split(','))
-    x1, y1, x2, y2 = parts
+    x1, y1, x2, y2 = map(int, coords.split(','))
     width = x2 - x1
     height = y2 - y1
     return '{}x{}+{}+{}'.format(width, height, x1, y1)
