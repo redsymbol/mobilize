@@ -4,10 +4,10 @@ Mobilize page components
 Components are pieces of web content assembled within a moplate to
 form the final mobile web page.  You can usually think of them as just
 HTML fragments.  More accurately, a component is an object that knows
-how to generate and render an HTML fragment.  During page rendering, a
-the fragments form a sequence of these components are strung together
-in order.  This forms the core content of the mobile page (normally
-laid out in a single vertical column).
+how to generate and render an HTML fragment.  During page rendering,
+the fragments from a sequence of these components are strung together
+in order.  This forms the core content of the mobile page (which is
+normally laid out in a single vertical column).
 
 There are two broad types of components: *simple* and *extracted*.
 The main difference is that extracted components create their content

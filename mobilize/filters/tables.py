@@ -1,5 +1,5 @@
 '''
-Filters that operate on tables
+Filters that operate on HTML tables
 
 '''
 

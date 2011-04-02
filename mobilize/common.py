@@ -1,6 +1,8 @@
 from lxml import html
 
+#: Default prefix used for all mobile-site CSS identifiers
 MWU_PREFIX = 'mwu-'
+#: Default CSS identifier prefix used for extracted elements (i.e, rendered components)
 ELEMENT_NAME = MWU_PREFIX + 'elem'
 
 def classvalue(*extra_class_suffixes):
@@ -11,9 +13,9 @@ def classvalue(*extra_class_suffixes):
     value of the "class" attribute.
 
     By policy, every class name needs to start with
-    common.ELEMENT_NAME (see classname() below).
-    extra_class_suffixes, will be the suffix of the additional class
-    names.  Examples: (assuming ELEMENT_NAME is "mwu-elem")
+    common.ELEMENT_NAME (see classname() below).  extra_class_suffixes
+    will be the suffix of the additional class names.  Examples:
+    (assuming ELEMENT_NAME is "mwu-elem")
 
     classvalue() -> "mwu-elem"
     classvalue("alpha") -> "mwu-elem mwu-elem-alpha"

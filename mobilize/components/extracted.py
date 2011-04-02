@@ -1,5 +1,3 @@
-# TODO: use abc
-
 import copy
 
 from mobilize.filters import COMMON_FILTERS
@@ -12,7 +10,11 @@ FILT_EACHELEM = 1
 FILT_COLLAPSED = 2
 
 class Extracted(Component):
-    '''abstract base of all components that are extracted from the source HTML page'''
+    '''
+    abstract base of all components that are extracted from the source HTML page
+
+    TODO: use abc (abstract base classes)
+    '''
     extracted = True
 
     #: The raw extracted elements. type: list of lxml.html.HtmlElement
@@ -46,11 +48,11 @@ class Extracted(Component):
         The filters, prefilters, and postfilters arguments all allow
         you to control what filters are applied to the extracted
         content. Each argument, if supplied, must be a list of filter
-        functions. By default, filters.COMMON_FILTERS are set to be
-        applied.  If you specify prefilters, that list is prepended to
-        the default list; likewise, postfilters is appended to the
-        default.  If you specify filters, that will *replace* the
-        default.
+        functions or callables. By default, filters.COMMON_FILTERS are
+        set to be applied.  If you specify prefilters, that list is
+        prepended to the default list; likewise, postfilters is
+        appended to the default.  If you specify filters, that will
+        *replace* the default.
 
         If you use the filters argument, you cannot specify prefilters
         or postfilters.  You can use one or both of prefilters or

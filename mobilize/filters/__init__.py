@@ -1,15 +1,14 @@
 '''
-Filters : functions that process and modify HTML snippets
+Filters: process and modify HTML snippets
 
-A filter is a function designed to alter or process a block of
-HTML-like code in some useful way.  It takes as input a string, meant
-to be a snippet of HTML, and returns another string.  The returned
-string may in general be the same thing as the input, but often it is
-modified in some way.
+A filter is a callable designed to alter or process a block of
+HTML-like code in some useful way.  They operate on HtmlElement
+instances, modifying them in place. The filtered element may in
+general be the same as before, but often it is modified in some way.
 
 FILTER API
 
-A function conforms to the filter API if it:
+A callable conforms to the filter API if it:
   * accepts an lxml.html.HTMLElement instance as an argument, and
   * does not return any value,
   * operates by making any changes directly on the element as a side effect, and

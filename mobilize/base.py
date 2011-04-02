@@ -113,8 +113,8 @@ class Moplate(object):
     similar DOM structure.
 
     The selectors is an ordered list of objects - strings, or
-    components - identifying content elements in the full body.  From
-    this, a list of HTML snippets will be made available to the
+    components - identifying content elements in the mobile page body.
+    From this, a list of HTML snippets will be made available to the
     template as the "elements" attribute of the parameter dictionary.
 
     Because of the magical "elements" parameter, the supplied params
