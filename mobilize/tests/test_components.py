@@ -21,12 +21,12 @@ class TestExtracted(unittest.TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            refinement = DummyExtracted('', filters=[], classvalue='alpha')
-            refinement.elems = [html.fromstring(td['elem_str'])]
-            newelem = refinement.process(td['idname'])
-            self.assertEqual(newelem, refinement.elem)
-            self.assertEqual(html.HtmlElement, type(refinement.elem))
-            self.assertSequenceEqual(td['newelem_str'], html.tostring(refinement.elem))
+            component = DummyExtracted('', filters=[], classvalue='alpha')
+            component.elems = [html.fromstring(td['elem_str'])]
+            newelem = component.process(td['idname'])
+            self.assertEqual(newelem, component.elem)
+            self.assertEqual(html.HtmlElement, type(component.elem))
+            self.assertSequenceEqual(td['newelem_str'], html.tostring(component.elem))
 
     def test_extract_csspath(self):
         from mobilize.components import CssPath

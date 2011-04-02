@@ -4,15 +4,15 @@ import copy
 
 from mobilize.filters import COMMON_FILTERS
 from mobilize import common
-from common import RefineClassBase
+from common import Component
 
 #: Indicates that filtering should be applied on every extracted element individually
 FILT_EACHELEM = 1
 #: Indicates that filtering should be done on the constructed final single element
 FILT_COLLAPSED = 2
 
-class Extracted(RefineClassBase):
-    '''abstract base of all refinements that are extracted from the source HTML page'''
+class Extracted(Component):
+    '''abstract base of all components that are extracted from the source HTML page'''
     extracted = True
 
     #: The raw extracted elements. type: list of lxml.html.HtmlElement
@@ -225,7 +225,6 @@ class GoogleAnalytics(Extracted):
     '''
     Locates and extracts Google Analytics tracking code from desktop page
 
-    This refinement locates 
     '''
     def __init__(self, **kw):
         assert 'selector' not in kw

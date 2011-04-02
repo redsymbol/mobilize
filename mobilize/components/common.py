@@ -1,5 +1,5 @@
-class RefineClassBase(object):
-    '''abstract base of all refinement classes'''
+class Component(object):
+    '''abstract base of all component classes'''
     def html(self):
         '''
         Render the element content HTML

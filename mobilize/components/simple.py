@@ -1,15 +1,15 @@
 # TODO: use abc
 
 from mobilize import common
-from common import RefineClassBase
+from common import Component
 
-class Unextracted(RefineClassBase):
-    '''abstract base of all refinements that are independent of the source HTML page'''
+class Unextracted(Component):
+    '''abstract base of all components that are independent of the source HTML page'''
     extracted = False
 
 class RawTemplate(Unextracted):
     '''
-    Unextracted refinement from a django template
+    Render directly from a django template
     '''
     def __init__(self, template, params = None):
         '''
