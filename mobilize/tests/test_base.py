@@ -219,7 +219,7 @@ class TestMobileSite(unittest.TestCase):
 </html>
 '''
         from mobilize.components import DjangoTemplate, XPath, CssPath, RawString
-        selectors = [
+        components = [
             XPath(r'//*[@id="header"]'),
             CssPath('ul.navigation'),
             CssPath('div#main-content'),
@@ -229,7 +229,7 @@ class TestMobileSite(unittest.TestCase):
         params = {
             'title' : '<Mobile Test One>',
             }
-        moplate = DjangoMoplate('one.html', selectors, params)
+        moplate = DjangoMoplate('one.html', components, params)
         tmap = mobilize.MoplateMap([('/foo$', moplate)])
         msite = mobilize.MobileSite('example.com', tmap)
 

@@ -112,10 +112,12 @@ class Moplate(object):
     Typically the moplate can be applied to a group of pages with
     similar DOM structure.
 
-    The selectors is an ordered list of objects - strings, or
-    components - identifying content elements in the mobile page body.
-    From this, a list of HTML snippets will be made available to the
-    template as the "elements" attribute of the parameter dictionary.
+    components is an ordered list of mobilize page components (see
+    L{mobilize.components}), identifying content elements in the
+    mobile page body, some of which are based on content from the
+    desktop page.  From this, a list of HTML snippets will be made
+    available to the template as the "elements" attribute of the
+    parameter dictionary.
 
     Because of the magical "elements" parameter, the supplied params
     cannot have a key of that name.
@@ -124,22 +126,22 @@ class Moplate(object):
     must implement at least self._render().
 
     '''
-    def __init__(self, template_name, selectors, params=None):
+    def __init__(self, template_name, components, params=None):
         '''
         ctor
         
         @param template_name : Template name (file)
         @type  template_name : str
 
-        @param selectors     : Selectors of content elements to extract from full body
-        @type  selectors     : list
+        @param components     : Components of content elements to extract from full body
+        @type  components     : list
         
         @param params        : Other template rendering parameters
         @type  params        : dict (str -> mixed)
         
         '''
         self.template_name = template_name
-        self.selectors = selectors
+        self.components = components
         if params:
             self.params = dict(params)
         else:
@@ -171,12 +173,11 @@ class Moplate(object):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         doc = html.fromstring(full_body)
-        elements = self.selectors
-        for ii, elem in enumerate(elements):
+        for ii, elem in enumerate(self.components):
             if elem.extracted:
                 elem.extract(doc)
                 elem.process(common.idname(ii))
-        params['elements'] = [elem.html() for elem in elements]
+        params['elements'] = [elem.html() for elem in self.components]
         return self._render(params)
 
     def _render(self, params):

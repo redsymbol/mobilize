@@ -23,7 +23,8 @@ class Extracted(Component):
     #: What becomes the processed element for the mobile page
     elem = None
 
-    def __init__(self, selector,
+    def __init__(self,
+                 selector,
                  filters=None,
                  prefilters=None,
                  postfilters=None,
@@ -229,6 +230,14 @@ class GoogleAnalytics(Extracted):
 
     '''
     def __init__(self, **kw):
+        '''
+        ctor
+
+        Unlike many extracted components, this one currently does not
+        accept a selector argument.  The source of the desktop page is
+        scanned to locate the google analytics tracking code.
+        
+        '''
         assert 'selector' not in kw
         if 'idname' not in kw:
             kw['idname'] = common.idname('ga')

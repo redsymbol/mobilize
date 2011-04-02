@@ -33,33 +33,33 @@ class TestExtracted(unittest.TestCase):
 
         testdata = [
             {'datafile' : 'a.xml',
-             'selectors' : [CssPath('div#happy', classvalue='some-class')],
+             'components' : [CssPath('div#happy', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><div id="happy">lucky</div></div>'],
              },
             {'datafile' : 'b.xml',
-             'selectors' : [CssPath('div#joyful', classvalue='some-class')],
+             'components' : [CssPath('div#joyful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><div id="joyful">fun</div></div>'],
              },
             {'datafile' : 'c.xml',
-             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
+             'components' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="graceful">laughing</p></div>'],
              },
             {'datafile' : 'd.xml',
-             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
+             'components' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="skipping graceful enthusiastic">laughing</p></div>'],
              },
             {'datafile' : 'e.xml',
-             'selectors' : [CssPath('p.graceful', classvalue='some-class')],
+             'components' : [CssPath('p.graceful', classvalue='some-class')],
              'extracted' : ['<div class="some-class" id="some-id"><p class="skipping graceful enthusiastic">laughing</p><p class="graceful">enthusiastic</p></div>'],
              },
             ]
         for ii, td in enumerate(testdata):
             doc = html.fromstring(open(data_file_path('extract_celems', td['datafile'])).read())
-            for sel in td['selectors']:
+            for sel in td['components']:
                 sel.extract(doc)
                 sel.process('some-id')
             expected = map(normxml, td['extracted'])
-            actual = [normxml(sel.html()) for sel in td['selectors']]
+            actual = [normxml(sel.html()) for sel in td['components']]
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
             self.assertEqual(expected, actual, msg)
 
