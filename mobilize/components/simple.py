@@ -1,6 +1,6 @@
 # TODO: use abc
 
-from mobilize import common
+from mobilize import util
 from common import Component
 
 class Simple(Component):

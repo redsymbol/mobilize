@@ -1,7 +1,7 @@
 import copy
 
 from mobilize.filters import COMMON_FILTERS
-from mobilize import common
+from mobilize import util
 from common import Component
 
 #: Indicates that filtering should be applied on every extracted element individually
@@ -119,7 +119,7 @@ class Extracted(Component):
             these_filters += postfilters
         self.filters = these_filters
         if classvalue is None:
-            classvalue = common.classvalue()
+            classvalue = util.classvalue()
         self.classvalue = classvalue
         self.idname = idname
         self.style = style
@@ -212,7 +212,7 @@ class Extracted(Component):
         
     def html(self):
         assert self.elem is not None, 'Must invoke self.extract() and self.process() before rendering to html'
-        return common.elem2str(self.elem)
+        return util.elem2str(self.elem)
 
 class XPath(Extracted):
     def _extract(self, source):
@@ -240,7 +240,7 @@ class GoogleAnalytics(Extracted):
         '''
         assert 'selector' not in kw
         if 'idname' not in kw:
-            kw['idname'] = common.idname('ga')
+            kw['idname'] = util.idname('ga')
         kw['selector'] = None
         super(GoogleAnalytics, self).__init__(**kw)
 

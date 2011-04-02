@@ -1,7 +1,7 @@
 import types
 import re
 from collections import OrderedDict
-import exceptions, common
+import exceptions, util
 
 class MobileSite(object):
     '''
@@ -176,7 +176,7 @@ class Moplate(object):
         for ii, elem in enumerate(self.components):
             if elem.extracted:
                 elem.extract(doc)
-                elem.process(common.idname(ii))
+                elem.process(util.idname(ii))
         params['elements'] = [elem.html() for elem in self.components]
         return self._render(params)
 

@@ -4,7 +4,7 @@ Filters that operate on HTML tables
 '''
 
 import re
-from mobilize.common import (
+from mobilize.util import (
     findonetag,
     htmlelem,
     replace_child,

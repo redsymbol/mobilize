@@ -2,7 +2,7 @@
 Filters designed to omit or remove certain parts of the source HTML
 '''
 
-from mobilize.common import (
+from mobilize.util import (
     findonetag,
     )
 

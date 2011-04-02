@@ -3,7 +3,7 @@ Filters whose job is to resize elements
 
 '''
 
-from mobilize.common import (
+from mobilize.util import (
     findonetag,
     )
 
