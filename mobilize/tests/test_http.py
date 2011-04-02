@@ -59,8 +59,8 @@ class TestHttp(unittest.TestCase):
             ('PATH_INFO', '/Scripts/FormMail_WP2.asp')
             ])
         expected = {
-#             'Content-Length': '151',
-#             'Content-Type' : 'application/x-www-form-urlencoded',
+             'Content-Length': '151',
+             'Content-Type' : 'application/x-www-form-urlencoded',
              'Host': 'example.com',
              'Accept-Language': 'en-us,en;q=0.5',
              'Accept-Encoding': 'identity',

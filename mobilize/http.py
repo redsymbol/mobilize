@@ -20,7 +20,7 @@ def _case(s):
         s = c.upper() + tail.lower()
     return s
 
-def _name2field(name):
+def _name2field(name, prefix=''):
     '''
     Convert HTTP_FOO_BAR_BAZ to Foo-Bar-Baz
 
@@ -31,8 +31,7 @@ def _name2field(name):
     @rtype  : str
     
     '''
-    prefix = 'HTTP_'
-    assert name.startswith(prefix), 'Keys are all supposed to start with "%s": %s' % (prefix, name)
+    assert name.startswith(prefix), 'Field name "%s" is supposed to start with "%s"' % (name, prefix)
     parts = name[len(prefix):].split('_')
     field = '-'.join(_case(part) for part in parts)
     return field
@@ -54,18 +53,30 @@ def get_request_headers(environ, overrides):
     
     '''
     from headers import get_request_xform
+    extrakeys = (
+        'CONTENT_LENGTH',
+        'CONTENT_TYPE',
+        )
+    def headername(rawkey):
+        '''Returns Camel-Case field name if this is an http request header, or None if it's not.'''
+        header = None
+        if rawkey.startswith('HTTP_'):
+            header = _name2field(rawkey, 'HTTP_')
+        elif rawkey in extrakeys:
+            header = _name2field(rawkey)
+        return header
     method = get_method(environ)
     headers = {}
     for rawkey, value in environ.iteritems():
-        if rawkey.startswith('HTTP_'):
+        header = headername(rawkey)
+        if header is not None:
             # We want to preserve the Camel-Casing of the header names
             # we're about to send, because who knows what web server
             # or gateway will randomly go crazy if we don't.  But for
             # consistency and simplicity, related data
             # (e.g. overrides) are keyed by their fully-lowercased
-            # equivalents.  These two are labeled "header" and
+            # equivalents.  These two ideas are labeled "header" and
             # "headerkey" respectively.
-            header = _name2field(rawkey)
             headerkey = header.lower()
             if headerkey in overrides:
                 override = overrides[headerkey]
