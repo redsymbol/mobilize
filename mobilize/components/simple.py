@@ -3,11 +3,11 @@
 from mobilize import common
 from common import Component
 
-class Unextracted(Component):
+class Simple(Component):
     '''abstract base of all components that are independent of the source HTML page'''
     extracted = False
 
-class DjangoTemplate(Unextracted):
+class DjangoTemplate(Simple):
     '''
     Render directly from a django template
     '''
@@ -29,7 +29,7 @@ class DjangoTemplate(Unextracted):
         from django.template.loader import render_to_string
         return render_to_string(self.template, self.params)
 
-class RawString(Unextracted):
+class RawString(Simple):
     def __init__(self, rawstring):
         self.rawstring = rawstring
 
