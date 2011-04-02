@@ -21,6 +21,7 @@ from .remove import (
     noinlinestyles,
     nomiscattrib,
     noevents,
+    noeventson,
     noimgsize,
     noattribs,
     omit,

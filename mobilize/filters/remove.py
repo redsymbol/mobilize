@@ -65,6 +65,14 @@ def noevents(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
+def noeventson(parent, xpath):
+    '''
+    Recursively apply the noevents filter on sub-elements matching expression
+
+    '''
+    for elem in parent.iterfind(xpath):
+        noevents(elem)
+    
 def noimgsize(elem):
     '''
     Strip the height and width attributes from the first child img tag
