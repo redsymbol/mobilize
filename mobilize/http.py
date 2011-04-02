@@ -5,22 +5,6 @@ HTTP and WSGI server utilities
 
 import re
 
-def _case(s):
-    '''
-    Change a string to have only its first character capitalized
-
-    @param s : string, STRING, or STRing
-    @type  s : str
-    
-    @return : String
-    @rtype  : str
-    
-    '''
-    if '' != s:
-        c, tail = s[0], s[1:]
-        s = c.upper() + tail.lower()
-    return s
-
 def _name2field(name, prefix=''):
     '''
     Convert HTTP_FOO_BAR_BAZ to Foo-Bar-Baz
@@ -34,7 +18,7 @@ def _name2field(name, prefix=''):
     '''
     assert name.startswith(prefix), 'Field name "%s" is supposed to start with "%s"' % (name, prefix)
     parts = name[len(prefix):].split('_')
-    field = '-'.join(_case(part) for part in parts)
+    field = '-'.join(part.capitalize() for part in parts)
     return field
 
 def get_request_headers(environ, overrides):
