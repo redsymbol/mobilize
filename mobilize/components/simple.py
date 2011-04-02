@@ -7,17 +7,17 @@ class Unextracted(Component):
     '''abstract base of all components that are independent of the source HTML page'''
     extracted = False
 
-class RawTemplate(Unextracted):
+class DjangoTemplate(Unextracted):
     '''
     Render directly from a django template
     '''
     def __init__(self, template, params = None):
         '''
-        @param template : Path to the template to render
+        @param template : Path to the django template to render
         @type  template : str
 
-        @param params : Template parameters
-        @type  params : 
+        @param params   : Template parameters
+        @type  params   : dict
         
         '''
         if not params:

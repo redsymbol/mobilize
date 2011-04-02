@@ -218,13 +218,13 @@ class TestMobileSite(unittest.TestCase):
   </body>
 </html>
 '''
-        from mobilize.components import RawTemplate, XPath, CssPath, RawString
+        from mobilize.components import DjangoTemplate, XPath, CssPath, RawString
         selectors = [
             XPath(r'//*[@id="header"]'),
             CssPath('ul.navigation'),
             CssPath('div#main-content'),
             RawString('<div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
-            RawTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}),
+            DjangoTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}),
             ]
         params = {
             'title' : '<Mobile Test One>',
