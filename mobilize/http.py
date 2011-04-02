@@ -221,10 +221,6 @@ def mk_wsgi_application(msite):
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         request_headers = get_request_headers(environ, request_overrides)
-        if 'CONTENT_LENGTH' in environ:
-            request_headers['Content-Length'] = environ['CONTENT_LENGTH']
-        if 'CONTENT_TYPE' in environ:
-            request_headers['Content-Type'] = environ['CONTENT_TYPE']
         conn.request(method, uri, body=req_body, headers=request_headers)
         resp = conn.getresponse()
         src_resp_body = resp.read()
