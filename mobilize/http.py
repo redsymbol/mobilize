@@ -196,6 +196,18 @@ def get_http():
 def dict2list(d):
     return list((header, value) for header, value in d.iteritems())
 
+class RequestInfo(object):
+    def __init__(self, wsgienviron):
+        self.wsgienviron = wsgienviron
+        self.method = get_method(self.wsgienviron)
+        self.body = None
+        self.uri = get_uri(self.wsgienviron)
+        self.rel_uri = get_rel_uri(self.wsgienviron)
+
+    def headers(self, overrides):
+        return get_request_headers(self.wsgienviron, overrides)
+        
+
 def mk_wsgi_application(msite):
     '''
     Create the WSGI application
@@ -208,23 +220,20 @@ def mk_wsgi_application(msite):
     
     '''
     def application(environ, start_response):
-        method = get_method(environ)
-        rel_uri = get_rel_uri(environ)
-        uri = get_uri(environ)
+        reqinfo = RequestInfo(environ)
         http = get_http()
-        req_body = None
-        if method in ('POST', 'PUT'):
-            req_body = environ['wsgi.input'].read()
+        if reqinfo.method in ('POST', 'PUT'):
+            reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
-        request_headers = get_request_headers(environ, request_overrides)
-        resp, src_resp_body = http.request(uri, method=method, body=req_body, headers=request_headers)
+        resp, src_resp_body = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+                                           headers=reqinfo.headers(request_overrides))
         status = '%s %s' % (resp.status, resp.reason)
-        if not (mobilizeable(resp) and msite.has_match(rel_uri)):
+        if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
             start_response(status, dict2list(resp))
             return [src_resp_body]
-        mobilized_body = str(msite.render_body(rel_uri, src_resp_body)) #TODO: why is the str() cast here?
+        mobilized_body = str(msite.render_body(reqinfo.rel_uri, src_resp_body)) #TODO: why is the str() cast here?
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
