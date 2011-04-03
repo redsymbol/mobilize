@@ -73,8 +73,9 @@ class TestHttp(unittest.TestCase):
              'Pragma': 'no-cache',
              'Cache-Control': 'no-cache',
              }
-        from mobilize.http import get_request_headers
-        actual = get_request_headers(environ1, {})
+        from mobilize.http import RequestInfo
+        reqinfo = RequestInfo(environ1)
+        actual = reqinfo.headers({})
         self.assertDictEqual(expected, actual)
         
         

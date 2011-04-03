@@ -21,60 +21,6 @@ def _name2field(name, prefix=''):
     field = '-'.join(part.capitalize() for part in parts)
     return field
 
-def get_request_headers(environ, overrides):
-    '''
-    get request headers
-
-    See docs of get_response_headers for an explanation of overrides.
-    
-    @param environ   : WSGI environment
-    @type  environ   : dict
-
-    @param overrides : Additional response transformations
-    @type  overrides : dict: str -> mixed
-
-    @return          : transformed request headers
-    @rtype           : dict
-    
-    '''
-    from headers import get_request_xform
-    extrakeys = (
-        'CONTENT_LENGTH',
-        'CONTENT_TYPE',
-        )
-    def headername(rawkey):
-        '''Returns Camel-Case field name if this is an http request header, or None if it's not.'''
-        header = None
-        if rawkey.startswith('HTTP_'):
-            header = _name2field(rawkey, 'HTTP_')
-        elif rawkey in extrakeys:
-            header = _name2field(rawkey)
-        return header
-    method = get_method(environ)
-    headers = {}
-    for rawkey, value in environ.iteritems():
-        header = headername(rawkey)
-        if header is not None:
-            # We want to preserve the Camel-Casing of the header names
-            # we're about to send, because who knows what web server
-            # or gateway will randomly go crazy if we don't.  But for
-            # consistency and simplicity, related data
-            # (e.g. overrides) are keyed by their fully-lowercased
-            # equivalents.  These two ideas are labeled "header" and
-            # "headerkey" respectively.
-            headerkey = header.lower()
-            if headerkey in overrides:
-                override = overrides[headerkey]
-                if callable(override):
-                    newvalue = override(environ, value)
-                else:
-                    newvalue = override
-            else:
-                xformer = get_request_xform(headerkey, method)
-                newvalue = xformer(environ, value)
-            headers[header] = newvalue
-    return headers
-
 def get_response_headers(resp_headers, environ, overrides):
     '''
     Fetch and calculate the mobile response headers
@@ -205,8 +151,57 @@ class RequestInfo(object):
         self.rel_uri = get_rel_uri(self.wsgienviron)
 
     def headers(self, overrides):
-        return get_request_headers(self.wsgienviron, overrides)
+        '''
+        get request headers
+    
+        See docs of get_response_headers for an explanation of overrides.
         
+        @param environ   : WSGI environment
+        @type  environ   : dict
+    
+        @param overrides : Additional response transformations
+        @type  overrides : dict: str -> mixed
+    
+        @return          : transformed request headers
+        @rtype           : dict
+        
+        '''
+        from headers import get_request_xform
+        extrakeys = (
+            'CONTENT_LENGTH',
+            'CONTENT_TYPE',
+            )
+        def headername(rawkey):
+            '''Returns Camel-Case field name if this is an http request header, or None if it's not.'''
+            header = None
+            if rawkey.startswith('HTTP_'):
+                header = _name2field(rawkey, 'HTTP_')
+            elif rawkey in extrakeys:
+                header = _name2field(rawkey)
+            return header
+        headers = {}
+        for rawkey, value in self.wsgienviron.iteritems():
+            header = headername(rawkey)
+            if header is not None:
+                # We want to preserve the Camel-Casing of the header names
+                # we're about to send, because who knows what web server
+                # or gateway will randomly go crazy if we don't.  But for
+                # consistency and simplicity, related data
+                # (e.g. overrides) are keyed by their fully-lowercased
+                # equivalents.  These two ideas are labeled "header" and
+                # "headerkey" respectively.
+                headerkey = header.lower()
+                if headerkey in overrides:
+                    override = overrides[headerkey]
+                    if callable(override):
+                        newvalue = override(self.wsgienviron, value)
+                    else:
+                        newvalue = override
+                else:
+                    xformer = get_request_xform(headerkey, self.method)
+                    newvalue = xformer(self.wsgienviron, value)
+                headers[header] = newvalue
+        return headers
 
 def mk_wsgi_application(msite):
     '''
