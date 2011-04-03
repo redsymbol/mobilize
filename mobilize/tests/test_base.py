@@ -10,30 +10,6 @@ MINIMAL_HTML_DOCUMENT = '''<!doctype html>
 </html>
 '''
 
-class _FakeMsg(object):
-    def __init__(self, content_type):
-        self.content_type = content_type
-    def gettype(self):
-        return self.content_type
-
-class _FakeHTTPResponse(object):
-    '''
-    Duck type mimic of httplib.HTTPResponse
-
-    Some attributes you may want to consider:
-      status   -  200, 404, etc.
-      version  - 'HTTP/1.1'
-      _headers  - {'Content-Type' : 'text/plain'}, etc.
-      
-    '''
-    def __init__(self, **attributes):
-        if '_headers' not in attributes:
-            attributes['_headers'] = {}
-        assert '_content-type' in attributes.keys(), 'must define _content-type'
-        for k, v in attributes.iteritems():
-            setattr(self, k, v)
-        self.msg = _FakeMsg(content_type=attributes['_content-type'])
-
 def norm_html(s):
     '''
     Normalize an HTML string
@@ -241,40 +217,37 @@ class TestUtil(unittest.TestCase):
     def test_mobilize(self):
         testdata = [
             {'is_m' : False,
-             'attributes' : {
-                    '_headers' : dict([('date', 'Tue, 05 Oct 2010 22:32:54 GMT'), ('connection', 'Keep-Alive'), ('etag', '"5e60d8-37e-491aadf613440"'), ('keep-alive', 'timeout=15, max=100'), ('server', 'Apache/2.2.9 (Debian) PHP/5.2.6-1+lenny8 with Suhosin-Patch mod_wsgi/3.2 Python/2.6.6 mod_perl/2.0.4 Perl/v5.10.0')]),
-                    '_content-type' : 'image/x-icon',
+             'headers' : dict([('date', 'Tue, 05 Oct 2010 22:32:54 GMT'), ('connection', 'Keep-Alive'), ('etag', '"5e60d8-37e-491aadf613440"'), ('keep-alive', 'timeout=15, max=100'), ('server', 'Apache/2.2.9 (Debian) PHP/5.2.6-1+lenny8 with Suhosin-Patch mod_wsgi/3.2 Python/2.6.6 mod_perl/2.0.4 Perl/v5.10.0'), ('content-type', 'image/x-icon')]),
+             },
+            {'is_m' : False,
+             'headers' : {
+                    'content-type' : 'image/x-icon',
                     },
              },
             {'is_m' : False,
-             'attributes' : {
-                    '_content-type' : 'image/x-icon',
+             'headers' : {
+                    'content-type' : 'text/css',
                     },
              },
             {'is_m' : False,
-             'attributes' : {
-                    '_content-type' : 'text/css',
-                    },
-             },
-            {'is_m' : False,
-             'attributes' : {
-                    '_content-type' : 'text/plain',
+             'headers' : {
+                    'content-type' : 'text/plain',
                     },
              },
             {'is_m' : True,
-             'attributes' : {
-                    '_content-type' : 'text/html',
+             'headers' : {
+                    'content-type' : 'text/html',
                     },
              },
             {'is_m' : True,
-             'attributes' : {
-                    '_content-type' : 'application/xhtml+xml',
+             'headers' : {
+                    'content-type' : 'application/xhtml+xml',
                     },
              },
             ]
         from mobilize.http import mobilizeable
         for ii, td in enumerate(testdata):
-            resp = _FakeHTTPResponse(**td['attributes'])
+            resp = td['headers']
             expected = td['is_m']
             actual = mobilizeable(resp)
             msg = 'e: %s, a: %s [%d]' % (expected, actual, ii)

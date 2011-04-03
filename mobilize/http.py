@@ -75,7 +75,7 @@ def get_request_headers(environ, overrides):
             headers[header] = newvalue
     return headers
 
-def get_response_headers(resp, environ, overrides):
+def get_response_headers(resp_headers, environ, overrides):
     '''
     Fetch and calculate the mobile response headers
 
@@ -93,8 +93,6 @@ def get_response_headers(resp, environ, overrides):
 
     TODO: Maybe we should Camel-Case the header names. currently they are lower-cased
 
-    TODO: I think we can replace the "resp" argument with "rawheaders" (which normally will be resp.getheaders()).  That will decouple better, and make unit tests much simpler
-    
     @param resp      : Response from target server
     @type  resp      : ?
 
@@ -109,8 +107,7 @@ def get_response_headers(resp, environ, overrides):
     
     '''
     from headers import get_response_xform
-    def hv(pair):
-        header, value = pair
+    def hv(header, value):
         if header in overrides:
             override = overrides[header]
             if callable(override):
@@ -123,7 +120,7 @@ def get_response_headers(resp, environ, overrides):
             value = xformer(environ, value)
             respheader = (header, value)
         return respheader
-    return list(hv(pair) for pair in resp.getheaders())
+    return list(hv(header, value) for header, value in resp_headers.iteritems())
 
 def mobilizeable(resp):
     '''
@@ -132,12 +129,11 @@ def mobilizeable(resp):
     (We don't want to try to mobilize images or other binary data, for
     example - at least at this level.)
 
-    @param resp : Response object from source server
-    @type  resp : httplib.HTTPResponse
+    @param resp : response headers
+    @type  resp : dict
     
     '''
-    content_type = resp.msg.gettype()
-    if 'xml' in content_type or 'html' in content_type:
+    if 'xml' in resp['content-type'] or 'html' in resp['content-type']:
         return True
     return False
 
@@ -178,8 +174,24 @@ def srchostport(environ):
 def get_method(environ):
     return environ['REQUEST_METHOD'].upper()
 
-def get_uri(environ):
+def get_rel_uri(environ):
     return environ['REQUEST_URI']
+
+def get_uri(environ, proto='http'):
+    host, port = srchostport(environ)
+    assert type(port) is int, type(port)
+    rel_uri = environ['REQUEST_URI']
+    uri = '%s://%s' % (proto, host)
+    if 80 != port:
+        uri += ':' + str(port)
+    uri += rel_uri
+    return uri
+
+def get_http():
+    from httplib2 import Http
+    http = Http()
+    http.follow_redirects = False
+    return http
 
 def mk_wsgi_application(msite):
     '''
@@ -192,28 +204,24 @@ def mk_wsgi_application(msite):
     @rtype       : function accepting (environ, start_response) arguments
     
     '''
-    from httplib import HTTPConnection
     def application(environ, start_response):
-        uri = get_uri(environ)
         method = get_method(environ)
-        environ['HTTP_ACCEPT_ENCODING'] = 'identity' # We need an uncompressed response
+        rel_uri = get_rel_uri(environ)
+        uri = get_uri(environ)
+        http = get_http()
         req_body = None
-        full_host, full_port = srchostport(environ)
-        conn = HTTPConnection(full_host, full_port)
         if method in ('POST', 'PUT'):
             req_body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         request_headers = get_request_headers(environ, request_overrides)
-        conn.request(method, uri, body=req_body, headers=request_headers)
-        resp = conn.getresponse()
-        src_resp_body = resp.read()
+        resp, src_resp_body = http.request(uri, method=method, body=req_body, headers=request_headers)
         status = '%s %s' % (resp.status, resp.reason)
-        if not (mobilizeable(resp) and msite.has_match(uri)):
+        if not (mobilizeable(resp) and msite.has_match(rel_uri)):
             # No matching template found, so pass through the source response
-            start_response(status, resp.getheaders())
+            start_response(status, list((header, value) for header, value in resp.iteritems()))
             return [src_resp_body]
-        mobilized_body = str(msite.render_body(uri, src_resp_body))
+        mobilized_body = str(msite.render_body(rel_uri, src_resp_body)) #TODO: why is the str() cast here?
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
