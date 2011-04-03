@@ -193,6 +193,9 @@ def get_http():
     http.follow_redirects = False
     return http
 
+def dict2list(d):
+    return list((header, value) for header, value in d.iteritems())
+
 def mk_wsgi_application(msite):
     '''
     Create the WSGI application
@@ -219,7 +222,7 @@ def mk_wsgi_application(msite):
         status = '%s %s' % (resp.status, resp.reason)
         if not (mobilizeable(resp) and msite.has_match(rel_uri)):
             # No matching template found, so pass through the source response
-            start_response(status, list((header, value) for header, value in resp.iteritems()))
+            start_response(status, dict2list(resp))
             return [src_resp_body]
         mobilized_body = str(msite.render_body(rel_uri, src_resp_body)) #TODO: why is the str() cast here?
         response_overrides = msite.response_overrides(environ)
