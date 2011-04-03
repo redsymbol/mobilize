@@ -167,7 +167,6 @@ class Moplate(object):
 
         '''
         from lxml import html
-        from filters import COMMON_FILTERS
         params = dict(self.params)
         if extra_params:
             params.update(extra_params)
