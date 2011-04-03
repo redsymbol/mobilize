@@ -182,3 +182,23 @@ def replace_child(parent, oldchild, newchild):
             oldchild.append(child)
     else:
         oldchild.getparent().replace(oldchild, newchild)
+
+def phone_href(phone):
+    '''
+    Create the HREF for a click-to-call link
+
+    Phone number is a string in any common format, e.g. 415-245-3234,
+    1.800.218.3141, etc.
+
+    @param phone : Phone number
+    @type  phone : str
+
+    @return : tel link HREF
+    @rtype  : str
+    
+    '''
+    digits = ''.join(c for c in phone if c in '0123456789')
+    if len(digits) == 10:
+        digits = '1' + digits
+    return 'tel:+' + digits
+
