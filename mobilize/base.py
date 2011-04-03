@@ -172,11 +172,11 @@ class Moplate(object):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         doc = html.fromstring(full_body)
-        for ii, elem in enumerate(self.components):
-            if elem.extracted:
-                elem.extract(doc)
-                elem.process(util.idname(ii))
-        params['elements'] = [elem.html() for elem in self.components]
+        for ii, component in enumerate(self.components):
+            if component.extracted:
+                component.extract(doc)
+                component.process(util.idname(ii))
+        params['elements'] = [component.html() for component in self.components]
         return self._render(params)
 
     def _render(self, params):
