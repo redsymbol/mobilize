@@ -117,9 +117,6 @@ def srchostport(environ):
             full_port = 80
     return full_host, full_port
     
-def get_method(environ):
-    return environ['REQUEST_METHOD'].upper()
-
 def get_rel_uri(environ):
     return environ['REQUEST_URI']
 
@@ -145,7 +142,7 @@ def dict2list(d):
 class RequestInfo(object):
     def __init__(self, wsgienviron):
         self.wsgienviron = wsgienviron
-        self.method = get_method(self.wsgienviron)
+        self.method = self.wsgienviron['REQUEST_METHOD'].upper()
         self.body = None
         self.uri = get_uri(self.wsgienviron)
         self.rel_uri = get_rel_uri(self.wsgienviron)
@@ -215,8 +212,8 @@ def mk_wsgi_application(msite):
     
     '''
     def application(environ, start_response):
-        reqinfo = RequestInfo(environ)
         http = get_http()
+        reqinfo = RequestInfo(environ)
         if reqinfo.method in ('POST', 'PUT'):
             reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
