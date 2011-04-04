@@ -155,7 +155,7 @@ class Extracted(Component):
                 self.elems[ii] = copy.deepcopy(elem)
         return self.elems
 
-    def process(self, default_idname):
+    def process(self, default_idname, moplatefilters=None):
         '''
         Process the extracted element, before rendering as a string
 
@@ -165,24 +165,31 @@ class Extracted(Component):
 
         Operates on self.elem, replacing it as a side effect.
 
-        The element will be wrapped in a new div, which are given the
+        The element will be wrapped in a new div, which is given the
         class and ID according to the classvalue and idname member
         variables.  default_idname is used as a fallback idname; If
         self.idname has already been set, that will be used instead.
 
-        @param elem      : HTML element to process
-        @type  elem      : lxml.html.HtmlElement
+        @param elem           : HTML element to process
+        @type  elem           : lxml.html.HtmlElement
 
-        @param default_idname    : ID attribute to apply to the enclosing div
-        @type  default_idname    : str
+        @param default_idname : ID attribute to apply to the enclosing div
+        @type  default_idname : str
 
-        @param filters   : Filters to apply to the element
-        @type  filters   : list of filterapi functions from mobilize.filter
+        @param moplatefilters : Additional moplate-level filters to apply
+        @type  moplatefilters : list of callable; or None for no filters (empty list)
 
-        @return          : New element with the applied changes
-        @rtype           : lxml.html.HtmlElement
+        @return               : New element with the applied changes
+        @rtype                : lxml.html.HtmlElement
         
         '''
+        if moplatefilters is None:
+            moplatefilters = []
+        def applyfilters(elem):
+            for filt in self.filters:
+                filt(elem)
+            for filt in moplatefilters:
+                filt(elem)
         from lxml.html import HtmlElement
         assert type(self.elems) is list, self.elems
         if self.idname is None:
@@ -192,8 +199,7 @@ class Extracted(Component):
         if self.filtermode == FILT_EACHELEM:
             # applying filters to extracted elements individually
             for elem in self.elems:
-                for filt in self.filters:
-                    filt(elem)
+                applyfilters(elem)
         # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = 'div'
@@ -201,8 +207,7 @@ class Extracted(Component):
             newelem.append(elem)
         if self.filtermode == FILT_COLLAPSED:
             # applying filters to the single collapsed element
-            for filt in self.filters:
-                filt(newelem)
+            applyfilters(newelem)
         newelem.attrib['class'] = self.classvalue
         newelem.attrib['id'] = idname
         if bool(self.style):

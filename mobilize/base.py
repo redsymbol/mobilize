@@ -1,7 +1,11 @@
 import types
 import re
 from collections import OrderedDict
-import exceptions, util
+from mobilize import (
+    exceptions,
+    util,
+    filters,
+    )
 
 class MobileSite(object):
     '''
@@ -171,11 +175,18 @@ class Moplate(object):
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
+        if 'fullsite' in params and 'request_path' in params:
+            desktop_url = 'http://%(fullsite)s%(request_path)s' % params
+            moplatefilters = [
+                lambda elem: filters.absimgsrc(elem, desktop_url)
+                ]
+        else:
+            moplatefilters = []
         doc = html.fromstring(full_body)
         for ii, component in enumerate(self.components):
             if component.extracted:
                 component.extract(doc)
-                component.process(util.idname(ii))
+                component.process(util.idname(ii), moplatefilters)
         params['elements'] = [component.html() for component in self.components]
         return self._render(params)
 

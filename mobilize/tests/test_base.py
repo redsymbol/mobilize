@@ -168,7 +168,7 @@ class TestMobileSite(unittest.TestCase):
   <body>
     <div class="mwu-elem" id="mwu-elem-0">
       <div id="header">
-        <img src="/logo.png" alt="Acme">
+        <img src="http://example.com/logo.png" alt="Acme">
         <h1>Acme Services</h1>
       </div>
     </div>
@@ -203,7 +203,9 @@ class TestMobileSite(unittest.TestCase):
             DjangoTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}),
             ]
         params = {
-            'title' : '<Mobile Test One>',
+            'title'        : '<Mobile Test One>',
+            'fullsite'     : 'example.com',
+            'request_path' : '/foo',
             }
         moplate = DjangoMoplate('one.html', components, params)
         tmap = mobilize.MoplateMap([('/foo$', moplate)])
