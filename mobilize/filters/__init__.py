@@ -41,9 +41,12 @@ from .tables import (
     Spec,
     )
 
+from .misc import (
+    absimgsrc,
+    )
+
 COMMON_FILTERS = [
     noinlinestyles,
     noevents,
     nomiscattrib,
     ]
-

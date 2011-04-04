@@ -832,3 +832,31 @@ here's some extra trailing text for you too
 </div>
 '''
         self.assertSequenceEqual(normxml(expected_str), normxml(actual_str))
+
+    def test_absimgsrc(self):
+        html1_in = '''<div>
+<p>Hi there.</p>
+<img src="http://foo.example.com/path/to/bananas.jpg" alt="yellow fruit" width="23" height="480">
+<img src="/_mwu/bananatree.jpg" alt="where they come from">
+<p>Here's some more.</p>
+<img src="/fruitpics/strawberry.jpg" alt="berry good">
+<p>and then:
+<img src="standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+</p>
+</div>'''
+        html1_out = '''<div>
+<p>Hi there.</p>
+<img src="http://foo.example.com/path/to/bananas.jpg" alt="yellow fruit" width="23" height="480">
+<img src="/_mwu/bananatree.jpg" alt="where they come from">
+<p>Here's some more.</p>
+<img src="http://desktop.example.com/fruitpics/strawberry.jpg" alt="berry good">
+<p>and then:
+<img src="http://desktop.example.com/articles/standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+</p>
+</div>'''
+        desktop_url = 'http://desktop.example.com/articles/delicious.html'
+        from mobilize.filters.misc import absimgsrc
+        elem = html.fromstring(html1_in)
+        absimgsrc(elem, desktop_url)
+        result = elem2str(elem)
+        self.assertSequenceEqual(normxml(html1_out), normxml(result))

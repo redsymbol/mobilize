@@ -4,6 +4,8 @@ from lxml import html
 MWU_PREFIX = 'mwu-'
 #: Default CSS identifier prefix used for extracted elements (i.e, rendered components)
 ELEMENT_NAME = MWU_PREFIX + 'elem'
+#:
+STATIC_URL = '/_mwu/'
 
 def classvalue(*extra_class_suffixes):
     '''
