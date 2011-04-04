@@ -79,7 +79,8 @@ def mobilizeable(resp):
     @type  resp : dict
     
     '''
-    if 'xml' in resp['content-type'] or 'html' in resp['content-type']:
+    contenttype = resp.get('content-type', '')
+    if 'xml' in contenttype or 'html' in contenttype:
         return True
     return False
 
