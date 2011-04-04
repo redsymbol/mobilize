@@ -202,3 +202,36 @@ def phone_href(phone):
         digits = '1' + digits
     return 'tel:+' + digits
 
+def urlbase(url):
+    '''
+    Determine the base of a URL
+
+    The base of a URL is defined as the absolute prefix of relative
+    URLs within the document.  For example, suppose a document whose
+    URL is http://example.com/fruit/lemons.html contains an image
+    whose SRC attribute is "Images/sliced-lemons.png".  The absolute
+    path of this image would be
+    http://example.com/fruit/Images/sliced-lemons.png.  Thus, the base
+    URL for this document is http://example.com/fruit/.
+
+    By definition, base URLs will always end with a trailing slash.
+    Base URLs are always absolute.
+
+    @param url : URL of document
+    @type  url : str
+
+    @return    : base URL
+    @rtype     : str
+    
+    '''
+    from urlparse import urlparse
+    parsed = urlparse(url)
+    assert '' != parsed.scheme
+    parts = parsed.path.lstrip('/').split('/')
+    if parsed.path in ('', '/') or len(parts) < 2:
+        basepath = '/'
+    elif parsed.path.endswith('/'):
+        basepath = parsed.path
+    else:
+        basepath = '/' + '/'.join(parts[:-1]).strip('/') + '/'
+    return '%s://%s%s' % (parsed.scheme, parsed.netloc, basepath)

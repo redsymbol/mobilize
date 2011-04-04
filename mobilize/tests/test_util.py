@@ -32,3 +32,36 @@ class TestUtil(unittest.TestCase):
         self.assertSequenceEqual('mwu-elem-42', util.idname(42))
         self.assertSequenceEqual('mwu-elem-0', util.idname(0))
         self.assertSequenceEqual('mwu-elem-blah', util.idname('blah'))
+
+    def test_urlbase(self):
+        testdata =[
+            {'url'  : 'http://example.com',
+             'base' : 'http://example.com/',
+             },
+            {'url'  : 'http://example.com/',
+             'base' : 'http://example.com/',
+             },
+            {'url'  : 'http://example.com/foo.html',
+             'base' : 'http://example.com/',
+             },
+            {'url'  : 'http://example.com/baz/something.html',
+             'base' : 'http://example.com/baz/',
+             },
+            {'url'  : 'http://example.com/baz/index.html',
+             'base' : 'http://example.com/baz/',
+             },
+            {'url'  : 'http://example.com/baz/',
+             'base' : 'http://example.com/baz/',
+             },
+            {'url'  : 'http://example.com/baz/x.html?a=2&b=3',
+             'base' : 'http://example.com/baz/',
+             },
+            {'url'  : 'http://example.com/baz/x.html#hey',
+             'base' : 'http://example.com/baz/',
+             },
+            ]
+        from mobilize.util import urlbase
+        for ii, td in enumerate(testdata):
+            actual = urlbase(td['url'])
+            msg = 'e: "%s", a; "%s" [%d]' % (td['base'], actual, ii)
+            self.assertSequenceEqual(td['base'], actual, msg)
