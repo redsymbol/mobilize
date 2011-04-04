@@ -38,4 +38,6 @@ class WsgiLogger(object):
         '''
         Write a message
         '''
+        if not msg.endswith('\n'):
+            msg += '\n'
         self.outf.write(msg)
