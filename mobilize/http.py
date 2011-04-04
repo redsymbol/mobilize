@@ -213,14 +213,21 @@ def mk_wsgi_application(msite):
     
     '''
     def application(environ, start_response):
+        from mobilize.log import WsgiLogger
+        logger = WsgiLogger.create(environ)
+        log = logger.log
+        debuglog = False
         http = get_http()
         reqinfo = RequestInfo(environ)
         if reqinfo.method in ('POST', 'PUT'):
             reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
+        request_headers = reqinfo.headers(request_overrides)
+        if debuglog:
+            log('request_headers (%s %s): %s' % (reqinfo.method, reqinfo.uri, str(request_headers)))
         resp, src_resp_body = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
-                                           headers=reqinfo.headers(request_overrides))
+                                           headers=request_headers)
         status = '%s %s' % (resp.status, resp.reason)
         if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
@@ -230,6 +237,8 @@ def mk_wsgi_application(msite):
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
+        if debuglog:
+            log('resp_headers (%s %s): %s' % (reqinfo.method, reqinfo.uri, str(mobilized_resp_headers)))
         start_response(status, mobilized_resp_headers)
         return [mobilized_body]
     return application
