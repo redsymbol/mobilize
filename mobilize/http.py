@@ -165,6 +165,41 @@ class RequestInfo(object):
         
         '''
         from headers import get_request_xform
+        headers = {}
+        for header, value in self.iterrawheaders():
+            # We want to preserve the Camel-Casing of the header names
+            # we're about to send, because who knows what web server
+            # or gateway will randomly go crazy if we don't.  But for
+            # consistency and simplicity, related data
+            # (e.g. overrides) are keyed by their fully-lowercased
+            # equivalents.  These two ideas are labeled "header" and
+            # "headerkey" respectively.
+            headerkey = header.lower()
+            if headerkey in overrides:
+                override = overrides[headerkey]
+                if callable(override):
+                    newvalue = override(self.wsgienviron, value)
+                else:
+                    newvalue = override
+            else:
+                xformer = get_request_xform(headerkey, self.method)
+                newvalue = xformer(self.wsgienviron, value)
+            headers[header] = newvalue
+        return headers
+
+    def iterrawheaders(self):
+        '''
+        Generate the raw http headers and their values
+
+        These are the raw headers from the client, before any
+        overrides or other customization.  The header name is camel
+        cased, with words separated by hyphens - e.g. "Last-Modified",
+        not "HTTP_LAST_MODIFIED" nor "last-modified".
+
+        @return : (header, value) pairs
+        @rtype  : iterator of (str, str)
+        
+        '''
         extrakeys = (
             'CONTENT_LENGTH',
             'CONTENT_TYPE',
@@ -177,29 +212,10 @@ class RequestInfo(object):
             elif rawkey in extrakeys:
                 header = _name2field(rawkey)
             return header
-        headers = {}
         for rawkey, value in self.wsgienviron.iteritems():
             header = headername(rawkey)
             if header is not None:
-                # We want to preserve the Camel-Casing of the header names
-                # we're about to send, because who knows what web server
-                # or gateway will randomly go crazy if we don't.  But for
-                # consistency and simplicity, related data
-                # (e.g. overrides) are keyed by their fully-lowercased
-                # equivalents.  These two ideas are labeled "header" and
-                # "headerkey" respectively.
-                headerkey = header.lower()
-                if headerkey in overrides:
-                    override = overrides[headerkey]
-                    if callable(override):
-                        newvalue = override(self.wsgienviron, value)
-                    else:
-                        newvalue = override
-                else:
-                    xformer = get_request_xform(headerkey, self.method)
-                    newvalue = xformer(self.wsgienviron, value)
-                headers[header] = newvalue
-        return headers
+                yield header, value
 
 def mk_wsgi_application(msite, debug=False):
     '''
@@ -216,37 +232,41 @@ def mk_wsgi_application(msite, debug=False):
         from mobilize.log import mk_wsgi_log
         log = mk_wsgi_log(environ)
         reqinfo = RequestInfo(environ)
-        def log_headers(label, headers):
-            log('%s (%s %s): %s' % (
-                    label,
-                    reqinfo.method,
-                    reqinfo.uri,
-                    str(request_headers),
-                    ))
+        def log_headers(label, headers, **kw):
+            if debug:
+                msg = '%s (%s %s): %s' % (
+                        label,
+                        reqinfo.method,
+                        reqinfo.uri,
+                        str(headers),
+                        )
+                for k, v in kw.iteritems():
+                    msg += ', %s=%s' % (k, v)
+                log(msg)
         http = get_http()
         if reqinfo.method in ('POST', 'PUT'):
             reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
+        if debug: # so we don't unnecessarily create a new list
+            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
         request_headers = reqinfo.headers(request_overrides)
-        if debug:
-            log_headers('request_headers', request_headers)
+        log_headers('modified request headers', request_headers)
         resp, src_resp_body = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         status = '%s %s' % (resp.status, resp.reason)
         if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
             resp_headers = dict2list(resp)
-            if debug:
-                log_headers('resp_headers [passthru]', resp_headers)
+            log_headers('raw response headers [passthru]', resp_headers)
             start_response(status, resp_headers)
             return [src_resp_body]
+        log_headers('raw response headers', resp, status=status)
         mobilized_body = str(msite.render_body(reqinfo.rel_uri, src_resp_body)) #TODO: why is the str() cast here?
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
-        if debug:
-            log_headers('resp_headers', mobilized_resp_headers)
+        log_headers('modified resp headers', mobilized_resp_headers)
         start_response(status, mobilized_resp_headers)
         return [mobilized_body]
     return application
