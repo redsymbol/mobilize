@@ -3,9 +3,30 @@ Mobilize logging facilities
 
 '''
 
-class WsgiLogger(object):
+def mk_wsgi_log(environ):
     '''
-    Class for logging to WSGI web server
+    Create a webserver logging function for a wsgi environment
+
+    This will return a callable that writes to the wsgi.errors file,
+    which normally means that messages will be written in the web
+    server error log for this (virtual)host.
+
+    Tne callable takes a single argument, a string, which is written
+    to the web server error log:
+
+      log = mk_wsgi_log(wsgienviron)
+      log('Hello World')
+
+    @param environ : WSGI environment
+    @type  environ : dict
+    
+    '''
+    logger = Logger(environ['wsgi.errors'])
+    return logger.log
+    
+class Logger(object):
+    '''
+    Class for logging
     '''
 
     def __init__(self, outf):
@@ -17,22 +38,6 @@ class WsgiLogger(object):
         
         '''
         self.outf = outf
-
-    @classmethod
-    def create(Cls, environ):
-        '''
-        Create a logger for a wsgi environment
-
-        This will return a logger that writes to the wsgi.errors file,
-        which normally means that messages will be written in the web
-        server error log for this (virtual)host.
-
-        @param environ : WSGI environment
-        @type  environ : dict
-        
-        '''
-        logger = Cls(environ['wsgi.errors'])
-        return logger
 
     def log(self, msg):
         '''
