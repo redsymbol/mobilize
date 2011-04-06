@@ -217,7 +217,7 @@ class RequestInfo(object):
             if header is not None:
                 yield header, value
 
-def mk_wsgi_application(msite, debug=False):
+def mk_wsgi_application(msite, verboselog=False):
     '''
     Create the WSGI application
 
@@ -233,7 +233,7 @@ def mk_wsgi_application(msite, debug=False):
         log = mk_wsgi_log(environ)
         reqinfo = RequestInfo(environ)
         def log_headers(label, headers, **kw):
-            if debug:
+            if verboselog:
                 msg = '%s (%s %s): %s' % (
                         label,
                         reqinfo.method,
@@ -248,7 +248,7 @@ def mk_wsgi_application(msite, debug=False):
             reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
-        if debug: # so we don't unnecessarily create a new list
+        if verboselog: # so we don't unnecessarily create a new list
             log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
         request_headers = reqinfo.headers(request_overrides)
         log_headers('modified request headers', request_headers)
