@@ -265,6 +265,8 @@ def mk_wsgi_application(msite, verboselog=False):
         mobilized_body = str(msite.render_body(reqinfo.rel_uri, src_resp_body)) #TODO: why is the str() cast here?
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
+        if 'transfer-encoding' in resp:
+            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
         mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
         log_headers('modified resp headers', mobilized_resp_headers)
         start_response(status, mobilized_resp_headers)
