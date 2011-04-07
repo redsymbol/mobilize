@@ -33,6 +33,7 @@ class Extracted(Component):
                  style='',
                  filtermode=FILT_EACHELEM,
                  usecopy=False,
+                 tag='div',
                  ):
         '''
         ctor
@@ -105,6 +106,9 @@ class Extracted(Component):
 
         @param usecopy     : Whether to operate on a copy of the source element
         @type  usecopy     : bool
+
+        @param tag         : Name of containing tag
+        @type  tag         : str
         
         '''
         self.selector = selector
@@ -125,6 +129,7 @@ class Extracted(Component):
         self.style = style
         self.filtermode = filtermode
         self.usecopy = usecopy
+        self.tag = tag
 
     def _extract(self, source):
         '''
@@ -202,7 +207,7 @@ class Extracted(Component):
                 applyfilters(elem)
         # wrap in special mobilize class, id
         newelem = HtmlElement()
-        newelem.tag = 'div'
+        newelem.tag = self.tag
         for elem in self.elems:
             newelem.append(elem)
         if self.filtermode == FILT_COLLAPSED:
