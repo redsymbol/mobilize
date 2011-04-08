@@ -34,6 +34,7 @@ class Extracted(Component):
                  filtermode=FILT_EACHELEM,
                  usecopy=False,
                  tag='div',
+                 innerhtml=False,
                  ):
         '''
         ctor
@@ -78,6 +79,13 @@ class Extracted(Component):
         filtermode FILT_EACHELEM, but complexity \Omega(M) for
         FILT_COLLAPSED.
 
+        If innerhtml is False (the default), then the selected element
+        will be extracted.  If innerhtml is True, the actual content
+        of that element is extracted; the parent tag itself is
+        dropped.  This only has an effect if there is exactly one
+        matching element, otherwise the innerhtml=False behavior is
+        forced.
+
         TODO: make FILT_COLLAPSED the default filtermode
 
         @param selector    : What part of the document to extract
@@ -109,6 +117,9 @@ class Extracted(Component):
 
         @param tag         : Name of containing tag
         @type  tag         : str
+
+        @param innerhtml   : If true, select the matching element's content only
+        @type  innerhtml   : bool
         
         '''
         self.selector = selector
@@ -130,6 +141,7 @@ class Extracted(Component):
         self.filtermode = filtermode
         self.usecopy = usecopy
         self.tag = tag
+        self.innerhtml = innerhtml
 
     def _extract(self, source):
         '''
@@ -152,6 +164,12 @@ class Extracted(Component):
         Extracts content from the source, sets to self.elems
 
         Relies on self._extract, which should be implemented by the subclass.
+        
+        @param source : HTML element of source to extract from
+        @type  source : lxml.html.HtmlElement
+
+        @return       : html element representing extracted content
+        @rtype        : lxml.html.HtmlElement
         
         '''
         self.elems = self._extract(source)
@@ -208,8 +226,11 @@ class Extracted(Component):
         # wrap in special mobilize class, id
         newelem = HtmlElement()
         newelem.tag = self.tag
-        for elem in self.elems:
-            newelem.append(elem)
+        if self.innerhtml and len(self.elems) == 1:
+            newelem.text = self.elems[0].text
+        else:
+            for elem in self.elems:
+                newelem.append(elem)
         if self.filtermode == FILT_COLLAPSED:
             # applying filters to the single collapsed element
             applyfilters(newelem)

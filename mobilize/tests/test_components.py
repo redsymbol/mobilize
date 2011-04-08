@@ -136,4 +136,37 @@ pageTracker._trackPageview();
         actual = normxml(noga.html())
         expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga"></div>''')
         self.assertSequenceEqual(expected, actual)
+
+
+    def test_innerhtml(self):
+        from mobilize.components import XPath
+        html_str = '''<table><tr><td>Hello</td></tr></table>'''
+        # test for innerhtml=False
+        component_f = XPath('//td', idname='foo', innerhtml=False)
+        component_f.extract(html.fromstring(html_str))
+        extracted = component_f.process('nothing')
+        extracted_str = html.tostring(extracted)
+        expected = '<div class="mwu-elem" id="foo"><td>Hello</td></div>'
+        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
+        
+        # test for innerhtml=True
+        component_t = XPath('//td', idname='foo', innerhtml=True)
+        component_t.extract(html.fromstring(html_str))
+        extracted = component_t.process('nothing')
+        extracted_str = html.tostring(extracted)
+        expected = '<div class="mwu-elem" id="foo">Hello</div>'
+        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
+        
+        # test for ineffectiveness of innerhtml=True with multiple matching elements
+        component_t = XPath('//td', idname='foo', innerhtml=True)
+        component_t.extract(html.fromstring('''
+<table><tr>
+<td>Hello</td>
+<td>Goodbye</td>
+</tr></table>
+'''))
+        extracted = component_t.process('nothing')
+        extracted_str = html.tostring(extracted)
+        expected = '<div class="mwu-elem" id="foo"><td>Hello</td><td>Goodbye</td></div>'
+        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
         
