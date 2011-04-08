@@ -207,7 +207,7 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     specmap for the above would read:
 
     specmap = [
-      Spec(idname('contact') 0, 0, 3, 0)),
+      Spec(idname('contact'), 0, 0, 3, 0)),
       Spec(idname('ourteam'), 1, 2, 4, 3)),
     ]
 
