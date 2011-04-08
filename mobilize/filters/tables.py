@@ -215,6 +215,8 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     browser are omitted. Set omit_whitespace=False if you don't want
     these cells discarded.
 
+    TODO: make the above paragraph true even if a TD element contains, say, an empty SPAN
+
     If the extracted cells are one-dimensional (i.e. a single column
     or row), the group will be a list of DIVs (as in the "contact us"
     example). But if the cells extend over more than one row and
