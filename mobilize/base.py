@@ -290,7 +290,7 @@ def _regex(re_or_str):
     @rtype           : RegexObject
     
     '''
-    if type(re_or_str) in str:
+    if type(re_or_str) is str:
         return re.compile(r'^' + re_or_str)
     return re_or_str
 

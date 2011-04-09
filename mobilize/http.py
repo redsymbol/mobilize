@@ -265,7 +265,7 @@ def mk_wsgi_application(msite, verboselog=False):
             return [src_resp_body]
         if verboselog:
             log_headers('raw response headers', resp, status=status)
-        mobilized_body = str(msite.render_body(reqinfo.rel_uri, src_resp_body)) #TODO: why is the str() cast here?
+        mobilized_body = msite.render_body(reqinfo.rel_uri, str(src_resp_body))
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         if 'transfer-encoding' in resp:
