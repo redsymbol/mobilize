@@ -239,7 +239,7 @@ def guess_charset(resp, src_resp_bytes, default_charset):
         key = b'<?xml'
         initial = body[:len(key)].lower()
         return key == initial
-    def _prebody(html_bytes):
+    def _headbytes(html_bytes):
         '''fetch the portion of a document before the opening of the body element'''
         def findpos(key):
             match = re.search(key, html_bytes, re.I)
@@ -266,19 +266,18 @@ def guess_charset(resp, src_resp_bytes, default_charset):
         if match is not None:
             charset = match.groups()[0].lower()
     else:
-        prolog = _prebody(src_resp_bytes).decode()
+        headbytes = _headbytes(src_resp_bytes).decode()
         match_ct = re.search(
             r'<meta\s+http-equiv\s*=\s*(?:"content-type"|content-type)\s+[^>]*charset=("[^>"]+"|[^>"]+)',
-            prolog, re.I)
+            headbytes, re.I)
         if match_ct is not None:
             charset = match_ct.groups()[0].lower()
         else:
             match_ct_html5 = re.search(
                 r'<meta\s+charset=("[^>"]+"|[^>" ]+)',
-                prolog, re.I)
+                headbytes, re.I)
             if match_ct_html5 is not None:
                 charset = match_ct_html5.groups()[0].lower().strip('"')
-            
     return charset
         
 
