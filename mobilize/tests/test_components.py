@@ -1,6 +1,7 @@
 import unittest
 from utils4test import data_file_path, normxml
 from mobilize.components import Extracted
+from mobilize.util import elem2str
 from lxml import html
 
 class DummyExtracted(Extracted):
@@ -26,7 +27,7 @@ class TestExtracted(unittest.TestCase):
             newelem = component.process(td['idname'])
             self.assertEqual(newelem, component.elem)
             self.assertEqual(html.HtmlElement, type(component.elem))
-            self.assertSequenceEqual(td['newelem_str'], html.tostring(component.elem))
+            self.assertSequenceEqual(td['newelem_str'], elem2str(component.elem))
 
     def test_extract_csspath(self):
         from mobilize.components import CssPath
@@ -147,7 +148,9 @@ pageTracker._trackPageview();
         extracted = component_f.process('nothing')
         extracted_str = html.tostring(extracted)
         expected = '<div class="mwu-elem" id="foo"><td>Hello</td></div>'
-        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
+        e = normxml(expected)
+        a = normxml(extracted_str)
+        self.assertSequenceEqual(e, a)
         
         # test for innerhtml=True
         component_t = XPath('//td', idname='foo', innerhtml=True)

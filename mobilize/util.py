@@ -108,7 +108,7 @@ def elem2str(elem):
     @rtype  : str
     
     '''
-    return html.tostring(elem, method='html')
+    return html.tostring(elem, method='html').decode('utf-8')
 
 def htmlelem(tag='div',
              children=None,

@@ -1,7 +1,9 @@
 import unittest
 import os
 import mobilize
-from utils4test import data_file_path, DATA_DIR
+from utils4test import (
+    data_file_path, DATA_DIR,
+    )
 
 TEMPLATE_DIR = os.path.join(DATA_DIR, 'templates')
 MINIMAL_HTML_DOCUMENT = '''<!doctype html>
