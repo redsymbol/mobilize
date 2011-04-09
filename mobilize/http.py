@@ -253,8 +253,12 @@ def mk_wsgi_application(msite, verboselog=False):
         request_headers = reqinfo.headers(request_overrides)
         if verboselog:
             log_headers('modified request headers', request_headers)
-        resp, src_resp_body = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
+
+        #charset = 'utf-8'  # TODO: be dynamic about charset
+        charset = 'ISO-8859-1'
+        src_resp_body = src_resp_bytes.decode(charset)
         status = '%s %s' % (resp.status, resp.reason)
         if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
@@ -262,10 +266,10 @@ def mk_wsgi_application(msite, verboselog=False):
             if verboselog:
                 log_headers('raw response headers [passthru]', resp_headers)
             start_response(status, resp_headers)
-            return [src_resp_body]
+            return [src_resp_bytes]
         if verboselog:
             log_headers('raw response headers', resp, status=status)
-        mobilized_body = msite.render_body(reqinfo.rel_uri, str(src_resp_body))
+        mobilized_body = msite.render_body(reqinfo.rel_uri, src_resp_body)
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         if 'transfer-encoding' in resp:
