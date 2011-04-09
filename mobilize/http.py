@@ -144,10 +144,13 @@ def dict2list(d):
 class RequestInfo(object):
     def __init__(self, wsgienviron):
         self.wsgienviron = wsgienviron
-        self.method = self.wsgienviron['REQUEST_METHOD'].upper()
-        self.body = None
-        self.uri = get_uri(self.wsgienviron)
-        self.rel_uri = get_rel_uri(self.wsgienviron)
+        self.method = wsgienviron['REQUEST_METHOD'].upper()
+        if self.method in ('POST', 'PUT'):
+            self.body = wsgienviron['wsgi.input'].read()
+        else:
+            self.body = None
+        self.uri = get_uri(wsgienviron)
+        self.rel_uri = get_rel_uri(wsgienviron)
 
     def headers(self, overrides):
         '''
@@ -312,8 +315,6 @@ def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
                 msg += ', %s=%s' % (k, v)
             log(msg)
         http = get_http()
-        if reqinfo.method in ('POST', 'PUT'):
-            reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         if verboselog:

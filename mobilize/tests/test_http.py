@@ -6,6 +6,8 @@ from utils4test import data_file_path, DATA_DIR
 class TestHttp(unittest.TestCase):
     maxDiff = 1024**2
     def test_get_request_headers(self):
+        import io
+        fake_wsgi_input = io.StringIO('hello')
         environ1 = dict([
             ('mod_wsgi.listener_port', '80'),
             ('HTTP_REFERER', 'http://example.mwuclient.com:2280/windsong_place_contact.html'),
@@ -36,7 +38,7 @@ class TestHttp(unittest.TestCase):
             ('HTTP_PRAGMA', 'no-cache'),
             ('SCRIPT_FILENAME', '/var/www/m.example.com/wsgiscript.py'),
             ('SERVER_ADMIN', '[no address given]'),
-            ('wsgi.input', None),
+            ('wsgi.input', fake_wsgi_input),
             ('HTTP_HOST', 'example.mwuclient.com:2280'),
             ('wsgi.multithread', True),
             ('mod_wsgi.callable_object', 'application'),
@@ -77,6 +79,10 @@ class TestHttp(unittest.TestCase):
         reqinfo = RequestInfo(environ1)
         actual = reqinfo.headers({})
         self.assertDictEqual(expected, actual)
+        self.assertEqual(reqinfo.body, 'hello')
+        self.assertEqual(reqinfo.method, 'POST')
+        self.assertEqual(reqinfo.uri, 'http://example.com/Scripts/FormMail_WP2.asp')
+        self.assertEqual(reqinfo.rel_uri, '/Scripts/FormMail_WP2.asp')
         
     def test_guess_charset(self):
         testdata = [
