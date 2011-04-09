@@ -36,7 +36,7 @@ def redir_dest(uri):
     @rtype     : str
     
     '''
-    from urllib import unquote
+    from urllib.parse import unquote
     match = _DEST_RE.search(uri)
     if match is not None:
         dest = unquote(match.group(1))

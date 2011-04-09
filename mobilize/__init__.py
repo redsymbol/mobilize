@@ -8,8 +8,8 @@ device-specific adaptation; and many other flexible, powerful,
 extensible features.
 
 '''
-from base import *
-from dj import DjangoMoplate
+from .base import *
+from .dj import DjangoMoplate
 __all__ = [
     'MobileSite',
     'TemplateMap',

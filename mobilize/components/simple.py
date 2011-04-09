@@ -1,7 +1,7 @@
 # TODO: use abc
 
 from mobilize import util
-from common import Component
+from .common import Component
 
 class Simple(Component):
     '''abstract base of all components that are independent of the source HTML page'''

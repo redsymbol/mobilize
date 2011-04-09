@@ -22,7 +22,7 @@ def absimgsrc(elem, desktop_url):
     mobilize.util.STATIC_URL, then the 
     '''
     from mobilize.util import urlbase
-    from urlparse import urlparse
+    from urllib.parse import urlparse
     parsed = urlparse(desktop_url)
     desktop_root_url = '%s://%s' % (parsed.scheme, parsed.netloc)
     base_url = urlbase(desktop_url)

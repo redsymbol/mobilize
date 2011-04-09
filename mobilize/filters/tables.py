@@ -254,9 +254,9 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
         assert spec.rowend >= spec.rowstart
         assert spec.colend >= spec.colstart
         wrap_rows = (spec.colend > spec.colstart) and (spec.rowend > spec.rowstart) # whether to wrap cells from the same TR tag in their own DIV
-        for ii in xrange(spec.rowstart, spec.rowend+1):
+        for ii in range(spec.rowstart, spec.rowend+1):
             cell_elems = []
-            for jj in xrange(spec.colstart, spec.colend+1):
+            for jj in range(spec.colstart, spec.colend+1):
                 td_elem = cells.get((ii, jj), None)
                 if td_elem is None:
                     continue # Could be a colspan issue.  Just skip over to next found cell

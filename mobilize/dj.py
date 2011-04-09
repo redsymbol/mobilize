@@ -3,7 +3,7 @@ Facilities making use of Django
 
 '''
 
-from base import Moplate
+from .base import Moplate
 
 def init_django(template_dirs):
     '''

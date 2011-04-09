@@ -58,7 +58,7 @@ class TestExtracted(unittest.TestCase):
             for sel in td['components']:
                 sel.extract(doc)
                 sel.process('some-id')
-            expected = map(normxml, td['extracted'])
+            expected = list(map(normxml, td['extracted']))
             actual = [normxml(sel.html()) for sel in td['components']]
             msg = 'e: %s, a: %s [%d %s]' % (expected, actual, ii, td['datafile'])
             self.assertEqual(expected, actual, msg)

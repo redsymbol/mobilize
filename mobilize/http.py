@@ -4,6 +4,7 @@ HTTP and WSGI server utilities
 '''
 
 import re
+import collections
 
 def _name2field(name, prefix=''):
     '''
@@ -52,11 +53,11 @@ def get_response_headers(resp_headers, environ, overrides):
     @rtype           : list of (header, value) tuples
     
     '''
-    from headers import get_response_xform
+    from .headers import get_response_xform
     def hv(header, value):
         if header in overrides:
             override = overrides[header]
-            if callable(override):
+            if isinstance(override, collections.Callable):
                 newvalue = override(environ, value)
             else:
                 newvalue = override
@@ -66,7 +67,7 @@ def get_response_headers(resp_headers, environ, overrides):
             value = xformer(environ, value)
             respheader = (header, value)
         return respheader
-    return list(hv(header, value) for header, value in resp_headers.iteritems())
+    return list(hv(header, value) for header, value in resp_headers.items())
 
 def mobilizeable(resp):
     '''
@@ -138,7 +139,7 @@ def get_http():
     return http
 
 def dict2list(d):
-    return list((header, value) for header, value in d.iteritems())
+    return list((header, value) for header, value in d.items())
 
 class RequestInfo(object):
     def __init__(self, wsgienviron):
@@ -164,7 +165,7 @@ class RequestInfo(object):
         @rtype           : dict
         
         '''
-        from headers import get_request_xform
+        from .headers import get_request_xform
         headers = {}
         for header, value in self.iterrawheaders():
             # We want to preserve the Camel-Casing of the header names
@@ -177,7 +178,7 @@ class RequestInfo(object):
             headerkey = header.lower()
             if headerkey in overrides:
                 override = overrides[headerkey]
-                if callable(override):
+                if isinstance(override, collections.Callable):
                     newvalue = override(self.wsgienviron, value)
                 else:
                     newvalue = override
@@ -212,7 +213,7 @@ class RequestInfo(object):
             elif rawkey in extrakeys:
                 header = _name2field(rawkey)
             return header
-        for rawkey, value in self.wsgienviron.iteritems():
+        for rawkey, value in self.wsgienviron.items():
             header = headername(rawkey)
             if header is not None:
                 yield header, value
@@ -239,7 +240,7 @@ def mk_wsgi_application(msite, verboselog=False):
                 reqinfo.uri,
                 str(headers),
                 )
-            for k, v in kw.iteritems():
+            for k, v in kw.items():
                 msg += ', %s=%s' % (k, v)
             log(msg)
         http = get_http()

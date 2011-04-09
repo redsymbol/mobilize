@@ -142,7 +142,7 @@ def htmlelem(tag='div',
         for child in children:
             elem.append(child)
     if attrib is not None:
-        for k, v in attrib.iteritems():
+        for k, v in attrib.items():
             elem.attrib[k] = v
     if text is not None:
         elem.text = text
@@ -178,7 +178,7 @@ def replace_child(parent, oldchild, newchild):
         oldchild.clear()
         oldchild.tag = newchild.tag
         oldchild.text = newchild.text
-        for k, v in newchild.attrib.iteritems():
+        for k, v in newchild.attrib.items():
             oldchild.attrib[k] = v
         for child in newchild:
             oldchild.append(child)
@@ -226,7 +226,7 @@ def urlbase(url):
     @rtype     : str
     
     '''
-    from urlparse import urlparse
+    from urllib.parse import urlparse
     parsed = urlparse(url)
     assert '' != parsed.scheme
     parts = parsed.path.lstrip('/').split('/')

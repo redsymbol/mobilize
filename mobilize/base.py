@@ -273,7 +273,7 @@ class MoplateMap(object):
         @raises exceptions.NoMatchingMoplateException : No matching template found
 
         '''
-        for pattern, moplate in self._mapping.iteritems():
+        for pattern, moplate in self._mapping.items():
             if pattern.search(url):
                 return moplate
         raise exceptions.NoMatchingMoplateException('no moplate match found for %s' % url)
@@ -290,7 +290,7 @@ def _regex(re_or_str):
     @rtype           : RegexObject
     
     '''
-    if type(re_or_str) in types.StringTypes:
+    if type(re_or_str) in str:
         return re.compile(r'^' + re_or_str)
     return re_or_str
 
@@ -341,7 +341,7 @@ def find_moplate(arg):
     @rtype     : mobilize.Moplate
     
     '''
-    if type(arg) in types.StringTypes:
+    if type(arg) in str:
         moplate = import_moplate(arg)
     elif type(arg) is tuple:
         moplate = import_moplate(*arg)

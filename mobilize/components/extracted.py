@@ -2,7 +2,7 @@ import copy
 
 from mobilize.filters import COMMON_FILTERS
 from mobilize import util
-from common import Component
+from .common import Component
 
 #: Indicates that filtering should be applied on every extracted element individually
 FILT_EACHELEM = 1

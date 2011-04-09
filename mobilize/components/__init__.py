@@ -19,5 +19,5 @@ the name - but never by parsing the desktop page content.
 
 '''
 
-from simple import *
-from extracted import *
+from .simple import *
+from .extracted import *
