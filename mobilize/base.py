@@ -342,7 +342,7 @@ def find_moplate(arg):
     @rtype     : mobilize.Moplate
     
     '''
-    if type(arg) in str:
+    if type(arg) is str:
         moplate = import_moplate(arg)
     elif type(arg) is tuple:
         moplate = import_moplate(*arg)
