@@ -78,5 +78,363 @@ class TestHttp(unittest.TestCase):
         actual = reqinfo.headers({})
         self.assertDictEqual(expected, actual)
         
-        
-        
+    def test_guess_charset(self):
+        testdata = [
+            {'msg' : 'Kitchen sink - all encoding signals present, and say utf-8',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                    'content-type' : 'text/html; charset=utf-8',
+                    },
+             'src_resp_bytes' : b'''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+             'default_charset' : 'utf-8',
+             'charset' : 'utf-8',
+             },
+            {'msg' : 'signaled by content-type header (utf-8)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                    'content-type' : 'text/html; charset=utf-8',
+                    },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            }, 
+            {'msg' : 'signaled by content-type header (ISO-8859-1)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                    'content-type' : 'text/html; charset=iso-8859-1',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            }, 
+            {'msg' : 'signaled by XML entity encoding (utf-8)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                    'content-type' : 'text/html',
+                },
+            'src_resp_bytes' : b'''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
+            {'msg': 'signaled by XML entity encoding (ISO-8859-1)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                    'content-type' : 'text/html',
+                },
+            'src_resp_bytes' : b'''<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (utf-8)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (utf-8, uppercase)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (utf-8, missing quotes)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content=text/html; charset=utf-8>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (iso-8859-1)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (iso-8859-1, uppercase)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            },
+            {'msg' : 'Signaled by meta http-equiv tag (iso-8859-1, missing quotes)',
+             # BTW, we need this because much HTML in the wild omits the quotes here:
+             #   <meta http-equiv="content-type" content=text/html; charset=iso-8859-1>
+             # Of course, this completely changes the semantics,
+             # making charset a separate attribute of the meta tag.
+             # But that's what real web pages do, so we have to handle it!
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content=text/html; charset=iso-8859-1>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            },
+            {'msg' : 'signaled by html5-style meta charset tag (utf-8)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet"/>
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
+            {'msg' : 'signaled by html5-style meta charset tag (ISO-8859-1)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="iso-8859-1">
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet"/>
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'iso-8859-1',
+            },
+            {'msg' : 'No perceivable signal, so falling back on default charset (us-ascii)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet"/>
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'us-ascii',
+            },
+            {'msg' : 'No perceivable signal, so falling back on default charset (utf-8)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet"/>
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'utf-8',
+            'charset' : 'utf-8',
+            },
+            ]
+        from mobilize.http import guess_charset
+        for ii, td in enumerate(testdata):
+            expected = td['charset']
+            actual = guess_charset(td['resp'], td['src_resp_bytes'], td['default_charset'])
+            msg = '{}: e: "{}", a: "{}" [{}]'.format(td['msg'], expected, actual, ii)
+            self.assertEqual(expected, actual, msg)

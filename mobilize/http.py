@@ -218,15 +218,85 @@ class RequestInfo(object):
             if header is not None:
                 yield header, value
 
-def mk_wsgi_application(msite, verboselog=False):
+def guess_charset(resp, src_resp_bytes, default_charset):
+    '''
+    Make the best guess of the charset of an http response
+
+    @param resp            : response headers
+    @type  resp            : dict
+
+    @param src_resp_bytes  : The raw response body
+    @type  src_resp_bytes  : bytes
+
+    @param default_charset : Charset to use if no other choice is clearly indicated
+    @type  default_charset : str
+
+    @return                : Likely best charset
+    @rtype                 : str
+    
+    '''
+    def _has_xml_header(body):
+        key = b'<?xml'
+        initial = body[:len(key)].lower()
+        return key == initial
+    def _prebody(html_bytes):
+        '''fetch the portion of a document before the opening of the body element'''
+        def findpos(key):
+            match = re.search(key, html_bytes, re.I)
+            assert match is not None, key
+            return match.start()
+        start = findpos(b'<head')
+        end = findpos(b'<body')
+        return html_bytes[start:end].strip()
+    def _ctcharset(resp):
+        if 'content-type' in resp:
+            match = re.search(r'\bcharset=([^; ]+)', resp['content-type'])
+            if match is not None:
+                return match.groups()[0]
+        return None
+    
+    charset = default_charset
+    check_ct = _ctcharset(resp)
+    if check_ct is not None:
+        charset = check_ct
+    elif _has_xml_header(src_resp_bytes):
+        n = src_resp_bytes.find(b'<html')
+        firstline = src_resp_bytes[:n].decode()
+        match = re.search(r'encoding="([^"]+)"', firstline)
+        if match is not None:
+            charset = match.groups()[0].lower()
+    else:
+        prolog = _prebody(src_resp_bytes).decode()
+        match_ct = re.search(
+            r'<meta\s+http-equiv\s*=\s*(?:"content-type"|content-type)\s+[^>]*charset=("[^>"]+"|[^>"]+)',
+            prolog, re.I)
+        if match_ct is not None:
+            charset = match_ct.groups()[0].lower()
+        else:
+            match_ct_html5 = re.search(
+                r'<meta\s+charset=("[^>"]+"|[^>" ]+)',
+                prolog, re.I)
+            if match_ct_html5 is not None:
+                charset = match_ct_html5.groups()[0].lower().strip('"')
+            
+    return charset
+        
+
+def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
     '''
     Create the WSGI application
 
-    @param msite : mobile site
-    @type  msite : mobilize.base.MobileSite
+    @param msite           : mobile site
+    @type  msite           : mobilize.base.MobileSite
 
-    @return      : WSGI application function
-    @rtype       : function accepting (environ, start_response) arguments
+    @param default_charset : Desktop website default charset
+    @type  default_charset : str
+
+    @param verboselog      : Enable verbose logging iff true
+    @type  verboselog      : bool
+
+    @return                : WSGI application function
+    @rtype                 : function accepting (environ, start_response) arguments
     
     '''
     def application(environ, start_response):
@@ -255,9 +325,7 @@ def mk_wsgi_application(msite, verboselog=False):
             log_headers('modified request headers', request_headers)
         resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
-
-        #charset = 'utf-8'  # TODO: be dynamic about charset
-        charset = 'ISO-8859-1'
+        charset = guess_charset(resp, src_resp_bytes, default_charset)
         src_resp_body = src_resp_bytes.decode(charset)
         status = '%s %s' % (resp.status, resp.reason)
         if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
