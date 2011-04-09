@@ -2,6 +2,7 @@ API_DOC_DIR=doc/api
 
 clean:
 	rm -f $$(find . -name '*.pyc' -o -name '*~')
+	rm -fr $$(find . -name __pycache__ -type d)
 test:
 	nosetests
 test-pdb:
