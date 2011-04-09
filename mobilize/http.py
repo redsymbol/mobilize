@@ -274,12 +274,11 @@ def guess_charset(resp, src_resp_bytes, default_charset):
             charset = match_ct.groups()[0].lower()
         else:
             match_ct_html5 = re.search(
-                r'<meta\s+charset=("[^>"]+"|[^>" ]+)',
+                r'<meta\s+charset\s*=\s*("[^>"]+"|[^>" ]+)',
                 headbytes, re.I)
             if match_ct_html5 is not None:
-                charset = match_ct_html5.groups()[0].lower().strip('"')
+                charset = match_ct_html5.groups()[0].lower().strip('" ')
     return charset
-        
 
 def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
     '''

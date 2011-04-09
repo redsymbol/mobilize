@@ -364,6 +364,29 @@ class TestHttp(unittest.TestCase):
             'default_charset' : 'us-ascii',
             'charset' : 'utf-8',
             },
+            {'msg' : 'signaled by html5-style meta charset tag (utf-8, uppercase with extra cruft)',
+             'resp' : {
+                    'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
+                    'server' : 'Apache/2.2.16 (Debian)',
+                    'content-length' : '1488',
+                    'content-encoding' : 'gzip',
+                    'vary' : 'User-Agent,Cookie,Accept-Encoding',
+                    'etag' : '"240deff688b75f3166b4baf12518926c"',
+                    'cache-control' : 'no-transform',
+                    'keep-alive' : 'timeout=15, max=100',
+                    'connection' : 'Keep-Alive',
+                },
+            'src_resp_bytes' : b'''<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset = " UTF-8 " >
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet"/>
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+            'default_charset' : 'us-ascii',
+            'charset' : 'utf-8',
+            },
             {'msg' : 'signaled by html5-style meta charset tag (ISO-8859-1)',
              'resp' : {
                     'date' : 'Sat, 09 Apr 2011 02:44:35 GMT',
