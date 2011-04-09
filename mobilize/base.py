@@ -320,6 +320,7 @@ def import_moplate(pagemodule, moplate_object='moplate'):
     
     '''
     import importlib
+    import msite.moplates
     mod = importlib.import_module('.' + pagemodule, 'msite.moplates')
     moplate = getattr(mod, moplate_object)
     assert isinstance(moplate, Moplate), type(moplate)
