@@ -122,7 +122,8 @@ def srchostport(environ):
 def get_rel_uri(environ):
     return environ['REQUEST_URI']
 
-def get_uri(environ, proto='http'):
+def get_uri(environ):
+    proto = environ.get('wsgi.url_scheme', 'http')
     host, port = srchostport(environ)
     assert type(port) is int, type(port)
     rel_uri = environ['REQUEST_URI']
