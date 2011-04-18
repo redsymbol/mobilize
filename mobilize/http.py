@@ -258,17 +258,20 @@ def guess_charset(resp, src_resp_bytes, default_charset):
             if match is not None:
                 return match.groups()[0]
         return None
-    
     charset = default_charset
     check_ct = _ctcharset(resp)
+    # Look for content-type HTTP response header
     if check_ct is not None:
         charset = check_ct
+    # Does the document have an xml encoding declaration?
     elif _has_xml_header(src_resp_bytes):
         n = src_resp_bytes.find(b'<html')
         firstline = src_resp_bytes[:n].decode()
         match = re.search(r'encoding="([^"]+)"', firstline)
         if match is not None:
             charset = match.groups()[0].lower()
+    # Does the HEAD element set the encoding in a META declaration?
+    # That means either an html5 'meta charset="..."', or 'meta http-equiv="content-type"'
     else:
         headbytes = _headbytes(src_resp_bytes).decode()
         match_ct = re.search(
@@ -282,6 +285,7 @@ def guess_charset(resp, src_resp_bytes, default_charset):
                 headbytes, re.I)
             if match_ct_html5 is not None:
                 charset = match_ct_html5.groups()[0].lower().strip('" ')
+    # Else just keep the default charset.
     return charset
 
 def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
