@@ -316,6 +316,8 @@ def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
                 msg += ', %s=%s' % (k, v)
             log(msg)
         http = get_http()
+        if reqinfo.method in ('POST', 'PUT'):
+            reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         if verboselog:
