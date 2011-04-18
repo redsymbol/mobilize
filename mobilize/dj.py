@@ -31,7 +31,7 @@ def init_django(template_dirs):
 
 class DjangoMoplate(Moplate):
     '''
-    Represents a mobile template rendered via the Django templating system
+    Represents a moplate rendered via the Django templating system
 
     Note that L{init_django} must be invoked before using most methods.
 
