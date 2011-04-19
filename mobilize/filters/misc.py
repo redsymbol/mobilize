@@ -92,8 +92,8 @@ def _link_converter(attribute, desktop_url):
     '''
     from mobilize.util import urlbase
     from urllib.parse import urlparse
+    from mobilize.util import STATIC_URL
     def is_desktop_relative(src):
-        from mobilize.util import STATIC_URL
         if src.startswith(STATIC_URL):
             return False
         for protocol in _protocols:
