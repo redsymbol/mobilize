@@ -177,13 +177,12 @@ pageTracker._trackPageview();
         '''
         Test that extracted components can accept multiple selectors
         '''
-        from mobilize.components import CssPath
+        from mobilize.components import CssPath, XPath
         selectors = [
             'nav',
             'section',
             ]
-        component = CssPath(selectors, idname='foo')
-        component.extract(html.fromstring('''<div>
+        src_html = '''<div>
 <nav>
   <a href="/A">A</a>
   <a href="/B">B</a>
@@ -193,10 +192,8 @@ pageTracker._trackPageview();
 <p>Hello.</p>
 </section>
 </div>
-'''))
-        extracted = component.process('nothing')
-        extracted_str = html.tostring(extracted)
-        expected = '''<div class="mwu-elem" id="foo">
+'''
+        expected_html = '''<div class="mwu-elem" id="foo">
 <nav>
   <a href="/A">A</a>
   <a href="/B">B</a>
@@ -205,4 +202,17 @@ pageTracker._trackPageview();
 <p>Hello.</p>
 </section>
 </div>'''
-        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
+        # test for CssPath
+        css_component = CssPath(selectors, idname='foo')
+        css_component.extract(html.fromstring(src_html))
+        extracted = css_component.process('nothing')
+        extracted_str = html.tostring(extracted)
+        self.assertSequenceEqual(normxml(expected_html), normxml(extracted_str))
+
+        # test for XPath
+        x_component = XPath(selectors, idname='foo')
+        x_component.extract(html.fromstring(src_html))
+        extracted = x_component.process('nothing')
+        extracted_str = html.tostring(extracted)
+        self.assertSequenceEqual(normxml(expected_html), normxml(extracted_str))
+        

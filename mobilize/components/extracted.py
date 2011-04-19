@@ -252,7 +252,14 @@ class Extracted(Component):
 
 class XPath(Extracted):
     def _extract(self, source):
-        return source.xpath(self.selector)
+        if type(self.selector) is list:
+            selectors = self.selector
+        else:
+            selectors = [self.selector]
+        extracted = []
+        for selector in selectors:
+            extracted += source.xpath(selector)
+        return extracted
 
 class CssPath(Extracted):
     def _extract(self, source):
