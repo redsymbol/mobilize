@@ -214,6 +214,7 @@ class Extracted(Component):
         @rtype                : lxml.html.HtmlElement
         
         '''
+        from lxml.html import HtmlElement
         if moplatefilters is None:
             moplatefilters = []
         def applyfilters(elem):
@@ -221,7 +222,6 @@ class Extracted(Component):
                 filt(elem)
             for filt in moplatefilters:
                 filt(elem)
-        from lxml.html import HtmlElement
         assert type(self.elems) is list, self.elems
         if self.idname is None:
             idname = default_idname
