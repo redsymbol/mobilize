@@ -26,6 +26,31 @@ class MobileSite(object):
         '''
         self.fullsite = fullsite
         self.moplate_map = moplate_map
+
+    def mk_site_filters(self, params):
+        '''
+        Create global mobile-site filters
+
+        Builds a list of filters that will be passed on to every
+        moplate during rendering, to be applied to the extracted
+        content of every mobile page.
+
+        This list can be altered or added to by subclasses.
+
+        @param params : Site-level template parameters
+        @type  params : dict
+        
+        @return       : Filters
+        @rtype        : list of callable
+        
+        '''
+        site_filters = []
+        if 'fullsite' in params and 'request_path' in params:
+            desktop_url = 'http://%(fullsite)s%(request_path)s' % params
+            site_filters.append(
+                lambda elem: filters.absimgsrc(elem, desktop_url)
+                )
+        return site_filters
     
     def render_body(self, url, full_body):
         '''
@@ -49,9 +74,10 @@ class MobileSite(object):
             'fullsite' : self.fullsite,
             'request_path' : url,
             }
+        site_filters = self.mk_site_filters(extra_params)
         try:
             moplate = self.moplate_map.get_moplate_for(url)
-            rendered = moplate.render(full_body, extra_params)
+            rendered = moplate.render(full_body, extra_params, site_filters)
         except exceptions.NoMatchingMoplateException:
             rendered = full_body
         return rendered
@@ -152,7 +178,7 @@ class Moplate(object):
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
 
-    def render(self, full_body, extra_params=None):
+    def render(self, full_body, extra_params=None, site_filters=None):
         '''
         Render the moplate for a particular HTML document body
 
@@ -166,27 +192,26 @@ class Moplate(object):
         @param extra_params : Extra template parameters to use for this rendering
         @type  extra_params : dict
         
+        @param site_filters : Mobile site filters to apply
+        @type  site_filters : list of filter callables
+        
         @return             : Rendered mobile page body
         @rtype              : str
 
         '''
         from lxml import html
         params = dict(self.params)
+        if site_filters is None:
+            site_filters = []
         if extra_params:
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
-        if 'fullsite' in params and 'request_path' in params:
-            desktop_url = 'http://%(fullsite)s%(request_path)s' % params
-            moplatefilters = [
-                lambda elem: filters.absimgsrc(elem, desktop_url)
-                ]
-        else:
-            moplatefilters = []
+        all_filters = list(site_filters) + self.mk_moplate_filters(params)
         doc = html.fromstring(full_body)
         for ii, component in enumerate(self.components):
             if component.extracted:
                 component.extract(doc)
-                component.process(util.idname(ii), moplatefilters)
+                component.process(util.idname(ii), all_filters)
         params['elements'] = [component.html() for component in self.components]
         return self._render(params)
 
@@ -204,6 +229,26 @@ class Moplate(object):
         
         '''
         assert False, 'must be implemented in subclass'
+
+    def mk_moplate_filters(self, params):
+        '''
+        Create moplate-level extra filters
+
+        Builds a list of filters specific to this moplate, that will
+        be applied to the extracted content of every mobile page.
+
+        This method is a hook that can be altered by subclasses.  By
+        default, it returns an empty list.  The params argument can be
+        used to generate filters specific to the parameter set.
+
+        @param params : Moplate template parameters
+        @type  params : dict
+
+        @return       : Filters
+        @rtype        : list of callable
+        
+        '''
+        return []
 
     def get_params(self):
         '''

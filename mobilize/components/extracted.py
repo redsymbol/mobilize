@@ -186,7 +186,7 @@ class Extracted(Component):
                 self.elems[ii] = copy.deepcopy(elem)
         return self.elems
 
-    def process(self, default_idname=None, moplatefilters=None):
+    def process(self, default_idname=None, extra_filters=None):
         '''
         Process the extracted element, before rendering as a string
 
@@ -208,20 +208,20 @@ class Extracted(Component):
         @param default_idname : Optional fallback ID attribute to apply to the enclosing div
         @type  default_idname : str
 
-        @param moplatefilters : Additional moplate-level filters to apply
-        @type  moplatefilters : list of callable; or None for no filters (empty list)
+        @param extra_filters  : Additional filters to post-apply, from moplate
+        @type  extra_filters  : list of callable; or None for no filters (empty list)
 
         @return               : New element with the applied changes
         @rtype                : lxml.html.HtmlElement
         
         '''
         from lxml.html import HtmlElement
-        if moplatefilters is None:
-            moplatefilters = []
+        if extra_filters is None:
+            extra_filters = []
         def applyfilters(elem):
             for filt in self.filters:
                 filt(elem)
-            for filt in moplatefilters:
+            for filt in extra_filters:
                 filt(elem)
         assert type(self.elems) is list, self.elems
         if self.idname is None:
