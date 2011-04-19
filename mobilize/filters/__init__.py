@@ -43,6 +43,7 @@ from .tables import (
 
 from .misc import (
     absimgsrc,
+    abslinkfilesrc,
     )
 
 DEFAULT_FILTERS = [

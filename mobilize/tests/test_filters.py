@@ -860,3 +860,23 @@ here's some extra trailing text for you too
         absimgsrc(elem, desktop_url)
         result = elem2str(elem)
         self.assertSequenceEqual(normxml(html1_out), normxml(result))
+
+    def test_abslinkfilesrc(self):
+        from mobilize.filters import abslinkfilesrc
+        html_in = '''<div>
+    <p><a href="marketstudy.xls">Market Study</a></p>
+    <p><a href="/whitepapers/fill-in-blank.doc">Make your own white paper!</a></p>
+    <p><a href="/whitepapers/widgets.pdf">Widget White Paper</a></p>
+</div>'''
+        html_out ='''<div>
+    <p><a href="http://example.com/about/marketstudy.xls">Market Study</a></p>
+    <p><a href="/whitepapers/fill-in-blank.doc">Make your own white paper!</a></p>
+    <p><a href="http://example.com/whitepapers/widgets.pdf">Widget White Paper</a></p>
+</div>'''
+        desktop_url = 'http://example.com/about/papers.html'
+        extensions=['.xls', '.pdf']
+
+        elem = html.fromstring(html_in)
+        abslinkfilesrc(elem, desktop_url, extensions)
+        result = html.tostring(elem)
+        self.assertSequenceEqual(normxml(html_out), normxml(result))
