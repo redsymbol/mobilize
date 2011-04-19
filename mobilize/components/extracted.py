@@ -186,7 +186,7 @@ class Extracted(Component):
                 self.elems[ii] = copy.deepcopy(elem)
         return self.elems
 
-    def process(self, default_idname, moplatefilters=None):
+    def process(self, default_idname=None, moplatefilters=None):
         '''
         Process the extracted element, before rendering as a string
 
@@ -200,11 +200,12 @@ class Extracted(Component):
         class and ID according to the classvalue and idname member
         variables.  default_idname is used as a fallback idname; If
         self.idname has already been set, that will be used instead.
+        It is a runtime error if neither are set.
 
         @param elem           : HTML element to process
         @type  elem           : lxml.html.HtmlElement
 
-        @param default_idname : ID attribute to apply to the enclosing div
+        @param default_idname : Optional fallback ID attribute to apply to the enclosing div
         @type  default_idname : str
 
         @param moplatefilters : Additional moplate-level filters to apply
@@ -224,6 +225,7 @@ class Extracted(Component):
                 filt(elem)
         assert type(self.elems) is list, self.elems
         if self.idname is None:
+            assert default_idname is not None, 'cannot determine an idname!'
             idname = default_idname
         else:
             idname = self.idname

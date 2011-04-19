@@ -112,7 +112,7 @@ class TestExtracted(unittest.TestCase):
         doc = html.fromstring(doc_str)
         ga = GoogleAnalytics()
         ga.extract(doc)
-        ga.process('nothing')
+        ga.process()
         actual = normxml(ga.html())
         expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga">
 <script type="text/javascript">
@@ -133,7 +133,7 @@ pageTracker._trackPageview();
         doc = html.fromstring(doc_str)
         noga = GoogleAnalytics()
         noga.extract(doc)
-        noga.process('nothing')
+        noga.process()
         actual = normxml(noga.html())
         expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga"></div>''')
         self.assertSequenceEqual(expected, actual)
@@ -145,7 +145,7 @@ pageTracker._trackPageview();
         # test for innerhtml=False
         component_f = XPath('//td', idname='foo', innerhtml=False)
         component_f.extract(html.fromstring(html_str))
-        extracted = component_f.process('nothing')
+        extracted = component_f.process()
         extracted_str = html.tostring(extracted)
         expected = '<div class="mwu-elem" id="foo"><td>Hello</td></div>'
         e = normxml(expected)
@@ -155,7 +155,7 @@ pageTracker._trackPageview();
         # test for innerhtml=True
         component_t = XPath('//td', idname='foo', innerhtml=True)
         component_t.extract(html.fromstring(html_str))
-        extracted = component_t.process('nothing')
+        extracted = component_t.process()
         extracted_str = html.tostring(extracted)
         expected = '<div class="mwu-elem" id="foo">Hello</div>'
         self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
@@ -168,7 +168,7 @@ pageTracker._trackPageview();
 <td>Goodbye</td>
 </tr></table>
 '''))
-        extracted = component_t.process('nothing')
+        extracted = component_t.process()
         extracted_str = html.tostring(extracted)
         expected = '<div class="mwu-elem" id="foo"><td>Hello</td><td>Goodbye</td></div>'
         self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
@@ -205,14 +205,39 @@ pageTracker._trackPageview();
         # test for CssPath
         css_component = CssPath(selectors, idname='foo')
         css_component.extract(html.fromstring(src_html))
-        extracted = css_component.process('nothing')
+        extracted = css_component.process()
         extracted_str = html.tostring(extracted)
         self.assertSequenceEqual(normxml(expected_html), normxml(extracted_str))
 
         # test for XPath
         x_component = XPath(selectors, idname='foo')
         x_component.extract(html.fromstring(src_html))
-        extracted = x_component.process('nothing')
+        extracted = x_component.process()
         extracted_str = html.tostring(extracted)
         self.assertSequenceEqual(normxml(expected_html), normxml(extracted_str))
-        
+
+    def test_process_idname(self):
+        from mobilize.components import CssPath, XPath
+        src_html = '''<div>
+<nav>
+  <a href="/A">A</a>
+  <a href="/B">B</a>
+</nav>
+'''
+        def prep_component(**kw):
+            return c
+        # check that default_idname is required if self.idname not defined
+        c1 = CssPath('nav')
+        c1.extract(html.fromstring(src_html))
+        with self.assertRaises(AssertionError):
+            c1.process()
+
+        # check that idname argument 
+        c2 = CssPath('nav', idname='foo')
+        c2.extract(html.fromstring(src_html))
+        c2.process() # no AssertionError on this line meanst the test passes
+
+        # check that default_idname supresses the error
+        c3 = CssPath('nav')
+        c3.extract(html.fromstring(src_html))
+        c3.process('foo') # no AssertionError on this line meanst the test passes
