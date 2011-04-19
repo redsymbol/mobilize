@@ -72,13 +72,13 @@ class TestExtracted(unittest.TestCase):
             pass
         def baz(elem):
             pass
-        from mobilize.filters import COMMON_FILTERS
+        from mobilize.filters import DEFAULT_FILTERS
         extracted = DummyExtracted('')
-        self.assertEquals(extracted.filters, COMMON_FILTERS)
+        self.assertEquals(extracted.filters, DEFAULT_FILTERS)
         extracted = DummyExtracted('', filters=[])
         self.assertEquals(extracted.filters, [])
         extracted = DummyExtracted('', prefilters=[foo], postfilters=[bar])
-        self.assertEquals(extracted.filters, [foo] + COMMON_FILTERS + [bar])
+        self.assertEquals(extracted.filters, [foo] + DEFAULT_FILTERS + [bar])
         ok = False
         try:
             extracted = DummyExtracted('', filters=[baz], prefilters=[foo], postfilters=[bar])

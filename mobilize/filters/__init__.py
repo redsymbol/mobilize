@@ -45,7 +45,7 @@ from .misc import (
     absimgsrc,
     )
 
-COMMON_FILTERS = [
+DEFAULT_FILTERS = [
     noinlinestyles,
     noevents,
     nomiscattrib,

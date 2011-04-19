@@ -1,6 +1,6 @@
 import copy
 
-from mobilize.filters import COMMON_FILTERS
+from mobilize.filters import DEFAULT_FILTERS
 from mobilize import util
 from .common import Component
 
@@ -56,7 +56,7 @@ class Extracted(Component):
         The filters, prefilters, and postfilters arguments all allow
         you to control what filters are applied to the extracted
         content. Each argument, if supplied, must be a list of filter
-        functions or callables. By default, filters.COMMON_FILTERS are
+        functions or callables. By default, filters.DEFAULT_FILTERS are
         set to be applied.  If you specify prefilters, that list is
         prepended to the default list; likewise, postfilters is
         appended to the default.  If you specify filters, that will
@@ -132,7 +132,7 @@ class Extracted(Component):
         else:
             self.selectors = [selector]
         if filters is None:
-            these_filters = list(COMMON_FILTERS)
+            these_filters = list(DEFAULT_FILTERS)
         else:
             assert (prefilters is None) and (postfilters is None),  'If you specify filters, you cannot specify either prefilters or postfilters'
             these_filters = list(filters)
