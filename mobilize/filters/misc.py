@@ -3,15 +3,6 @@ _protocols = (
     'https',
     'ftp',
     )
-def _is_desktop_relative(src):
-    from mobilize.util import STATIC_URL
-    if src.startswith(STATIC_URL):
-        return False
-    for protocol in _protocols:
-        if src.startswith(protocol + '://'):
-            return False
-    return True
-
 def absimgsrc(elem, desktop_url):
     '''
     Modify img "src" relative paths to be absolute
@@ -21,18 +12,7 @@ def absimgsrc(elem, desktop_url):
     and it is not a mobile-site image as indicated by a URL prefix of
     mobilize.util.STATIC_URL, then the 
     '''
-    from mobilize.util import urlbase
-    from urllib.parse import urlparse
-    parsed = urlparse(desktop_url)
-    desktop_root_url = '%s://%s' % (parsed.scheme, parsed.netloc)
-    base_url = urlbase(desktop_url)
-    def fiximg(img_elem):
-        if 'src' in img_elem.attrib:
-            if _is_desktop_relative(img_elem.attrib['src']):
-                if img_elem.attrib['src'].startswith('/'):
-                    img_elem.attrib['src'] = desktop_root_url + img_elem.attrib['src']
-                else:
-                    img_elem.attrib['src'] = base_url + img_elem.attrib['src']
+    fiximg = _link_converter('src', desktop_url)
     if 'img' == elem.tag:
         fiximg(elem)
     else:
@@ -77,24 +57,57 @@ def abslinkfilesrc(elem, desktop_url, extensions):
     @type  extensions : list of str
     
     '''
-    from mobilize.util import urlbase
-    from urllib.parse import urlparse
-    parsed = urlparse(desktop_url)
-    desktop_root_url = '%s://%s' % (parsed.scheme, parsed.netloc)
-    base_url = urlbase(desktop_url)
-    def replace_href(anchor):
-        if _is_desktop_relative(anchor.attrib['href']):
-            if anchor.attrib['href'].startswith('/'):
-                anchor.attrib['href'] = desktop_root_url + anchor.attrib['href']
-            else:
-                anchor.attrib['href'] = base_url + anchor.attrib['href']
+    fixanchor = _link_converter('href', desktop_url)
     def check_anchor(anchor):
         for ext in extensions:
             if anchor.attrib.get('href', '').endswith(ext):
-                replace_href(anchor)
+                fixanchor(anchor)
     if 'a' == elem.tag:
         check_anchor(elem)
     else:
         for anchor in elem.iterfind('.//a'):
             check_anchor(anchor)
     
+def _link_converter(attribute, desktop_url):
+    '''
+    Create a function that will convert link attributes to absolute desktop urls
+
+    This utility creates and returns a function that can be applied to
+    an element, to convert URL attribute which is relative to a full
+    absolute URL on the desktop site.  Examples include the 'src'
+    attribute of an IMG tag, or the 'href' attribute of an A tag.
+
+    If the value of the URL attribute is already absolute, or starts
+    with mobilize.util.STATIC_URL, that value will be unchanged.
+
+    @param attribute   : The name of the element's attribute to inspect, and possibly change
+    @type  attribute   : str
+
+    @param desktop_url : The URL of the current page's corresponding desktop version
+    @type  desktop_url : str
+
+    @return            : link converter
+    @rtype             : function
+
+    '''
+    from mobilize.util import urlbase
+    from urllib.parse import urlparse
+    def is_desktop_relative(src):
+        from mobilize.util import STATIC_URL
+        if src.startswith(STATIC_URL):
+            return False
+        for protocol in _protocols:
+            if src.startswith(protocol + '://'):
+                return False
+        return True
+    parsed = urlparse(desktop_url)
+    desktop_root_url = '%s://%s' % (parsed.scheme, parsed.netloc)
+    base_url = urlbase(desktop_url)
+    def convert(elem):
+        if attribute in elem.attrib:
+            if is_desktop_relative(elem.attrib[attribute]):
+                if elem.attrib[attribute].startswith('/'):
+                    elem.attrib[attribute] = desktop_root_url + elem.attrib[attribute]
+                else:
+                    elem.attrib[attribute] = base_url + elem.attrib[attribute]
+    return convert
