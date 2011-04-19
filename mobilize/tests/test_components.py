@@ -173,3 +173,36 @@ pageTracker._trackPageview();
         expected = '<div class="mwu-elem" id="foo"><td>Hello</td><td>Goodbye</td></div>'
         self.assertSequenceEqual(normxml(expected), normxml(extracted_str))
         
+    def test_select_multiple(self):
+        '''
+        Test that extracted components can accept multiple selectors
+        '''
+        from mobilize.components import CssPath
+        selectors = [
+            'nav',
+            'section',
+            ]
+        component = CssPath(selectors, idname='foo')
+        component.extract(html.fromstring('''<div>
+<nav>
+  <a href="/A">A</a>
+  <a href="/B">B</a>
+</nav>
+<table><tr><td>&nbsp;</td><td>I'm using tables for layout!!! DUR</td></tr></table>
+<section>
+<p>Hello.</p>
+</section>
+</div>
+'''))
+        extracted = component.process('nothing')
+        extracted_str = html.tostring(extracted)
+        expected = '''<div class="mwu-elem" id="foo">
+<nav>
+  <a href="/A">A</a>
+  <a href="/B">B</a>
+</nav>
+<section>
+<p>Hello.</p>
+</section>
+</div>'''
+        self.assertSequenceEqual(normxml(expected), normxml(extracted_str))

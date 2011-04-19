@@ -44,6 +44,11 @@ class Extracted(Component):
         depends on the subclass.  For example, it could be an xpath
         expression, a CSS "path", etc.
 
+        In general, the selector may actually be plural, i.e. some
+        iterable of individual selectors.  The effect, again depending
+        on the subclass, will be to the matches of each selector
+        together.
+
         Before final rendering, zero or more filters will be applied
         to the extracted content. Since each filter may transform the
         HTML snippet in an arbitrary way, the order matters.
@@ -252,8 +257,14 @@ class XPath(Extracted):
 class CssPath(Extracted):
     def _extract(self, source):
         from lxml.cssselect import CSSSelector
-        css_sel = CSSSelector(self.selector)
-        return source.xpath(css_sel.path)
+        if type(self.selector) is list:
+            selectors = self.selector
+        else:
+            selectors = [self.selector]
+        extracted = []
+        for selector in selectors:
+            extracted += source.xpath(CSSSelector(selector).path)
+        return extracted
     
 class GoogleAnalytics(Extracted):
     '''
