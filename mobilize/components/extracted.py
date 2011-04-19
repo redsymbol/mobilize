@@ -94,7 +94,7 @@ class Extracted(Component):
         TODO: make FILT_COLLAPSED the default filtermode
 
         @param selector    : What part of the document to extract
-        @type  selector    : str
+        @type  selector    : str, or list of str
 
         @param filters     : Absolute list of filters to use
         @type  filters     : list of function
@@ -127,7 +127,10 @@ class Extracted(Component):
         @type  innerhtml   : bool
         
         '''
-        self.selector = selector
+        if type(selector) in (list, tuple):
+            self.selectors = list(selector) # casting tuple to list
+        else:
+            self.selectors = [selector]
         if filters is None:
             these_filters = list(COMMON_FILTERS)
         else:
@@ -252,27 +255,18 @@ class Extracted(Component):
 
 class XPath(Extracted):
     def _extract(self, source):
-        if type(self.selector) is list:
-            selectors = self.selector
-        else:
-            selectors = [self.selector]
         extracted = []
-        for selector in selectors:
+        for selector in self.selectors:
             extracted += source.xpath(selector)
         return extracted
 
-class CssPath(Extracted):
-    def _extract(self, source):
+class CssPath(XPath):
+    def __init__(self, *a, **kw):
         from lxml.cssselect import CSSSelector
-        if type(self.selector) is list:
-            selectors = self.selector
-        else:
-            selectors = [self.selector]
-        extracted = []
-        for selector in selectors:
-            extracted += source.xpath(CSSSelector(selector).path)
-        return extracted
-    
+        super(CssPath, self).__init__(*a, **kw)
+        for ii, selector in enumerate(self.selectors):
+            self.selectors[ii] = CSSSelector(selector).path
+            
 class GoogleAnalytics(Extracted):
     '''
     Locates and extracts Google Analytics tracking code from desktop page
