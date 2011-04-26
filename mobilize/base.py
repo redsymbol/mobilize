@@ -48,7 +48,7 @@ class MobileSite(object):
         if 'fullsite' in params and 'request_path' in params:
             desktop_url = 'http://%(fullsite)s%(request_path)s' % params
             site_filters.append(
-                lambda elem: filters.absimgsrc(elem, desktop_url)
+                lambda elem: filters.absimgsrc(elem, desktop_url),
                 )
         return site_filters
     

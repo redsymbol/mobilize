@@ -26,8 +26,8 @@ def apply_filters(htmlstr, filters):
 
 class TestFilters(TestCase):
     maxDiff=1024**2
-    def test_noinlinestyles(self):
-        from mobilize.filters import noinlinestyles
+    def test_nomiscattrib(self):
+        from mobilize.filters import nomiscattrib
         testdata = [
             {'in'  : '''<div class="foo" style="background-color: red;">Hello.</div>''',
              'out' :  '''<div class="foo">Hello.</div>''',
@@ -40,7 +40,7 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noinlinestyles])))
+            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [nomiscattrib])))
 
     def test_noimgsize(self):
         from mobilize.filters import noimgsize
@@ -81,9 +81,9 @@ class TestFilters(TestCase):
 <h1>The Headline</h1>
 <a href="#">Click Here</a>
 </div>'''
-        from mobilize.filters import noinlinestyles, noevents
+        from mobilize.filters import nomiscattrib, noevents
         my_filters = [
-            noinlinestyles,
+            nomiscattrib,
             noevents,
             ]
         self.assertEquals(elem2str(apply_filters(htmlin, my_filters)), htmlout)

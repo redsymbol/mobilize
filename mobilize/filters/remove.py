@@ -6,26 +6,14 @@ from mobilize.util import (
     findonetag,
     )
 
-# Supporting code
-# (none yet)
-
 # Filters
 
-def noinlinestyles(elem):
-    '''
-    Remove any inline styles on a tag
-
-    As a side effect, if the passed element has a 'style' attribute,
-    then that attribute is removed.
-    
-    @param elem : Element representing an html tag
-    @type  elem : lxml.html.HTMLElement
-
-    '''
-    if 'style' in elem.attrib:
-        del elem.attrib['style']
-
-def nomiscattrib(elem):
+def nomiscattrib(root_elem):
+    nomiscattrib_one(root_elem)
+    for elem in root_elem.iterdescendants():
+        nomiscattrib_one(elem)
+        
+def nomiscattrib_one(elem):
     '''
     Remove certain miscellaneous unwanted attributes
     
@@ -42,9 +30,8 @@ def nomiscattrib(elem):
     unwanteds = (
         'align',
         'border',
-        'cellspacing',
-        'cellpadding',
         'valign',
+        'style',
         )
     for unwanted in unwanteds:
         if unwanted in elem.attrib:
