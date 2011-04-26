@@ -234,11 +234,12 @@ class Extracted(Component):
             for elem in self.elems:
                 applyfilters(elem)
         # wrap in special mobilize class, id
-        newelem = HtmlElement()
-        newelem.tag = self.tag
         if self.innerhtml and len(self.elems) == 1:
-            newelem.text = self.elems[0].text
+            newelem = copy.deepcopy(self.elems[0])
+            newelem.tag = self.tag
         else:
+            newelem = HtmlElement()
+            newelem.tag = self.tag
             for elem in self.elems:
                 newelem.append(elem)
         if self.filtermode == FILT_COLLAPSED:
