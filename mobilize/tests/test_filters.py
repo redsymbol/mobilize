@@ -880,3 +880,19 @@ here's some extra trailing text for you too
         abslinkfilesrc(elem, desktop_url, extensions)
         result = html.tostring(elem)
         self.assertSequenceEqual(normxml(html_out), normxml(result))
+
+    def test_nobr(self):
+        from mobilize.filters import nobr
+        html_in = "<p>Hello.<br> This is a <br> broken<br>up paragraph.</p>"
+        expected_space = "<p>Hello. This is a  broken up paragraph.</p>"
+        expected_nospace = "<p>Hello. This is a  brokenup paragraph.</p>"
+        elem_space = html.fromstring(html_in)
+        nobr(elem_space, space=True)
+        space_out = elem2str(elem_space)
+        self.assertSequenceEqual(expected_space, space_out)
+        
+        elem_nospace = html.fromstring(html_in)
+        nobr(elem_nospace, space=False)
+        nospace_out = elem2str(elem_nospace)
+        self.assertSequenceEqual(expected_nospace, nospace_out)
+

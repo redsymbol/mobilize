@@ -170,3 +170,27 @@ def noinputwidth(elem):
         if 'cols' in textarea_elem.attrib:
             del textarea_elem.attrib['cols']
 
+def nobr(elem, space=True):
+    '''
+    Remove all BR tags from the innerHTML of an element.
+
+    If space is True, ensure at least one space is present after the
+    BR tag's position (before dropping), inserting if necessary.  This
+    is useful because sometimes only a BR tag is used to separate
+    words that we don't want to run together (i.e., we want
+    "buy<br>now" to become "buy now", not "buynow").
+
+    If space is False, the br tags are simply dropped.
+
+    @param space : If True, leave a space character behind
+    @type  space : bool
+    
+    '''
+    for br_elem in elem.iterfind('.//br'):
+        if space:
+            if br_elem.tail is None:
+                br_elem.tail = ' '
+            elif not br_elem.tail.startswith(' '):
+                br_elem.tail = ' ' + br_elem.tail 
+        br_elem.drop_tree()
+    

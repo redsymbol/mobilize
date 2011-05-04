@@ -24,6 +24,7 @@ from .remove import (
     noattribs,
     omit,
     squeezebr,
+    nobr,
     noinputwidth,
     )
 
