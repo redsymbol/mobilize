@@ -309,6 +309,10 @@ def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
         from mobilize.log import mk_wsgi_log
         log = mk_wsgi_log(environ)
         reqinfo = RequestInfo(environ)
+        handler = msite.handler_map.get_handler_for(reqinfo.rel_uri)
+        from mobilize.base import Moplate
+        if not isinstance(handler, Moplate):
+            return handler.wsgiresponse(start_response)
         def log_headers(label, headers, **kw):
             msg = '%s (%s %s): %s' % (
                 label,
