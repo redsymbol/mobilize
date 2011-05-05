@@ -1,3 +1,12 @@
+'''
+Mobilize handlers
+
+Extendable classes for handlers, including Moplate.
+
+Also includes some standard instances that are generally useful and
+reusable (e.g., todesktop, which is an instance of ToDesktop)
+
+'''
 from . import util
 
 class Handler(object):
@@ -230,3 +239,6 @@ class ToDesktopPermanent(Handler):
     
     '''
     status = '301 MOVED PERMANENTLY'
+
+# Standard/reusable handler instances
+todesktop = ToDesktop()
