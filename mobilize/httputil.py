@@ -22,6 +22,20 @@ def _name2field(name, prefix=''):
     field = '-'.join(part.capitalize() for part in parts)
     return field
 
+def _get_uri(environ):
+    '''
+    Get the incoming request URI
+    
+    '''
+    proto = environ.get('wsgi.url_scheme', 'http')
+    host, port = srchostport(environ)
+    assert type(port) is int, type(port)
+    uri = '%s://%s' % (proto, host)
+    if 80 != port:
+        uri += ':' + str(port)
+    uri += get_rel_uri(environ)
+    return uri
+
 def get_response_headers(resp_headers, environ, overrides):
     '''
     Fetch and calculate the mobile response headers
@@ -120,20 +134,29 @@ def srchostport(environ):
     return full_host, full_port
     
 def get_rel_uri(environ):
+    '''
+    Shortcut function for getting the relative request URI
+
+    So if the request is to http://m.example.com/foo/bar.html, this
+    will return '/foo/bar.html'.
+
+    @return : relative request URI
+    @rtype  : str
+    
+    '''
     return environ['REQUEST_URI']
 
-def get_uri(environ):
-    proto = environ.get('wsgi.url_scheme', 'http')
-    host, port = srchostport(environ)
-    assert type(port) is int, type(port)
-    rel_uri = environ['REQUEST_URI']
-    uri = '%s://%s' % (proto, host)
-    if 80 != port:
-        uri += ':' + str(port)
-    uri += rel_uri
-    return uri
-
 def get_http():
+    '''
+    Get an http object
+
+    This is just an instance of the httplib2.Http class, properly
+    customized, extended and configured.
+
+    @return : http object
+    @rtype  : httplib2.Http
+    
+    '''
     from httplib2 import Http
     http = Http()
     http.follow_redirects = False
@@ -143,14 +166,27 @@ def dict2list(d):
     return list((header, value) for header, value in d.items())
 
 class RequestInfo(object):
+    '''
+    Encapsulates information about an incoming HTTP request.
+
+    This is for the request directly from the client, prior to any handler.
+    
+    '''
     def __init__(self, wsgienviron):
+        '''
+        ctor
+
+        @param wsgienviron : WSGI environment
+        @type  wsgienviron : dict
+        
+        '''
         self.wsgienviron = wsgienviron
         self.method = wsgienviron['REQUEST_METHOD'].upper()
         if self.method in ('POST', 'PUT'):
             self.body = wsgienviron['wsgi.input'].read()
         else:
             self.body = None
-        self.uri = get_uri(wsgienviron)
+        self.uri = _get_uri(wsgienviron)
         self.rel_uri = get_rel_uri(wsgienviron)
 
     def headers(self, overrides):
