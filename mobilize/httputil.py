@@ -337,10 +337,10 @@ def mk_wsgi_application(msite, verboselog=False):
     '''
     def application(environ, start_response):
         from mobilize.handlers import passthrough
-        from mobilize.exceptions import NoMatchingMoplateException
+        from mobilize.exceptions import NoMatchingHandlerException
         try:
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
-        except NoMatchingMoplateException:
+        except NoMatchingHandlerException:
             handler = passthrough
         return handler.wsgi_response(msite, environ, start_response)
     return application

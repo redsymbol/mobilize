@@ -88,7 +88,7 @@ class TestMoplate(unittest.TestCase):
 
 class TestHandlerMap(unittest.TestCase):
     def test_get_handler_for(self):
-        from mobilize.exceptions import NoMatchingMoplateException
+        from mobilize.exceptions import NoMatchingHandlerException
         from mobilize import DjangoMoplate
         # test templates
         t_a = DjangoMoplate('a.html', [])
@@ -112,7 +112,7 @@ class TestHandlerMap(unittest.TestCase):
         self.assertEqual('b.html', matching('/beta/'))
         self.assertEqual('c.html', matching('/beta/flava/'))
         self.assertEqual('d.html', matching('/foobar'))
-        self.assertRaises(NoMatchingMoplateException, matching, '/no/such/url/')
+        self.assertRaises(NoMatchingHandlerException, matching, '/no/such/url/')
 
 class TestMobileSite(unittest.TestCase):
     maxDiff = None

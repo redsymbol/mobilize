@@ -4,8 +4,8 @@ class MobilizeException(Exception):
 
     '''
 
-class NoMatchingMoplateException(MobilizeException):
+class NoMatchingHandlerException(MobilizeException):
     '''
-    Indicates no mobile template is available that matches the indicated URL
+    Indicates no handler is available that matches the given URL/dispatch
     '''
 

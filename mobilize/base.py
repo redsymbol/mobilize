@@ -158,13 +158,13 @@ class HandlerMap(object):
         @return    : The moplate
         @rtype     : Moplate
         
-        @raises exceptions.NoMatchingMoplateException : No matching template found
+        @raises exceptions.NoMatchingHandlerException : No matching template found
 
         '''
         for pattern, moplate in self._mapping.items():
             if pattern.search(url):
                 return moplate
-        raise exceptions.NoMatchingMoplateException('no moplate match found for %s' % url)
+        raise exceptions.NoMatchingHandlerException('no moplate match found for %s' % url)
 
 def _regex(re_or_str):
     '''
