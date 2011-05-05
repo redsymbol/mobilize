@@ -140,12 +140,13 @@ class HandlerMap(object):
         @type  mapping : list of tuple(key, value)
         
         '''
+        from mobilize.handlers import Handler
         self._mapping = OrderedDict()
         for k, v in mapping:
-            if type(v) is str:
-                handler = find_moplate(v)
-            else:
+            if isinstance(v, Handler):
                 handler = v
+            else:
+                handler = find_moplate(v)
             self._mapping[_regex(k)] = handler
 
     def get_handler_for(self, url):
@@ -229,6 +230,8 @@ def find_moplate(arg):
 
     @return    : moplate
     @rtype     : mobilize.Moplate
+
+    @raise RuntimeError: arg is not in a usable format
     
     '''
     if type(arg) is str:
@@ -236,6 +239,6 @@ def find_moplate(arg):
     elif type(arg) is tuple:
         moplate = import_moplate(*arg)
     else:
-        moplate = arg
+        raise RuntimeError('Cannot apply find_moplate to argument of type {}'.format(str(type(arg))))
     return moplate
 
