@@ -216,7 +216,6 @@ class ToDesktop(Handler):
     TODO: what if the device detection redirects them here?  Could get in a redirect loop
     
     '''
-    #status = '301 MOVED PERMANENTLY'
     status = '302 FOUND'
     def wsgiresponse(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
@@ -225,3 +224,9 @@ class ToDesktop(Handler):
         start_response(self.status, [('location', to)])
         return ['<html><body><a href="{}">Go to page</a>'.format(to)]
 
+class ToDesktopPermanent(Handler):
+    '''
+    Operates similarly to ToDesktop, but with a 301 permanent redirect.
+    
+    '''
+    status = '301 MOVED PERMANENTLY'
