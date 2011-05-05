@@ -58,17 +58,6 @@ class MobileSite(object):
                 )
         return site_filters
 
-    def has_match(self, url):
-        '''
-        Indicate whether there is a moplate matching this URL.
-        '''
-        moplate = None
-        try:
-            moplate = self.handler_map.get_handler_for(url)
-        except exceptions.NoMatchingMoplateException:
-            pass
-        return moplate is not None
-
     def request_overrides(self, wsgienviron):
         '''
         Site-specific HTTP request overrides

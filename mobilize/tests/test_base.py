@@ -116,15 +116,6 @@ class TestHandlerMap(unittest.TestCase):
 
 class TestMobileSite(unittest.TestCase):
     maxDiff = None
-    def test_no_match(self):
-        t_a = mobilize.DjangoMoplate('a.html', [])
-        mapping = [
-            (r'/alpha/$',    t_a),
-            ]
-        tmap = mobilize.HandlerMap(mapping)
-        msite = mobilize.MobileSite('example.com', tmap)
-        self.assertTrue(msite.has_match('/alpha/'))
-        self.assertFalse(msite.has_match('/beta/'))
 
     def test_render(self):
         from mobilize.dj import DjangoMoplate
