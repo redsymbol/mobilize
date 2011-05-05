@@ -276,7 +276,7 @@ class ToDesktop(Handler):
         start_response(self.status, [('location', to)])
         return ['<html><body><a href="{}">Go to page</a>'.format(to)]
 
-class ToDesktopPermanent(Handler):
+class ToDesktopPermanent(ToDesktop):
     '''
     Operates similarly to ToDesktop, but with a 301 permanent redirect.
     
