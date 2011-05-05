@@ -10,8 +10,10 @@ extensible features.
 '''
 from .base import *
 from .dj import DjangoMoplate
+from .handlers import ToDesktop
+todesktop = ToDesktop()
+
 __all__ = [
     'MobileSite',
-    'TemplateMap',
     'DjangoMoplate',
     ]
