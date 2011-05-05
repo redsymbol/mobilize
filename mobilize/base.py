@@ -279,14 +279,8 @@ class Moplate(Handler):
         return self.params
 
     def wsgiresponse(self, msite, environ, start_response):
-        from mobilize.http import (
-            RequestInfo,
-            get_http,
-            guess_charset,
-            mobilizeable,
-            get_response_headers,
-            )
-        reqinfo = RequestInfo(environ)
+        from mobilize import http as httputil
+        reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
             msg = '%s (%s %s): %s' % (
                 label,
@@ -297,7 +291,7 @@ class Moplate(Handler):
             for k, v in kw.items():
                 msg += ', %s=%s' % (k, v)
             log(msg)
-        http = get_http()
+        http = httputil.get_http()
         if reqinfo.method in ('POST', 'PUT'):
             reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
@@ -309,10 +303,10 @@ class Moplate(Handler):
             log_headers('modified request headers', request_headers)
         resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
-        charset = guess_charset(resp, src_resp_bytes, msite.default_charset)
+        charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         src_resp_body = src_resp_bytes.decode(charset)
         status = '%s %s' % (resp.status, resp.reason)
-        if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
+        if not (httputil.mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
             resp_headers = dict2list(resp)
             if msite.verboselog:
@@ -326,7 +320,7 @@ class Moplate(Handler):
         response_overrides['content-length'] = str(len(mobilized_body))
         if 'transfer-encoding' in resp:
             del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
-        mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
+        mobilized_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         if msite.verboselog:
             log_headers('modified resp headers', mobilized_resp_headers)
         start_response(status, mobilized_resp_headers)
