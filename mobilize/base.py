@@ -282,6 +282,8 @@ class Moplate(Handler):
         from mobilize import httputil
         reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
+            from mobilize.log import mk_wsgi_log
+            log = mk_wsgi_log(environ)
             msg = '%s (%s %s): %s' % (
                 label,
                 reqinfo.method,

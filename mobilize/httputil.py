@@ -300,9 +300,6 @@ def mk_wsgi_application(msite, verboselog=False):
     
     '''
     def application(environ, start_response):
-        from mobilize.log import mk_wsgi_log
-        log = mk_wsgi_log(environ)
-        reqinfo = RequestInfo(environ)
-        handler = msite.handler_map.get_handler_for(reqinfo.rel_uri)
+        handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         return handler.wsgiresponse(msite, environ, start_response)
     return application
