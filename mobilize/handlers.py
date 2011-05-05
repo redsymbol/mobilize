@@ -38,7 +38,13 @@ class Handler(object):
         '''
         assert False, 'subclass must implement'
 
-class Moplate(Handler):
+class WebSourcer(Handler):
+    '''
+    A Handler that uses another web page as a source
+
+    '''
+    
+class Moplate(WebSourcer):
     '''
     A kind of mobile webpage template with magical powers
 
@@ -192,32 +198,32 @@ class Moplate(Handler):
             log_headers('modified request headers', request_headers)
         resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
+        if msite.verboselog:
+            log_headers('raw response headers', resp, status=status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         src_resp_body = src_resp_bytes.decode(charset)
         status = '%s %s' % (resp.status, resp.reason)
-        if not (httputil.mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
-            # No matching template found, so pass through the source response
-            resp_headers = httputil.dict2list(resp)
+        if httputil.mobilizeable(resp):
+            extra_params = {
+                'fullsite' : msite.fullsite,
+                'request_path' : reqinfo.rel_uri,
+                }
+            mobilized_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
+            response_overrides = msite.response_overrides(environ)
+            response_overrides['content-length'] = str(len(mobilized_body))
+            if 'transfer-encoding' in resp:
+                del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
+            mobilized_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
             if msite.verboselog:
-                log_headers('raw response headers [passthru]', resp_headers)
-            start_response(status, resp_headers)
-            return [src_resp_bytes]
-        if msite.verboselog:
-            log_headers('raw response headers', resp, status=status)
-        extra_params = {
-            'fullsite' : msite.fullsite,
-            'request_path' : reqinfo.rel_uri,
-            }
-        mobilized_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
-        response_overrides = msite.response_overrides(environ)
-        response_overrides['content-length'] = str(len(mobilized_body))
-        if 'transfer-encoding' in resp:
-            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
-        mobilized_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
-        if msite.verboselog:
-            log_headers('modified resp headers', mobilized_resp_headers)
-        start_response(status, mobilized_resp_headers)
-        return [mobilized_body]
+                log_headers('modified resp headers', mobilized_resp_headers)
+
+            final_body = mobilized_body
+            final_resp_headers = mobilized_resp_headers
+        else:
+            final_resp_headers = httputil.dict2list(resp)
+            final_body = src_resp_bytes
+        start_response(status, final_resp_headers)
+        return [final_body]
 
 class ToDesktop(Handler):
     '''
@@ -244,7 +250,7 @@ class ToDesktopPermanent(Handler):
     '''
     status = '301 MOVED PERMANENTLY'
 
-class PassThrough(Handler):
+class PassThrough(WebSourcer):
     '''
     Pass through the response from the desktop source
     '''
