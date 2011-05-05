@@ -197,7 +197,7 @@ class Moplate(Handler):
         status = '%s %s' % (resp.status, resp.reason)
         if not (httputil.mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
             # No matching template found, so pass through the source response
-            resp_headers = dict2list(resp)
+            resp_headers = httputil.dict2list(resp)
             if msite.verboselog:
                 log_headers('raw response headers [passthru]', resp_headers)
             start_response(status, resp_headers)
@@ -244,5 +244,46 @@ class ToDesktopPermanent(Handler):
     '''
     status = '301 MOVED PERMANENTLY'
 
+class PassThrough(Handler):
+    '''
+    Pass through the response from the desktop source
+    '''
+    def wsgiresponse(self, msite, environ, start_response):
+        from mobilize import httputil
+        reqinfo = httputil.RequestInfo(environ)
+        def log_headers(label, headers, **kw):
+            from mobilize.log import mk_wsgi_log
+            log = mk_wsgi_log(environ)
+            msg = '%s (%s %s): %s' % (
+                label,
+                reqinfo.method,
+                reqinfo.uri,
+                str(headers),
+                )
+            for k, v in kw.items():
+                msg += ', %s=%s' % (k, v)
+            log(msg)
+        http = httputil.get_http()
+        if reqinfo.method in ('POST', 'PUT'):
+            reqinfo.body = environ['wsgi.input'].read()
+        request_overrides = msite.request_overrides(environ)
+        request_overrides['X-MWU-Mobilize'] = '1'
+        if msite.verboselog:
+            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
+        request_headers = reqinfo.headers(request_overrides)
+        if msite.verboselog:
+            log_headers('modified request headers', request_headers)
+        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+                                           headers=request_headers)
+        charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
+        src_resp_body = src_resp_bytes.decode(charset)
+        status = '%s %s' % (resp.status, resp.reason)
+        resp_headers = httputil.dict2list(resp)
+        if msite.verboselog:
+            log_headers('raw response headers [passthru]', resp_headers)
+        start_response(status, resp_headers)
+        return [src_resp_bytes]
+
 # Standard/reusable handler instances
 todesktop = ToDesktop()
+passthrough = PassThrough()
