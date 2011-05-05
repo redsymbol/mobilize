@@ -8,6 +8,7 @@ reusable (e.g., todesktop, which is an instance of ToDesktop)
 
 '''
 from . import util
+from . import httputil
 
 class Handler(object):
     '''
@@ -40,9 +41,46 @@ class Handler(object):
 
 class WebSourcer(Handler):
     '''
-    A Handler that uses another web page as a source
+    A Handler that uses another web page as an HTTP source
 
     '''
+    def wsgiresponse(self, msite, environ, start_response):
+        reqinfo = httputil.RequestInfo(environ)
+        def log_headers(label, headers, **kw):
+            from mobilize.log import mk_wsgi_log
+            log = mk_wsgi_log(environ)
+            msg = '%s (%s %s): %s' % (
+                label,
+                reqinfo.method,
+                reqinfo.uri,
+                str(headers),
+                )
+            for k, v in kw.items():
+                msg += ', %s=%s' % (k, v)
+            log(msg)
+        http = httputil.get_http()
+        if reqinfo.method in ('POST', 'PUT'):
+            reqinfo.body = environ['wsgi.input'].read()
+        request_overrides = msite.request_overrides(environ)
+        request_overrides['X-MWU-Mobilize'] = '1'
+        if msite.verboselog:
+            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
+        request_headers = reqinfo.headers(request_overrides)
+        if msite.verboselog:
+            log_headers('modified request headers', request_headers)
+        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+                                           headers=request_headers)
+        if msite.verboselog:
+            log_headers('raw response headers', resp, status=status)
+        charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
+        src_resp_body = src_resp_bytes.decode(charset)
+        status = '%s %s' % (resp.status, resp.reason)
+        final_body, final_resp_headers = self._wsgiresponse(environ, msite, reqinfo, resp, src_resp_body)
+        if msite.verboselog:
+            log_headers('final resp headers', final_resp_headers)
+        start_response(status, final_resp_headers)
+        return [final_body]
+
     
 class Moplate(WebSourcer):
     '''
@@ -171,38 +209,7 @@ class Moplate(WebSourcer):
         '''
         return self.params
 
-    def wsgiresponse(self, msite, environ, start_response):
-        from mobilize import httputil
-        reqinfo = httputil.RequestInfo(environ)
-        def log_headers(label, headers, **kw):
-            from mobilize.log import mk_wsgi_log
-            log = mk_wsgi_log(environ)
-            msg = '%s (%s %s): %s' % (
-                label,
-                reqinfo.method,
-                reqinfo.uri,
-                str(headers),
-                )
-            for k, v in kw.items():
-                msg += ', %s=%s' % (k, v)
-            log(msg)
-        http = httputil.get_http()
-        if reqinfo.method in ('POST', 'PUT'):
-            reqinfo.body = environ['wsgi.input'].read()
-        request_overrides = msite.request_overrides(environ)
-        request_overrides['X-MWU-Mobilize'] = '1'
-        if msite.verboselog:
-            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
-        request_headers = reqinfo.headers(request_overrides)
-        if msite.verboselog:
-            log_headers('modified request headers', request_headers)
-        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
-                                           headers=request_headers)
-        if msite.verboselog:
-            log_headers('raw response headers', resp, status=status)
-        charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
-        src_resp_body = src_resp_bytes.decode(charset)
-        status = '%s %s' % (resp.status, resp.reason)
+    def _wsgiresponse(self, environ, msite, reqinfo, resp, src_resp_body):
         if httputil.mobilizeable(resp):
             extra_params = {
                 'fullsite' : msite.fullsite,
@@ -214,16 +221,13 @@ class Moplate(WebSourcer):
             if 'transfer-encoding' in resp:
                 del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
             mobilized_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
-            if msite.verboselog:
-                log_headers('modified resp headers', mobilized_resp_headers)
-
             final_body = mobilized_body
             final_resp_headers = mobilized_resp_headers
         else:
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
-        start_response(status, final_resp_headers)
-        return [final_body]
+        return final_body, final_resp_headers
+        
 
 class ToDesktop(Handler):
     '''
@@ -254,42 +258,10 @@ class PassThrough(WebSourcer):
     '''
     Pass through the response from the desktop source
     '''
-    def wsgiresponse(self, msite, environ, start_response):
-        from mobilize import httputil
-        reqinfo = httputil.RequestInfo(environ)
-        def log_headers(label, headers, **kw):
-            from mobilize.log import mk_wsgi_log
-            log = mk_wsgi_log(environ)
-            msg = '%s (%s %s): %s' % (
-                label,
-                reqinfo.method,
-                reqinfo.uri,
-                str(headers),
-                )
-            for k, v in kw.items():
-                msg += ', %s=%s' % (k, v)
-            log(msg)
-        http = httputil.get_http()
-        if reqinfo.method in ('POST', 'PUT'):
-            reqinfo.body = environ['wsgi.input'].read()
-        request_overrides = msite.request_overrides(environ)
-        request_overrides['X-MWU-Mobilize'] = '1'
-        if msite.verboselog:
-            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
-        request_headers = reqinfo.headers(request_overrides)
-        if msite.verboselog:
-            log_headers('modified request headers', request_headers)
-        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
-                                           headers=request_headers)
-        charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
-        src_resp_body = src_resp_bytes.decode(charset)
-        status = '%s %s' % (resp.status, resp.reason)
+    def _wsgiresponse(self, environ, msite, reqinfo, resp, src_resp_body):
         resp_headers = httputil.dict2list(resp)
-        if msite.verboselog:
-            log_headers('raw response headers [passthru]', resp_headers)
-        start_response(status, resp_headers)
-        return [src_resp_bytes]
-
+        return src_resp_body, resp_headers
+    
 # Standard/reusable handler instances
 todesktop = ToDesktop()
 passthrough = PassThrough()
