@@ -219,7 +219,7 @@ class ToDesktop(Handler):
     #status = '301 MOVED PERMANENTLY'
     status = '302 FOUND'
     def wsgiresponse(self, msite, environ, start_response):
-        from mobilize.http import RequestInfo
+        from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ)
         to = 'http://{}{}'.format(msite.fullsite, reqinfo.rel_uri)
         start_response(self.status, [('location', to)])
