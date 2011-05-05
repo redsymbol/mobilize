@@ -20,7 +20,7 @@ class Handler(object):
     
     '''
     
-    def wsgiresponse(self, msite, environ, start_response):
+    def wsgi_response(self, msite, environ, start_response):
         '''
         Create WSGI HTTP response
 
@@ -43,8 +43,10 @@ class WebSourcer(Handler):
     '''
     A Handler that uses another web page as an HTTP source
 
+    Subclasses must implement the _final_wsgi_response method.
+
     '''
-    def wsgiresponse(self, msite, environ, start_response):
+    def wsgi_response(self, msite, environ, start_response):
         reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
             from mobilize.log import mk_wsgi_log
@@ -75,11 +77,40 @@ class WebSourcer(Handler):
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         src_resp_body = src_resp_bytes.decode(charset)
         status = '%s %s' % (resp.status, resp.reason)
-        final_body, final_resp_headers = self._wsgiresponse(environ, msite, reqinfo, resp, src_resp_body)
+        final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
         if msite.verboselog:
             log_headers('final resp headers', final_resp_headers)
         start_response(status, final_resp_headers)
         return [final_body]
+
+    def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
+        '''
+        Create the final WSGI response body and headers
+
+        This method must return a pair: the final response body as a
+        string, and the final response headers.  The response headers
+        are in the form of a list of (key, value) pairs.
+
+        @param environ       : WSGI environment
+        @type  environ       : dict
+
+        @param msite         : Mobile site
+        @type  msite         : mobilize.base.MobileSite
+
+        @param reqinfo       : request info
+        @type  reqinfo       : mobilize.httputil.RequestInfo
+
+        @param resp          : Response from source
+        @type  resp          : ? from httplib2
+
+        @param src_resp_body : Decoded body of response from source
+        @type  src_resp_body : str
+        
+        @return              : tuple(final_body, final_resp_headers)
+        @rtype               : tuple of (str, list of (str, str) pairs)
+        
+        '''
+        assert False, 'subclass must implement'
 
     
 class Moplate(WebSourcer):
@@ -112,8 +143,8 @@ class Moplate(WebSourcer):
         @param template_name : Template name (file)
         @type  template_name : str
 
-        @param components     : Components of content elements to extract from full body
-        @type  components     : list
+        @param components    : Components of content elements to extract from full body
+        @type  components    : list
         
         @param params        : Other template rendering parameters
         @type  params        : dict (str -> mixed)
@@ -209,25 +240,23 @@ class Moplate(WebSourcer):
         '''
         return self.params
 
-    def _wsgiresponse(self, environ, msite, reqinfo, resp, src_resp_body):
+    def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         if httputil.mobilizeable(resp):
             extra_params = {
                 'fullsite' : msite.fullsite,
                 'request_path' : reqinfo.rel_uri,
                 }
-            mobilized_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
+            final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
             response_overrides = msite.response_overrides(environ)
-            response_overrides['content-length'] = str(len(mobilized_body))
+            response_overrides['content-length'] = str(len(final_body))
             if 'transfer-encoding' in resp:
                 del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
-            mobilized_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
-            final_body = mobilized_body
-            final_resp_headers = mobilized_resp_headers
+            final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         else:
+            # Don't know how to mobilize this, so just pass through source response.
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
         return final_body, final_resp_headers
-        
 
 class ToDesktop(Handler):
     '''
@@ -240,7 +269,7 @@ class ToDesktop(Handler):
     
     '''
     status = '302 FOUND'
-    def wsgiresponse(self, msite, environ, start_response):
+    def wsgi_response(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ)
         to = 'http://{}{}'.format(msite.fullsite, reqinfo.rel_uri)
@@ -258,7 +287,7 @@ class PassThrough(WebSourcer):
     '''
     Pass through the response from the desktop source
     '''
-    def _wsgiresponse(self, environ, msite, reqinfo, resp, src_resp_body):
+    def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         resp_headers = httputil.dict2list(resp)
         return src_resp_body, resp_headers
     

@@ -342,5 +342,5 @@ def mk_wsgi_application(msite, verboselog=False):
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         except NoMatchingMoplateException:
             handler = passthrough
-        return handler.wsgiresponse(msite, environ, start_response)
+        return handler.wsgi_response(msite, environ, start_response)
     return application
