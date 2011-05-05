@@ -204,7 +204,11 @@ class Moplate(Handler):
             return [src_resp_bytes]
         if msite.verboselog:
             log_headers('raw response headers', resp, status=status)
-        mobilized_body = msite.render_body(reqinfo.rel_uri, src_resp_body)
+        extra_params = {
+            'fullsite' : msite.fullsite,
+            'request_path' : reqinfo.rel_uri,
+            }
+        mobilized_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(mobilized_body))
         if 'transfer-encoding' in resp:

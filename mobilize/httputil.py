@@ -300,6 +300,9 @@ def mk_wsgi_application(msite, verboselog=False):
     
     '''
     def application(environ, start_response):
-        handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
+        try:
+            handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
+        except exceptions.NoMatchingMoplateException:
+            raise # TODO: handle
         return handler.wsgiresponse(msite, environ, start_response)
     return application
