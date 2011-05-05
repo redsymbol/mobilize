@@ -13,19 +13,19 @@ class MobileSite(object):
 
     '''
     
-    def __init__(self, fullsite, moplate_map):
+    def __init__(self, fullsite, handler_map):
         '''
         ctor
         
         @param fullsite     : domain of corresponding full (desktop) website
         @type  fullsite     : str
 
-        @param moplate_map : Moplate mapper
-        @type  moplate_map : MoplateMap
+        @param handler_map : Handler/moplate mapping
+        @type  handler_map : HandlerMap
         
         '''
         self.fullsite = fullsite
-        self.moplate_map = moplate_map
+        self.handler_map = handler_map
 
     def mk_site_filters(self, params):
         '''
@@ -76,7 +76,7 @@ class MobileSite(object):
             }
         site_filters = self.mk_site_filters(extra_params)
         try:
-            moplate = self.moplate_map.get_moplate_for(url)
+            moplate = self.handler_map.get_handler_for(url)
             rendered = moplate.render(full_body, extra_params, site_filters)
         except exceptions.NoMatchingMoplateException:
             rendered = full_body
@@ -88,7 +88,7 @@ class MobileSite(object):
         '''
         moplate = None
         try:
-            moplate = self.moplate_map.get_moplate_for(url)
+            moplate = self.handler_map.get_handler_for(url)
         except exceptions.NoMatchingMoplateException:
             pass
         return moplate is not None
@@ -133,7 +133,17 @@ class MobileSite(object):
         '''
         return {}
 
-class Moplate(object):
+class Handler(object):
+    '''
+    Handles a mobile page request
+
+    This objects knows how to generate the HTTP response for a
+    specific page on the mobile site.  It's a basis for more
+    specialized services such as moplates.
+    
+    '''
+
+class Moplate(Handler):
     '''
     A kind of mobile webpage template with magical powers
 
@@ -260,10 +270,9 @@ class Moplate(object):
         '''
         return self.params
 
-class MoplateMap(object):
+class HandlerMap(object):
     '''
-    Represents a mapping between pages (URLs) and their mobile
-    templates
+    Represents a mapping between pages (URLs) and their handlers
     '''
     def __init__(self, mapping):
         '''
@@ -281,14 +290,16 @@ class MoplateMap(object):
 
         MOPLATE RESOLUTION
         
-        The values of the mapping object specify moplates.
-        Each can be either:
-          1) a Moplate instance
+        The values of the mapping object specify handlers, which are
+        often moplates. Each value can be either:
+          1) a Handler instance
           2) a string
           3) a tuple of two strings
 
-        If a string, this is assumed to be a module that has a
-        'moplate' attribute.
+        The last two are shortcuts for specifying particular moplates.
+        If a single string, this is assumed to be a module that has a
+        'moplate' attribute, of type Moplate.  That object is imported
+        as the handler.
 
         If a tuple of two strings, this is assumed to be a module
         (first string) that has a attribute (second string) that is
@@ -303,9 +314,13 @@ class MoplateMap(object):
         '''
         self._mapping = OrderedDict()
         for k, v in mapping:
-            self._mapping[_regex(k)] = find_moplate(v)
+            if type(v) is str:
+                handler = find_moplate(v)
+            else:
+                handler = v
+            self._mapping[_regex(k)] = handler
 
-    def get_moplate_for(self, url):
+    def get_handler_for(self, url):
         '''
         Get moplate for a given URL
 
@@ -377,7 +392,7 @@ def find_moplate(arg):
 
     arg is some piece of data that specifies a moplate, in one of a
     number of different ways.  See the documentation of
-    MoplateMap.__init__ for details.  This function essentially
+    HandlerMap.__init__ for details.  This function essentially
     handles the resolution process described there.
 
     @param arg : Some data that specifies a moplate to import

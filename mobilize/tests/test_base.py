@@ -86,8 +86,8 @@ class TestMoplate(unittest.TestCase):
             ok = True
         self.assertTrue(ok)
 
-class TestMoplateMap(unittest.TestCase):
-    def test_get_moplate_for(self):
+class TestHandlerMap(unittest.TestCase):
+    def test_get_handler_for(self):
         from mobilize.exceptions import NoMatchingMoplateException
         from mobilize import DjangoMoplate
         # test templates
@@ -102,10 +102,10 @@ class TestMoplateMap(unittest.TestCase):
             (r'/beta/',     t_c),
             (r'/\w+$',      t_d),
             ]
-        tmap = mobilize.MoplateMap(mapping)
+        tmap = mobilize.HandlerMap(mapping)
         def matching(url):
             # the name of the moplate actually matched
-            t = tmap.get_moplate_for(url)
+            t = tmap.get_handler_for(url)
             return t.template_name
 
         self.assertEqual('a.html', matching('/alpha/'))
@@ -121,14 +121,14 @@ class TestMobileSite(unittest.TestCase):
         mapping = [
             (r'/alpha/$',    t_a),
             ]
-        tmap = mobilize.MoplateMap(mapping)
+        tmap = mobilize.HandlerMap(mapping)
         msite = mobilize.MobileSite('example.com', tmap)
         self.assertTrue(msite.has_match('/alpha/'))
         self.assertFalse(msite.has_match('/beta/'))
 
     def test_has_match(self):
         full_body = 'veggies are good for you<br/>' * 5
-        msite = mobilize.MobileSite('example.com', mobilize.MoplateMap([]))
+        msite = mobilize.MobileSite('example.com', mobilize.HandlerMap([]))
         rendered = msite.render_body('/someurl', full_body)
         
     def test_render(self):
@@ -210,7 +210,7 @@ class TestMobileSite(unittest.TestCase):
             'request_path' : '/foo',
             }
         moplate = DjangoMoplate('one.html', components, params)
-        tmap = mobilize.MoplateMap([('/foo$', moplate)])
+        tmap = mobilize.HandlerMap([('/foo$', moplate)])
         msite = mobilize.MobileSite('example.com', tmap)
 
         expected = mobile_body
