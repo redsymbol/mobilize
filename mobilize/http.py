@@ -288,18 +288,12 @@ def guess_charset(resp, src_resp_bytes, default_charset):
     # Else just keep the default charset.
     return charset
 
-def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
+def mk_wsgi_application(msite, verboselog=False):
     '''
     Create the WSGI application
 
     @param msite           : mobile site
     @type  msite           : mobilize.base.MobileSite
-
-    @param default_charset : Desktop website default charset
-    @type  default_charset : str
-
-    @param verboselog      : Enable verbose logging iff true
-    @type  verboselog      : bool
 
     @return                : WSGI application function
     @rtype                 : function accepting (environ, start_response) arguments
@@ -310,51 +304,5 @@ def mk_wsgi_application(msite, default_charset='utf-8', verboselog=False):
         log = mk_wsgi_log(environ)
         reqinfo = RequestInfo(environ)
         handler = msite.handler_map.get_handler_for(reqinfo.rel_uri)
-        from mobilize.base import Moplate
-        if not isinstance(handler, Moplate):
-            return handler.wsgiresponse(start_response)
-        def log_headers(label, headers, **kw):
-            msg = '%s (%s %s): %s' % (
-                label,
-                reqinfo.method,
-                reqinfo.uri,
-                str(headers),
-                )
-            for k, v in kw.items():
-                msg += ', %s=%s' % (k, v)
-            log(msg)
-        http = get_http()
-        if reqinfo.method in ('POST', 'PUT'):
-            reqinfo.body = environ['wsgi.input'].read()
-        request_overrides = msite.request_overrides(environ)
-        request_overrides['X-MWU-Mobilize'] = '1'
-        if verboselog:
-            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
-        request_headers = reqinfo.headers(request_overrides)
-        if verboselog:
-            log_headers('modified request headers', request_headers)
-        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
-                                           headers=request_headers)
-        charset = guess_charset(resp, src_resp_bytes, default_charset)
-        src_resp_body = src_resp_bytes.decode(charset)
-        status = '%s %s' % (resp.status, resp.reason)
-        if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
-            # No matching template found, so pass through the source response
-            resp_headers = dict2list(resp)
-            if verboselog:
-                log_headers('raw response headers [passthru]', resp_headers)
-            start_response(status, resp_headers)
-            return [src_resp_bytes]
-        if verboselog:
-            log_headers('raw response headers', resp, status=status)
-        mobilized_body = msite.render_body(reqinfo.rel_uri, src_resp_body)
-        response_overrides = msite.response_overrides(environ)
-        response_overrides['content-length'] = str(len(mobilized_body))
-        if 'transfer-encoding' in resp:
-            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
-        mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
-        if verboselog:
-            log_headers('modified resp headers', mobilized_resp_headers)
-        start_response(status, mobilized_resp_headers)
-        return [mobilized_body]
+        return handler.wsgiresponse(msite, environ, start_response)
     return application

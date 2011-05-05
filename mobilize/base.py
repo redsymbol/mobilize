@@ -12,6 +12,12 @@ class MobileSite(object):
     Represents a mobile website
 
     '''
+
+    #: Desktop website default charset
+    default_charset='utf-8'
+    
+    #: Enable verbose logging iff true
+    verboselog=False
     
     def __init__(self, fullsite, handler_map):
         '''
@@ -142,6 +148,8 @@ class Handler(object):
     specialized services such as moplates.
     
     '''
+    def wsgiresponse(self, fullsite, environ, start_response):
+        assert False, 'subclass must implement'
 
 class Moplate(Handler):
     '''
@@ -269,6 +277,61 @@ class Moplate(Handler):
         
         '''
         return self.params
+
+    def wsgiresponse(self, msite, environ, start_response):
+        from mobilize.http import (
+            RequestInfo,
+            get_http,
+            guess_charset,
+            mobilizeable,
+            get_response_headers,
+            )
+        reqinfo = RequestInfo(environ)
+        def log_headers(label, headers, **kw):
+            msg = '%s (%s %s): %s' % (
+                label,
+                reqinfo.method,
+                reqinfo.uri,
+                str(headers),
+                )
+            for k, v in kw.items():
+                msg += ', %s=%s' % (k, v)
+            log(msg)
+        http = get_http()
+        if reqinfo.method in ('POST', 'PUT'):
+            reqinfo.body = environ['wsgi.input'].read()
+        request_overrides = msite.request_overrides(environ)
+        request_overrides['X-MWU-Mobilize'] = '1'
+        if msite.verboselog:
+            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
+        request_headers = reqinfo.headers(request_overrides)
+        if msite.verboselog:
+            log_headers('modified request headers', request_headers)
+        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+                                           headers=request_headers)
+        charset = guess_charset(resp, src_resp_bytes, msite.default_charset)
+        src_resp_body = src_resp_bytes.decode(charset)
+        status = '%s %s' % (resp.status, resp.reason)
+        if not (mobilizeable(resp) and msite.has_match(reqinfo.rel_uri)):
+            # No matching template found, so pass through the source response
+            resp_headers = dict2list(resp)
+            if msite.verboselog:
+                log_headers('raw response headers [passthru]', resp_headers)
+            start_response(status, resp_headers)
+            return [src_resp_bytes]
+        if msite.verboselog:
+            log_headers('raw response headers', resp, status=status)
+        mobilized_body = msite.render_body(reqinfo.rel_uri, src_resp_body)
+        response_overrides = msite.response_overrides(environ)
+        response_overrides['content-length'] = str(len(mobilized_body))
+        if 'transfer-encoding' in resp:
+            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
+        mobilized_resp_headers = get_response_headers(resp, environ, response_overrides)
+        if msite.verboselog:
+            log_headers('modified resp headers', mobilized_resp_headers)
+        start_response(status, mobilized_resp_headers)
+        return [mobilized_body]
+
 
 class HandlerMap(object):
     '''
