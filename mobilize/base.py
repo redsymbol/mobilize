@@ -279,7 +279,7 @@ class Moplate(Handler):
         return self.params
 
     def wsgiresponse(self, msite, environ, start_response):
-        from mobilize import http as httputil
+        from mobilize import httputil
         reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
             msg = '%s (%s %s): %s' % (

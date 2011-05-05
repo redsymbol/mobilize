@@ -75,7 +75,7 @@ class TestHttp(unittest.TestCase):
              'Pragma': 'no-cache',
              'Cache-Control': 'no-cache',
              }
-        from mobilize.http import RequestInfo
+        from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ1)
         actual = reqinfo.headers({})
         self.assertDictEqual(expected, actual)
@@ -461,7 +461,7 @@ class TestHttp(unittest.TestCase):
             'charset' : 'utf-8',
             },
             ]
-        from mobilize.http import guess_charset
+        from mobilize.httputil import guess_charset
         for ii, td in enumerate(testdata):
             expected = td['charset']
             actual = guess_charset(td['resp'], td['src_resp_bytes'], td['default_charset'])

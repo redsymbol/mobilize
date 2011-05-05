@@ -249,7 +249,7 @@ class TestUtil(unittest.TestCase):
                     },
              },
             ]
-        from mobilize.http import mobilizeable
+        from mobilize.httputil import mobilizeable
         for ii, td in enumerate(testdata):
             resp = td['headers']
             expected = td['is_m']
@@ -309,7 +309,7 @@ class TestUtil(unittest.TestCase):
              'port' : 42,
              },
             ]
-        from mobilize.http import srchostport
+        from mobilize.httputil import srchostport
         for ii, td in enumerate(testdata):
             host, port = srchostport(td['environ'])
             self.assertEqual(td['host'], host, 'e: %s, a: %s [%d]' % (td['host'], host, ii))
