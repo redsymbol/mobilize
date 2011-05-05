@@ -57,36 +57,6 @@ class MobileSite(object):
                 lambda elem: filters.absimgsrc(elem, desktop_url),
                 )
         return site_filters
-    
-    def render_body(self, url, full_body):
-        '''
-        Render the mobile page's body
-
-        If no moplate exists for the URL, pass the body through
-        unmodified.
-
-        @param url       : relative URL on the mobile site
-        @type  url       : str
-
-        @param full_body : Source body, e.g. from the corresponding desktop site page
-        @type  full_body : str
-
-        @return          : Mobile page body
-        @rtype           : str
-        
-        '''
-        rendered = ''
-        extra_params = {
-            'fullsite' : self.fullsite,
-            'request_path' : url,
-            }
-        site_filters = self.mk_site_filters(extra_params)
-        try:
-            moplate = self.handler_map.get_handler_for(url)
-            rendered = moplate.render(full_body, extra_params, site_filters)
-        except exceptions.NoMatchingMoplateException:
-            rendered = full_body
-        return rendered
 
     def has_match(self, url):
         '''

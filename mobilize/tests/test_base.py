@@ -126,11 +126,6 @@ class TestMobileSite(unittest.TestCase):
         self.assertTrue(msite.has_match('/alpha/'))
         self.assertFalse(msite.has_match('/beta/'))
 
-    def test_has_match(self):
-        full_body = 'veggies are good for you<br/>' * 5
-        msite = mobilize.MobileSite('example.com', mobilize.HandlerMap([]))
-        rendered = msite.render_body('/someurl', full_body)
-        
     def test_render(self):
         from mobilize.dj import DjangoMoplate
         full_body = '''<!doctype html>
@@ -170,7 +165,7 @@ class TestMobileSite(unittest.TestCase):
   <body>
     <div class="mwu-elem" id="mwu-elem-0">
       <div id="header">
-        <img src="http://example.com/logo.png" alt="Acme">
+        <img src="/logo.png" alt="Acme">
         <h1>Acme Services</h1>
       </div>
     </div>
@@ -214,7 +209,7 @@ class TestMobileSite(unittest.TestCase):
         msite = mobilize.MobileSite('example.com', tmap)
 
         expected = mobile_body
-        actual = msite.render_body('/foo', full_body)
+        actual = moplate.render(full_body, params)
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
