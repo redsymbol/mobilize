@@ -87,7 +87,7 @@ class MobileSite(object):
         function must return a dictionary with 0 or more key-value
         pairs.  The keys are lowercased HTTP response header names.
         The values are overrides; see
-        mobilize.http.get_response_headers for documentation.
+        mobilize.httputil.get_response_headers for documentation.
 
         @param wsgienviron : WSGI environment for this request/response cycle
         @type  wsgienviron : dict
@@ -116,7 +116,7 @@ class HandlerMap(object):
         converted to a Python regex object, after prepending with
         start-of-line match (i.e. the "^" character).
 
-        MOPLATE RESOLUTION
+        HANDLER AND MOPLATE RESOLUTION
         
         The values of the mapping object specify handlers, which are
         often moplates. Each value can be either:
@@ -133,8 +133,9 @@ class HandlerMap(object):
         (first string) that has a attribute (second string) that is
         the moplate to import.
 
-        The mechanics of this resolution are handled with the
-        find_moplate and import_moplate functions in this module.
+        The mechanics of these moplate resolution shortcuts are
+        handled with the find_moplate and import_moplate functions in
+        this module.
           
         @param mapping : The mobile domain mapping
         @type  mapping : list of tuple(key, value)

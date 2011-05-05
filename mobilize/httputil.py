@@ -92,6 +92,9 @@ def mobilizeable(resp):
 
     @param resp : response headers
     @type  resp : dict
+
+    @return : True iff the response is mobilizeable
+    @rtype  : bool
     
     '''
     contenttype = resp.get('content-type', '')
@@ -307,7 +310,7 @@ def guess_charset(resp, src_resp_bytes, default_charset):
         if match is not None:
             charset = match.groups()[0].lower()
     # Does the HEAD element set the encoding in a META declaration?
-    # That means either an html5 'meta charset="..."', or 'meta http-equiv="content-type"'
+    # That means either an html5 'meta charset="..."', or html4 'meta http-equiv="content-type"'
     else:
         headbytes = _headbytes(src_resp_bytes).decode()
         match_ct = re.search(
@@ -328,11 +331,11 @@ def mk_wsgi_application(msite, verboselog=False):
     '''
     Create the WSGI application
 
-    @param msite           : mobile site
-    @type  msite           : mobilize.base.MobileSite
+    @param msite : mobile site
+    @type  msite : mobilize.base.MobileSite
 
-    @return                : WSGI application function
-    @rtype                 : function accepting (environ, start_response) arguments
+    @return      : WSGI application function
+    @rtype       : function accepting (environ, start_response) arguments
     
     '''
     def application(environ, start_response):
@@ -341,6 +344,7 @@ def mk_wsgi_application(msite, verboselog=False):
         try:
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         except NoMatchingHandlerException:
+            # TODO: if verboselog, log that we're passing through
             handler = passthrough
         return handler.wsgi_response(msite, environ, start_response)
     return application

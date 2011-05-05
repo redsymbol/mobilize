@@ -258,7 +258,10 @@ class ToDesktop(Handler):
     TODO: what if the device detection redirects them here?  Could get in a redirect loop
     
     '''
+
+    #: HTTP response status
     status = '302 FOUND'
+    
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ)
@@ -271,6 +274,7 @@ class ToDesktopPermanent(ToDesktop):
     Operates similarly to ToDesktop, but with a 301 permanent redirect.
     
     '''
+    
     status = '301 MOVED PERMANENTLY'
 
 class PassThrough(WebSourcer):
