@@ -230,16 +230,6 @@ class Moplate(WebSourcer):
         '''
         return []
 
-    def get_params(self):
-        '''
-        Get the current template parameters
-
-        @return : current parameters
-        @rtype  : dict
-        
-        '''
-        return self.params
-
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         if httputil.mobilizeable(resp):
             extra_params = {
