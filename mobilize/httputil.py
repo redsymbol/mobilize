@@ -327,6 +327,26 @@ def guess_charset(resp, src_resp_bytes, default_charset):
     # Else just keep the default charset.
     return charset
 
+def netbytes2str(rawbytes, charset):
+    '''
+    Create a lxml-friendly Python string from the raw HTTP response
+
+    This is necessary because httplib2.Http.request returns a response
+    body of type bytes, but we want to feed a correctly decoded string
+    with properly handled newlines, etc. to lxml.
+
+    @param rawbytes : The response body from the network
+    @type  rawbytes : bytes
+
+    @param charset : Character encoding of rawbytes
+    @type  charset : str
+
+    @return : lxml-friendly Python string
+    @rtype  : str
+
+    '''
+    return rawbytes.replace(b'\r\n', b'\n').decode(charset)
+
 def mk_wsgi_application(msite):
     '''
     Create the WSGI application

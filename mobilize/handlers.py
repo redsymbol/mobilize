@@ -75,7 +75,7 @@ class WebSourcer(Handler):
         if msite.verboselog:
             log_headers('raw response headers', resp, status=status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
-        src_resp_body = src_resp_bytes.decode(charset)
+        src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
         status = '%s %s' % (resp.status, resp.reason)
         final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
         if msite.verboselog:
@@ -88,8 +88,9 @@ class WebSourcer(Handler):
         Create the final WSGI response body and headers
 
         This method must return a pair: the final response body as a
-        string, and the final response headers.  The response headers
-        are in the form of a list of (key, value) pairs.
+        string (not bytes), and the final response headers.  The
+        response headers are in the form of a list of (key, value)
+        pairs.
 
         @param environ       : WSGI environment
         @type  environ       : dict

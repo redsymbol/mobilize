@@ -467,3 +467,12 @@ class TestHttp(unittest.TestCase):
             actual = guess_charset(td['resp'], td['src_resp_bytes'], td['default_charset'])
             msg = '{}: e: "{}", a: "{}" [{}]'.format(td['msg'], expected, actual, ii)
             self.assertEqual(expected, actual, msg)
+
+    def test_netbytes2str(self):
+        from mobilize.httputil import netbytes2str
+        kungfu = '功夫' # b'\xe5\x8a\x9f\xe5\xa4\xab'
+        src = b'<html><body><p>\xe5\x8a\x9f\xe5\xa4\xab means:\r\n<ul>\r\n<li>hard work</li>\r\n<li>great skill</li>\r\n</ul>'
+        expected = '<html><body><p>功夫 means:\n<ul>\n<li>hard work</li>\n<li>great skill</li>\n</ul>'
+        actual = netbytes2str(src, 'utf-8')
+        self.assertEquals(expected, actual)
+        
