@@ -327,7 +327,7 @@ def guess_charset(resp, src_resp_bytes, default_charset):
     # Else just keep the default charset.
     return charset
 
-def mk_wsgi_application(msite, verboselog=False):
+def mk_wsgi_application(msite):
     '''
     Create the WSGI application
 
@@ -344,7 +344,6 @@ def mk_wsgi_application(msite, verboselog=False):
         try:
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         except NoMatchingHandlerException:
-            # TODO: if verboselog, log that we're passing through
             handler = passthrough
         return handler.wsgi_response(msite, environ, start_response)
     return application

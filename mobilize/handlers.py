@@ -282,6 +282,7 @@ class PassThrough(WebSourcer):
     Pass through the response from the desktop source
     '''
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
+        # TODO: if msite.verboselog, log that we're passing through
         resp_headers = httputil.dict2list(resp)
         return src_resp_body, resp_headers
     
