@@ -10,7 +10,7 @@ reusable (e.g., todesktop, which is an instance of ToDesktop)
 from . import util
 from . import httputil
 
-class Handler(object):
+class Handler:
     '''
     Handles a mobile page request
 

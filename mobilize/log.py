@@ -24,7 +24,7 @@ def mk_wsgi_log(environ):
     logger = Logger(environ['wsgi.errors'])
     return logger.log
     
-class Logger(object):
+class Logger:
     '''
     Class for logging
     '''

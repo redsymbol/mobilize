@@ -168,7 +168,7 @@ def get_http():
 def dict2list(d):
     return list((header, value) for header, value in d.items())
 
-class RequestInfo(object):
+class RequestInfo:
     '''
     Encapsulates information about an incoming HTTP request.
 

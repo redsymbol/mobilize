@@ -12,7 +12,7 @@ from mobilize.util import (
 
 # Supporting code
 
-class Spec(object):
+class Spec:
     '''
     A specification of tables cells
 

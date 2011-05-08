@@ -1,4 +1,4 @@
-class Component(object):
+class Component:
     '''
     abstract base of all component classes
 

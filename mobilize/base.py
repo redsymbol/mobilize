@@ -7,7 +7,7 @@ from mobilize import (
     filters,
     )
 
-class MobileSite(object):
+class MobileSite:
     '''
     Represents a mobile website
 
@@ -98,7 +98,7 @@ class MobileSite(object):
         '''
         return {}
 
-class HandlerMap(object):
+class HandlerMap:
     '''
     Represents a mapping between pages (URLs) and their handlers
     '''
