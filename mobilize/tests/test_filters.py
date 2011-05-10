@@ -38,6 +38,9 @@ class TestFilters(TestCase):
             {'in'  : '''<div class="foo" Style="background-color: red;">Hello.</div>''',
              'out' :  '''<div class="foo">Hello.</div>''',
              },
+            {'in'  : '''<div><a href="/a">Hello.</a> <a href="http://example.com" target="_blank">New Tab</a></div>''',
+            'out'  : '''<div><a href="/a">Hello.</a> <a href="http://example.com">New Tab</a></div>''',
+             },
             ]
         for ii, td in enumerate(testdata):
             self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [nomiscattrib])))

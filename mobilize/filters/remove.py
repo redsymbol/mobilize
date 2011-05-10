@@ -23,19 +23,25 @@ def nomiscattrib_one(elem):
      * align
      TODO: update this list
     
-    @param elem : Element representing an html tag
+    @param elem : an html element
     @type  elem : lxml.html.HTMLElement
 
     '''
-    unwanteds = (
+    universals = (
         'align',
         'border',
         'valign',
         'style',
         )
-    for unwanted in unwanteds:
-        if unwanted in elem.attrib:
-            del elem.attrib[unwanted]
+    singles = {
+        'a' : ['target'],
+        }
+    for universal in universals:
+        if universal in elem.attrib:
+            del elem.attrib[universal]
+    for single in singles.get(elem.tag, []):
+        if single in elem.attrib:
+            del elem.attrib[single]
 
 def noevents(elem):
     '''
@@ -193,4 +199,3 @@ def nobr(elem, space=True):
             elif not br_elem.tail.startswith(' '):
                 br_elem.tail = ' ' + br_elem.tail 
         br_elem.drop_tree()
-    
