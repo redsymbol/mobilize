@@ -27,21 +27,27 @@ def nomiscattrib_one(elem):
     @type  elem : lxml.html.HTMLElement
 
     '''
+    # Attributes we want to remove from all elements
     universals = (
         'align',
         'border',
         'valign',
         'style',
         )
+    # Attributes we want to remove only from certain tags
+    # tag name -> list of attributes to remove
     singles = {
         'a' : ['target'],
         }
-    for universal in universals:
-        if universal in elem.attrib:
-            del elem.attrib[universal]
-    for single in singles.get(elem.tag, []):
-        if single in elem.attrib:
-            del elem.attrib[single]
+    def toremoves():
+        for universal in universals:
+            yield universal
+        if elem.tag in singles:
+            for single in singles[elem.tag]:
+                yield single
+    for toremove in toremoves():
+        if toremove in elem.attrib:
+            del elem.attrib[toremove]
 
 def noevents(elem):
     '''
