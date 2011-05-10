@@ -9,6 +9,9 @@ from mobilize.util import (
 # Filters
 
 def nomiscattrib(root_elem):
+    '''
+    Apply the nomiscattrib_one filter to all child elements
+    '''
     nomiscattrib_one(root_elem)
     for elem in root_elem.iterdescendants():
         nomiscattrib_one(elem)
@@ -49,7 +52,7 @@ def nomiscattrib_one(elem):
         if toremove in elem.attrib:
             del elem.attrib[toremove]
 
-def noevents(elem):
+def noevents_one(elem):
     '''
     Removes "onSOMETHING" events
 
@@ -64,9 +67,9 @@ def noevents(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
-def noeventson(parent, xpath):
+def noevents(parent, xpath):
     '''
-    Recursively apply the noevents filter on sub-elements matching expression
+    Apply the noevents_one filter on sub-elements matching expression
 
     '''
     for elem in parent.iterfind(xpath):

@@ -19,7 +19,6 @@ A callable conforms to the filter API if it:
 from .remove import (
     nomiscattrib,
     noevents,
-    noeventson,
     noimgsize,
     noattribs,
     omit,
@@ -47,6 +46,5 @@ from .misc import (
     )
 
 DEFAULT_FILTERS = [
-    noevents,
     nomiscattrib,
     ]

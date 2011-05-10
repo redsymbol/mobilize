@@ -56,7 +56,7 @@ class TestFilters(TestCase):
             self.assertSequenceEqual(td['out'], elem2str(apply_filters(td['in'], [noimgsize])))
         
     def test_noevents(self):
-        from mobilize.filters import noevents
+        from mobilize.filters.remove import noevents_one
         testdata = [
             {'in'  : '''<a href="#" id="makeHPLink" onclick="cnnMakeHP('homepage_set_overlay')" class="realmLink">Make CNN Your Homepage</a>''',
              'out' : '''<a href="#" id="makeHPLink" class="realmLink">Make CNN Your Homepage</a>''',
@@ -72,7 +72,7 @@ class TestFilters(TestCase):
              },
             ]
         for ii, td in enumerate(testdata):
-            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noevents])))
+            self.assertEquals(td['out'], elem2str(apply_filters(td['in'], [noevents_one])))
             
     def test_chain_filters(self):
         '''test that filters can be chained'''
@@ -84,10 +84,11 @@ class TestFilters(TestCase):
 <h1>The Headline</h1>
 <a href="#">Click Here</a>
 </div>'''
-        from mobilize.filters import nomiscattrib, noevents
+        from mobilize.filters import nomiscattrib
+        from mobilize.filters.remove import noevents_one
         my_filters = [
             nomiscattrib,
-            noevents,
+            noevents_one,
             ]
         self.assertEquals(elem2str(apply_filters(htmlin, my_filters)), htmlout)
 
