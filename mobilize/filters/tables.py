@@ -408,33 +408,7 @@ def table2divs(elem, omit_whitespace=True):
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div>
 
     '''
-    from lxml.html import HtmlElement
-    MARKER_BASE = 'mwu-table2divs'
-    def rcmarker(**kw):
-        return rcmarkerbase(MARKER_BASE, **kw)
-    container_elem = htmlelem(attrib={'class' : MARKER_BASE})
-    if 'table' == elem.tag:
-        table_elem = elem
-    else:
-        table_elem = elem.find('table')
-    if table_elem is not None:
-        root_elem = rowsparent(table_elem)
-        rows = root_elem.findall('./tr')
-        for rownum, row in enumerate(rows):
-            cols = row.findall('./td')
-            for colnum, tdelem in enumerate(cols):
-                if omit_whitespace and elementempty(tdelem):
-                    continue # skip over this empty cell
-                cell_elem = htmlelem(text=tdelem.text)
-                for colchild in tdelem:
-                    anychildren = True
-                    cell_elem.append(colchild)
-                cell_elem.attrib['class'] = ' '.join([
-                        rcmarker(row=rownum, col=colnum),
-                        rcmarker(row=rownum),
-                        rcmarker(col=colnum),])
-                container_elem.append(cell_elem)
-        replace_child(elem, table_elem, container_elem)
+    return _table2divs(elem, omit_whitespace, 'mwu-table2divs', False)
             
 def table2divrows(elem, omit_whitespace=True):
     '''
@@ -477,11 +451,16 @@ def table2divrows(elem, omit_whitespace=True):
     </div>
     
     '''
+    return _table2divs(elem, omit_whitespace, 'mwu-table2divrows', True)
+
+def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
+    '''
+    helper for some table-to-div filters
+    '''
     from lxml.html import HtmlElement
-    MARKER_BASE = 'mwu-table2divrows'
     def rcmarker(**kw):
-        return rcmarkerbase(MARKER_BASE, **kw)
-    container_elem = htmlelem(attrib={'class' : MARKER_BASE})
+        return rcmarkerbase(marker_base, **kw)
+    container_elem = htmlelem(attrib={'class' : marker_base})
     if 'table' == elem.tag:
         table_elem = elem
     else:
@@ -489,8 +468,9 @@ def table2divrows(elem, omit_whitespace=True):
     if table_elem is not None:
         root_elem = rowsparent(table_elem)
         rows = root_elem.findall('./tr')
-        for rownum, row in enumerate(rows): 
-            rowcontainer_elem = htmlelem(attrib={'class' : rcmarker(row=rownum)})
+        for rownum, row in enumerate(rows):
+            if wrap_rows:
+                rowcontainer_elem = htmlelem(attrib={'class' : rcmarker(row=rownum)})
             cols = row.findall('./td')
             for colnum, tdelem in enumerate(cols):
                 if omit_whitespace and elementempty(tdelem):
@@ -499,11 +479,24 @@ def table2divrows(elem, omit_whitespace=True):
                 for colchild in tdelem:
                     anychildren = True
                     cell_elem.append(colchild)
-                cell_elem.attrib['class'] = ' '.join([
+                if wrap_rows:
+                    markers = [
                         rcmarker(row=rownum, col=colnum),
-                        rcmarker(col=colnum),])
-                rowcontainer_elem.append(cell_elem)
-            container_elem.append(rowcontainer_elem)
+                        rcmarker(col=colnum),
+                        ]
+                else:
+                    markers = [
+                        rcmarker(row=rownum, col=colnum),
+                        rcmarker(row=rownum),
+                        rcmarker(col=colnum),
+                        ]
+                cell_elem.attrib['class'] = ' '.join(markers)
+                if wrap_rows:
+                    rowcontainer_elem.append(cell_elem)
+                else:
+                    container_elem.append(cell_elem)
+            if wrap_rows:
+                container_elem.append(rowcontainer_elem)
         replace_child(elem, table_elem, container_elem)
 
 def table2divgroupsgs(elem, specmapgen, omit_whitespace=True):
