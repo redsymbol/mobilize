@@ -464,7 +464,7 @@ def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
     if 'table' == elem.tag:
         table_elem = elem
     else:
-        table_elem = elem.find('table')
+        table_elem = elem.find('.//table')
     if table_elem is not None:
         root_elem = rowsparent(table_elem)
         rows = root_elem.findall('./tr')

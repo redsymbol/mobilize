@@ -301,6 +301,20 @@ here's some extra trailing text for you too
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-col1 mwu-table2divs-row1">Milk</div></div>
 ''',
              },
+            # find more deeply nested table
+            {'in_str' : '''<div><ul><li><div>
+<table>
+  <tr>
+   <td>Eggs</td>
+  </tr>
+</table>
+</div></li></ul></div>
+''',
+             'out_str' : '''<div><ul><li><div>
+<div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">Eggs</div></div>
+</div></li></ul></div>
+''',
+             },
             ]
         from mobilize.filters import table2divs
         for ii, td in enumerate(testdata):
