@@ -218,10 +218,10 @@ class TestFilters(TestCase):
       </tr>
     </table></div>
 ''',
-             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
-    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
-    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
-    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div></div>
+             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-col0 mwu-table2divs-row1">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-col1 mwu-table2divs-row1">Milk</div></div></div>
 ''',
              },
             {'in_str' : '''<div><table><tbody>
@@ -235,10 +235,10 @@ class TestFilters(TestCase):
       </tr>
     </tbody></table></div>
 ''',
-             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
-    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
-    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
-    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div></div>
+             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-col0 mwu-table2divs-row1">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-col1 mwu-table2divs-row1">Milk</div></div></div>
 ''',
              },
             {'in_str' : '''<div><p>Nothing here.</p></div>''',
@@ -251,10 +251,10 @@ class TestFilters(TestCase):
       </tr>
     </table></div>''',
              'out_str' : '''<div><div class="mwu-table2divs">
-    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">
       <table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
     </div>
-    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Key Lime Pie</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Key Lime Pie</div>
     </div>
 </div>''',
              },
@@ -272,7 +272,7 @@ here's some extra trailing text for you too
       </tr>
     </table></div>''',
              'out_str' : '''<div><div class="mwu-table2divs">
-    <div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">
+    <div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">
 Does html like this exist somewhere in the wild?
 <table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
 <p>yeah, I bet somewhere it does</p>
@@ -280,7 +280,7 @@ Does html like this exist somewhere in the wild?
 <table id="foobar"><tr><td>Game</td><td>Over Man</td></tr></table>
 here's some extra trailing text for you too
     </div>
-    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Key Lime Pie</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Key Lime Pie</div>
     </div>
 </div>''',
              },
@@ -295,10 +295,10 @@ here's some extra trailing text for you too
       </tr>
     </table>
 ''',
-             'out_str' : '''<div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-row0 mwu-table2divs-col0">Eggs</div>
-    <div class="mwu-table2divs-row0-col1 mwu-table2divs-row0 mwu-table2divs-col1">Ham</div>
-    <div class="mwu-table2divs-row1-col0 mwu-table2divs-row1 mwu-table2divs-col0">Beer</div>
-    <div class="mwu-table2divs-row1-col1 mwu-table2divs-row1 mwu-table2divs-col1">Milk</div></div>
+             'out_str' : '''<div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">Eggs</div>
+    <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Ham</div>
+    <div class="mwu-table2divs-row1-col0 mwu-table2divs-col0 mwu-table2divs-row1">Beer</div>
+    <div class="mwu-table2divs-row1-col1 mwu-table2divs-col1 mwu-table2divs-row1">Milk</div></div>
 ''',
              },
             ]

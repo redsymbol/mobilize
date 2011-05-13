@@ -479,17 +479,12 @@ def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
                 for colchild in tdelem:
                     anychildren = True
                     cell_elem.append(colchild)
-                if wrap_rows:
-                    markers = [
-                        rcmarker(row=rownum, col=colnum),
-                        rcmarker(col=colnum),
-                        ]
-                else:
-                    markers = [
-                        rcmarker(row=rownum, col=colnum),
-                        rcmarker(row=rownum),
-                        rcmarker(col=colnum),
-                        ]
+                markers = [
+                    rcmarker(row=rownum, col=colnum),
+                    rcmarker(col=colnum),
+                    ]
+                if not wrap_rows:
+                    markers.append(rcmarker(row=rownum))
                 cell_elem.attrib['class'] = ' '.join(markers)
                 if wrap_rows:
                     rowcontainer_elem.append(cell_elem)
