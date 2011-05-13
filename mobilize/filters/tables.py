@@ -414,7 +414,44 @@ def table2divs(elem, omit_whitespace=True):
             
 def table2divrows(elem, omit_whitespace=True):
     '''
-    like table2divs, but rows are organized into their own divs
+    like table2divs, but rows are organized into their own divs.
+
+    See the documentation of table2divs for a complete explanation.
+    The method signature and return type are identical. The only
+    differences are:
+    
+      0) The CSS class markers are prefixed by "mwu-table2divrows", not
+         "mwu-table2divs" (see example below).
+      1) "TD" divs generated from table cells from the same row are grouped
+         into a parent "TR" div.
+      2) The row marker CSS class appears in that parent "TR" div, and not
+         in the child "TD" divs.
+
+    For example, this HTML:
+    <table>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </table>
+
+    ... will render like this:
+
+    <div class="mwu-table2divrows">
+      <div class="mwu-table2divrows-row0">
+        <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">Eggs</div>
+        <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Ham</div>
+      </div>
+      <div class="mwu-table2divrows-row1">
+        <div class="mwu-table2divrows-row1-col0 mwu-table2divrows-col0">Beer</div>
+        <div class="mwu-table2divrows-row1-col1 mwu-table2divrows-col1">Milk</div>
+      </div>
+    </div>
+    
     '''
     from lxml.html import HtmlElement
     MARKER_BASE = 'mwu-table2divrows'
