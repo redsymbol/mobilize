@@ -284,6 +284,35 @@ def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
             groups_elem.append(group_elem)
         replace_child(elem, table_elem, groups_elem)
 
+def rcmarkerbase(prefix, row=None, col=None):
+    '''
+    Construct a row-column marker string
+
+    Used by some filters (e.g., table2divs and relatives) to construct
+    a CSS class label that indicates a row and/or column source.  The
+    returned value will be a valid CSS class name, provided the prefix
+    is well-behaved.
+
+    @param prefix : Initial part of the label
+    @type  prefix : str
+
+    @param row    : Row number (zero-based)
+    @type  row    : int
+    
+    @param column : Column number (zero-based)
+    @type  column : int
+
+    @return       : Marker string
+    @rtype        : str
+    
+    '''
+    s = prefix
+    if row is not None:
+        s += '-row%s' % row
+    if col is not None:
+        s += '-col%s' % col
+    return s
+
 def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
@@ -381,13 +410,8 @@ def table2divs(elem, omit_whitespace=True):
     '''
     from lxml.html import HtmlElement
     MARKER_BASE = 'mwu-table2divs'
-    def rcmarker(row=None, col=None):
-        s = MARKER_BASE
-        if row is not None:
-            s += '-row%s' % row
-        if col is not None:
-            s += '-col%s' % col
-        return s
+    def rcmarker(**kw):
+        return rcmarkerbase(MARKER_BASE, **kw)
     container_elem = htmlelem(attrib={'class' : MARKER_BASE})
     if 'table' == elem.tag:
         table_elem = elem
@@ -455,13 +479,8 @@ def table2divrows(elem, omit_whitespace=True):
     '''
     from lxml.html import HtmlElement
     MARKER_BASE = 'mwu-table2divrows'
-    def rcmarker(row=None, col=None):
-        s = MARKER_BASE
-        if row is not None:
-            s += '-row%s' % row
-        if col is not None:
-            s += '-col%s' % col
-        return s
+    def rcmarker(**kw):
+        return rcmarkerbase(MARKER_BASE, **kw)
     container_elem = htmlelem(attrib={'class' : MARKER_BASE})
     if 'table' == elem.tag:
         table_elem = elem
