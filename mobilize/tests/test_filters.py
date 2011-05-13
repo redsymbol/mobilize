@@ -927,6 +927,102 @@ here's some extra trailing text for you too
 </div>
 ''',
              },
+            #================
+            {'in_str' : '''<div><table><tbody>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </tbody></table></div>
+''',
+             'out_str' : '''<div>
+  <div class="mwu-table2divrows">
+    <div class="mwu-table2divrows-row0">
+      <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">Eggs</div>
+      <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Ham</div>
+    </div>
+    <div class="mwu-table2divrows-row1">
+      <div class="mwu-table2divrows-row1-col0 mwu-table2divrows-col0">Beer</div>
+      <div class="mwu-table2divrows-row1-col1 mwu-table2divrows-col1">Milk</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            {'in_str' : '''<div><p>Nothing here.</p></div>''',
+             'out_str' : '''<div><p>Nothing here.</p></div>''',
+             },
+            {'in_str' : '''<div><table>
+      <tr>
+        <td><table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table></td>
+        <td>Key Lime Pie</td>
+      </tr>
+    </table></div>''',
+             'out_str' : '''<div><div class="mwu-table2divrows">
+<div class="mwu-table2divrows-row0">
+    <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">
+      <table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+    </div>
+    <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Key Lime Pie</div>
+    </div>
+</div>
+</div>''',
+             },
+            {'in_str' : '''<div><table>
+      <tr>
+        <td>
+Does html like this exist somewhere in the wild?
+<table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+<p>yeah, I bet somewhere it does</p>
+(probably on some website that gets 10K hits on a slow day)
+<table id="foobar"><tr><td>Game</td><td>Over Man</td></tr></table>
+here's some extra trailing text for you too
+</td>
+        <td>Key Lime Pie</td>
+      </tr>
+    </table></div>''',
+             'out_str' : '''<div><div class="mwu-table2divrows">
+  <div class="mwu-table2divrows-row0">
+    <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">
+Does html like this exist somewhere in the wild?
+<table id="foobar"><tr><td>Whoa</td><td>dude</td></tr></table>
+<p>yeah, I bet somewhere it does</p>
+(probably on some website that gets 10K hits on a slow day)
+<table id="foobar"><tr><td>Game</td><td>Over Man</td></tr></table>
+here's some extra trailing text for you too
+    </div>
+    <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Key Lime Pie</div>
+    </div>
+  </div>
+</div>''',
+             },
+            {'in_str' : '''<table>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </table>
+''',
+             'out_str' : '''<div class="mwu-table2divrows">
+  <div class="mwu-table2divrows-row0">
+    <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">Eggs</div>
+    <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Ham</div>
+  </div>
+  <div class="mwu-table2divrows-row1">
+    <div class="mwu-table2divrows-row1-col0 mwu-table2divrows-col0">Beer</div>
+    <div class="mwu-table2divrows-row1-col1 mwu-table2divrows-col1">Milk</div>
+  </div>
+</div>
+''',
+             },
             ]
         from mobilize.filters import table2divrows
         for ii, td in enumerate(testdata):
