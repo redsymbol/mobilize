@@ -900,3 +900,36 @@ here's some extra trailing text for you too
         nospace_out = elem2str(elem_nospace)
         self.assertSequenceEqual(expected_nospace, nospace_out)
 
+    def test_table2divrows(self):
+        testdata = [
+            {'in_str' : '''<div><table>
+      <tr>
+        <td>Eggs</td>
+        <td>Ham</td>
+      </tr>
+      <tr>
+        <td>Beer</td>
+        <td>Milk</td>
+      </tr>
+    </table></div>
+''',
+             'out_str' : '''<div>
+  <div class="mwu-table2divrows">
+    <div class="mwu-table2divrows-row0">
+      <div class="mwu-table2divrows-row0-col0 mwu-table2divrows-col0">Eggs</div>
+      <div class="mwu-table2divrows-row0-col1 mwu-table2divrows-col1">Ham</div>
+    </div>
+    <div class="mwu-table2divrows-row1">
+      <div class="mwu-table2divrows-row1-col0 mwu-table2divrows-col0">Beer</div>
+      <div class="mwu-table2divrows-row1-col1 mwu-table2divrows-col1">Milk</div>
+    </div>
+  </div>
+</div>
+''',
+             },
+            ]
+        from mobilize.filters import table2divrows
+        for ii, td in enumerate(testdata):
+            in_elem = html.fragment_fromstring(td['in_str'], create_parent=False)
+            table2divrows(in_elem)
+            self.assertSequenceEqual(normxml(td['out_str']), normxml(elem2str(in_elem)))

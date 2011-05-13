@@ -416,6 +416,39 @@ def table2divrows(elem, omit_whitespace=True):
     '''
     like table2divs, but rows are organized into their own divs
     '''
+    from lxml.html import HtmlElement
+    MARKER_BASE = 'mwu-table2divrows'
+    def rcmarker(row=None, col=None):
+        s = MARKER_BASE
+        if row is not None:
+            s += '-row%s' % row
+        if col is not None:
+            s += '-col%s' % col
+        return s
+    container_elem = htmlelem(attrib={'class' : MARKER_BASE})
+    if 'table' == elem.tag:
+        table_elem = elem
+    else:
+        table_elem = elem.find('table')
+    if table_elem is not None:
+        root_elem = rowsparent(table_elem)
+        rows = root_elem.findall('./tr')
+        for rownum, row in enumerate(rows): 
+            rowcontainer_elem = htmlelem(attrib={'class' : rcmarker(row=rownum)})
+            cols = row.findall('./td')
+            for colnum, tdelem in enumerate(cols):
+                if omit_whitespace and elementempty(tdelem):
+                    continue # skip over this empty cell
+                cell_elem = htmlelem(text=tdelem.text)
+                for colchild in tdelem:
+                    anychildren = True
+                    cell_elem.append(colchild)
+                cell_elem.attrib['class'] = ' '.join([
+                        rcmarker(row=rownum, col=colnum),
+                        rcmarker(col=colnum),])
+                rowcontainer_elem.append(cell_elem)
+            container_elem.append(rowcontainer_elem)
+        replace_child(elem, table_elem, container_elem)
 
 def table2divgroupsgs(elem, specmapgen, omit_whitespace=True):
     '''
