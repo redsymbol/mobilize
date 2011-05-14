@@ -27,11 +27,17 @@ def _get_uri(environ):
     Get the incoming request URI
     
     '''
+    portmap = {
+        'http'  : 80,
+        'https' : 443,
+        }
     proto = environ.get('wsgi.url_scheme', 'http')
     host, port = srchostport(environ)
+    print("PORT::{}".format(port))
     assert type(port) is int, type(port)
     uri = '%s://%s' % (proto, host)
-    if 80 != port:
+    stdport = portmap.get(proto, False)
+    if stdport and port != stdport:
         uri += ':' + str(port)
     uri += get_rel_uri(environ)
     return uri
@@ -107,7 +113,7 @@ def srchostport(environ):
     Calculate/choose source hostname and port
 
     environ is meant to be the WSGI environment dictionary,
-    expectected to contain the following keys:
+    expected to contain the following keys:
 
       MWU_OTHER_DOMAIN
       SERVER_PORT
@@ -120,8 +126,8 @@ def srchostport(environ):
     @param param : WSGI environment
     @type  param : dict
 
-    @return : Source host and port
-    @rtype  : tuple(str, int)
+    @return      : Source host and port
+    @rtype       : tuple(str, int)
     
     '''
     full_host = environ['MWU_OTHER_DOMAIN']

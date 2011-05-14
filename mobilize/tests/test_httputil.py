@@ -475,4 +475,43 @@ class TestHttp(unittest.TestCase):
         expected = '<html><body><p>功夫 means:\n<ul>\n<li>hard work</li>\n<li>great skill</li>\n</ul>'
         actual = netbytes2str(src, 'utf-8')
         self.assertEquals(expected, actual)
-        
+
+    def test__get_uri(self):
+        from mobilize.httputil import _get_uri
+        def env(**kw):
+            environ = {
+            'MWU_OTHER_DOMAIN' : 'www.example.com',
+            'wsgi.url_scheme' : 'http',
+            'SERVER_PORT' : 80,
+            'REQUEST_URI' : '/',
+            }
+            if 'proto' in kw:
+                environ['wsgi.url_scheme'] = kw['proto']
+                del kw['proto']
+            environ.update(kw)
+            return environ
+        testdata = [
+            {'environ' : env(),
+             'uri'     : 'http://www.example.com/',
+             },
+            {'environ' : env(REQUEST_URI='/foo/bar'),
+             'uri'     : 'http://www.example.com/foo/bar',
+             },
+            {'environ' : env(REQUEST_URI='/foo/bar', SERVER_PORT=42),
+             'uri'     : 'http://www.example.com/foo/bar',
+             },
+            {'environ' : env(),
+             'uri'     : 'http://www.example.com/',
+             },
+            {'environ' : env(proto='https', SERVER_PORT=443),
+             'uri'     : 'https://www.example.com/',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            expected = td['uri']
+            try:
+                actual = _get_uri(td['environ'])
+            except AttributeError:
+                print(td['environ'])
+                raise
+            self.assertSequenceEqual(expected, actual)
