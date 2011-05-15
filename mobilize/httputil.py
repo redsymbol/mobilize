@@ -33,7 +33,6 @@ def _get_uri(environ):
         }
     proto = environ.get('wsgi.url_scheme', 'http')
     host, port = srchostport(environ)
-    print("PORT::{}".format(port))
     assert type(port) is int, type(port)
     uri = '%s://%s' % (proto, host)
     stdport = portmap.get(proto, False)
