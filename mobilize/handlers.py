@@ -73,7 +73,7 @@ class WebSourcer(Handler):
         resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         if msite.verboselog:
-            log_headers('raw response headers', resp, status=status)
+            log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
         status = '%s %s' % (resp.status, resp.reason)
