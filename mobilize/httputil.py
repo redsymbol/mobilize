@@ -135,10 +135,15 @@ def srchostport(environ):
         full_port = int(full_port)
     else:
         requesting_port = int(environ['SERVER_PORT'])
-        if requesting_port in (80, 443):
-            full_port = requesting_port
+        # TODO: these are development hooks.  Need to fix
+        devremap = {
+            2280 : 80,
+            2443 : 443,
+            }
+        if requesting_port in devremap:
+            full_port = devremap[requesting_port]
         else:
-            full_port = 80
+            full_port = requesting_port
     return full_host, full_port
     
 def get_rel_uri(environ):

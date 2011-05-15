@@ -498,7 +498,7 @@ class TestHttp(unittest.TestCase):
              'uri'     : 'http://www.example.com/foo/bar',
              },
             {'environ' : env(REQUEST_URI='/foo/bar', SERVER_PORT=42),
-             'uri'     : 'http://www.example.com/foo/bar',
+             'uri'     : 'http://www.example.com:42/foo/bar',
              },
             {'environ' : env(),
              'uri'     : 'http://www.example.com/',
