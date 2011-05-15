@@ -61,8 +61,6 @@ class WebSourcer(Handler):
                 msg += ', %s=%s' % (k, v)
             log(msg)
         http = httputil.get_http()
-        if reqinfo.method in ('POST', 'PUT'):
-            reqinfo.body = environ['wsgi.input'].read()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         if msite.verboselog:
