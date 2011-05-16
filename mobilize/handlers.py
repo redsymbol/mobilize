@@ -73,9 +73,13 @@ class WebSourcer(Handler):
         if msite.verboselog:
             log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
-        src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
         status = '%s %s' % (resp.status, resp.reason)
-        final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
+        if httputil.mobilizeable(resp):
+            src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
+            final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
+        else:
+            final_resp_headers = httputil.dict2list(resp)
+            final_body = src_resp_bytes
         if msite.verboselog:
             log_headers('final resp headers', final_resp_headers)
         start_response(status, final_resp_headers)
@@ -230,21 +234,16 @@ class Moplate(WebSourcer):
         return []
 
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
-        if httputil.mobilizeable(resp):
-            extra_params = {
-                'fullsite' : msite.fullsite,
-                'request_path' : reqinfo.rel_uri,
-                }
-            final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
-            response_overrides = msite.response_overrides(environ)
-            response_overrides['content-length'] = str(len(final_body))
-            if 'transfer-encoding' in resp:
-                del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
-            final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
-        else:
-            # Don't know how to mobilize this, so just pass through source response.
-            final_resp_headers = httputil.dict2list(resp)
-            final_body = src_resp_bytes
+        extra_params = {
+            'fullsite' : msite.fullsite,
+            'request_path' : reqinfo.rel_uri,
+            }
+        final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
+        response_overrides = msite.response_overrides(environ)
+        response_overrides['content-length'] = str(len(final_body))
+        if 'transfer-encoding' in resp:
+            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
+        final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         return final_body, final_resp_headers
 
 class ToDesktop(Handler):
