@@ -468,6 +468,36 @@ class TestHttp(unittest.TestCase):
             msg = '{}: e: "{}", a: "{}" [{}]'.format(td['msg'], expected, actual, ii)
             self.assertEqual(expected, actual, msg)
 
+    def test__headbytes(self):
+        testdata = [
+            # normal case
+            {'bytesin' : b'''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>
+  <body>Hi.</body></html>''',
+             'bytesout' : b'''<head>
+    <link href="http://media.redsymbol.net/redsymbol.css" rel="stylesheet" type="text/css" />
+    <title>Test Page</title>
+  </head>''',
+             },
+            # no head
+            {'bytesin' : b'''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <body>Hi.</body></html>''',
+             'bytesout' : b'',
+             },
+            ]
+        from mobilize.httputil import _headbytes
+        for ii, td in enumerate(testdata):
+            expected = td['bytesout']
+            actual = _headbytes(td['bytesin'])
+            self.assertEqual(expected, actual)
+
     def test_netbytes2str(self):
         from mobilize.httputil import netbytes2str
         kungfu = '功夫' # b'\xe5\x8a\x9f\xe5\xa4\xab'

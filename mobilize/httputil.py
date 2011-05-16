@@ -271,6 +271,17 @@ class RequestInfo:
             if header is not None:
                 yield header, value
 
+def _headbytes(html_bytes):
+    '''fetch the portion of a document before the opening of the body element'''
+    def findpos(key):
+        match = re.search(key, html_bytes, re.I)
+        if match is None:
+            return -1
+        return match.start()
+    start = findpos(b'<head')
+    end = findpos(b'<body')
+    return html_bytes[start:end].strip() if (start >= 0 and end >= 0) else b''
+
 def guess_charset(resp, src_resp_bytes, default_charset):
     '''
     Make the best guess of the charset of an http response
@@ -292,15 +303,6 @@ def guess_charset(resp, src_resp_bytes, default_charset):
         key = b'<?xml'
         initial = body[:len(key)].lower()
         return key == initial
-    def _headbytes(html_bytes):
-        '''fetch the portion of a document before the opening of the body element'''
-        def findpos(key):
-            match = re.search(key, html_bytes, re.I)
-            assert match is not None, key
-            return match.start()
-        start = findpos(b'<head')
-        end = findpos(b'<body')
-        return html_bytes[start:end].strip()
     def _ctcharset(resp):
         if 'content-type' in resp:
             match = re.search(r'\bcharset=([^; ]+)', resp['content-type'])
