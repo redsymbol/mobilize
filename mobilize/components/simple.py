@@ -30,8 +30,26 @@ class DjangoTemplate(Simple):
         return render_to_string(self.template, self.params)
 
 class RawString(Simple):
+    '''
+    Insert a string directly into the mobile component stream
+    '''
     def __init__(self, rawstring):
         self.rawstring = rawstring
 
     def html(self):
         return self.rawstring
+
+class Clear(RawString):
+    '''
+    Insert a clearfix element
+
+    This implements a clearfix by inserting an element the horribly
+    nonsemantic, but widely supported way.
+
+    At some point, hopefully we'll come up with a solely CSS clearfix
+    that works across all mobile browsers, obsoleting this component
+    entirely.
+
+    '''
+    def __init__(self):
+        super(Clear, self).__init__('<div style="clear: both;">&nbsp;</div>\n')
