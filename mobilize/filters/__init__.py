@@ -29,6 +29,7 @@ from .remove import (
     squeezebr,
     nobr,
     noinputwidth,
+    omitattrib_one,
     )
 
 from .resize import (

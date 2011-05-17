@@ -51,9 +51,10 @@ def nomiscattrib_one(elem):
         if elem.tag in singles:
             for single in singles[elem.tag]:
                 yield single
-    for toremove in toremoves():
-        if toremove in elem.attrib:
-            del elem.attrib[toremove]
+    omitattrib_one(elem, toremoves())
+    # for toremove in toremoves():
+    #     if toremove in elem.attrib:
+    #         del elem.attrib[toremove]
 
 @filterapi
 def noevents_one(elem):
@@ -219,3 +220,19 @@ def nobr(elem, space=True):
             elif not br_elem.tail.startswith(' '):
                 br_elem.tail = ' ' + br_elem.tail 
         br_elem.drop_tree()
+
+@filterapi
+def omitattrib_one(elem, toremove):
+    '''
+    Omit the indicated attributes from an element.
+
+    @param elem     : Element to trim attributes from
+    @type  elem     : HtmlElement
+
+    @param toremove : Names of attributes to kill
+    @type  toremove : list of str
+    
+    '''
+    for item in toremove:
+        if item in elem.attrib:
+            del elem.attrib[item]
