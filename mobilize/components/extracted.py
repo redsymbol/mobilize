@@ -9,6 +9,10 @@ FILT_EACHELEM = 1
 #: Indicates that filtering should be done on the constructed final single element
 FILT_COLLAPSED = 2
 
+def _csspath2xpath(csspath):
+    from lxml.cssselect import CSSSelector
+    return CSSSelector(csspath).path
+    
 class Extracted(Component):
     '''
     abstract base of all components that are extracted from the source HTML page
@@ -265,10 +269,9 @@ class XPath(Extracted):
 
 class CssPath(XPath):
     def __init__(self, *a, **kw):
-        from lxml.cssselect import CSSSelector
         super(CssPath, self).__init__(*a, **kw)
         for ii, selector in enumerate(self.selectors):
-            self.selectors[ii] = CSSSelector(selector).path
+            self.selectors[ii] = _csspath2xpath(selector)
             
 class GoogleAnalytics(Extracted):
     '''
@@ -308,3 +311,29 @@ class GoogleAnalytics(Extracted):
                     break
         return elems
         
+class BigImage(XPath):
+    '''
+    Extract and style a large image for mobile
+
+    This extracts a largish image element, identified by CSS path or
+    xpath.  It then has its height and width elements removed, and is
+    wrapped in a div with CSS class mwu-elem-bigimage class.  As
+    defined by default in the mobilize-skel CSS file, this class will
+    cause the image to span the width of the screen.
+
+    Given current (2011) mobile screen sizes, it's best to use these
+    on images that are 480px or wider, and look good when compressed
+    to as low as half that width.
+    
+    '''
+
+    def __init__(self, csspath=None, xpath=None):
+        from mobilize.util import classvalue
+        from mobilize.filters import noimgsize
+        assert not (csspath is None and xpath is None), 'You must provide either a csspath or an xpath!'
+        if xpath is None:
+            xpath = _csspath2xpath(csspath)
+        super(BigImage, self).__init__(xpath,
+                                       classvalue=classvalue('bigimage'),
+                                       postfilters=[noimgsize],
+                                       )
