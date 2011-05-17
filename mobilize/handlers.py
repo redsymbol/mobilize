@@ -46,6 +46,12 @@ class WebSourcer(Handler):
     Subclasses must implement the _final_wsgi_response method.
 
     '''
+    #: Headers to remove from the final response
+    REMOVE_RESP_HEADERS = (
+        'transfer-encoding', # What's returned to the client is not actually chunked.
+        'content-location',  # Can confuse client browser in certain situations
+        )
+        
     def wsgi_response(self, msite, environ, start_response):
         reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
@@ -74,6 +80,9 @@ class WebSourcer(Handler):
             log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
+        for toremove in self.REMOVE_RESP_HEADERS:
+            if toremove in resp:
+                del resp[toremove]
         if httputil.mobilizeable(resp):
             src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
             final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
@@ -241,8 +250,6 @@ class Moplate(WebSourcer):
         final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(final_body))
-        if 'transfer-encoding' in resp:
-            del resp['transfer-encoding'] # Currently what's returned to the client is not actually chunked.
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         return final_body, final_resp_headers
 
