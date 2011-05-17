@@ -49,7 +49,6 @@ class WebSourcer(Handler):
     #: Headers to remove from the final response
     REMOVE_RESP_HEADERS = (
         'transfer-encoding', # What's returned to the client is not actually chunked.
-        'content-location',  # Can confuse client browser in certain situations
         )
         
     def wsgi_response(self, msite, environ, start_response):
