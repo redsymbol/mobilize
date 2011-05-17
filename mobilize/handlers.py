@@ -80,9 +80,6 @@ class WebSourcer(Handler):
             log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
-        for toremove in self.REMOVE_RESP_HEADERS:
-            if toremove in resp:
-                del resp[toremove]
         if httputil.mobilizeable(resp):
             src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
             final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
@@ -91,6 +88,9 @@ class WebSourcer(Handler):
             final_body = src_resp_bytes
         if msite.verboselog:
             log_headers('final resp headers', final_resp_headers)
+        # Omit any contraindicated response header fields
+        final_resp_headers = [(header, value) for header, value in final_resp_headers
+                              if header not in self.REMOVE_RESP_HEADERS]
         start_response(status, final_resp_headers)
         return [final_body]
 
