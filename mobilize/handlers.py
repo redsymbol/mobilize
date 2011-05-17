@@ -65,7 +65,7 @@ class WebSourcer(Handler):
             for k, v in kw.items():
                 msg += ', %s=%s' % (k, v)
             log(msg)
-        http = httputil.get_http()
+        http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         if msite.verboselog:

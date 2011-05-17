@@ -99,6 +99,21 @@ class MobileSite:
         '''
         return {}
 
+    def get_http(self):
+        '''
+        Get the Http object used for making source requests
+
+        On rare occasions, a particular desktop site may need custom
+        settings on the http object used to fetch the source
+        documents, which can be done by overriding this method.
+        
+        @return : http object
+        @rtype  : httplib2.Http
+    
+        '''
+        from .httputil import get_http
+        return get_http()
+
 class HandlerMap:
     '''
     Represents a mapping between pages (URLs) and their handlers

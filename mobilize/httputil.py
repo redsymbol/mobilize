@@ -166,6 +166,11 @@ def get_http():
     This is just an instance of the httplib2.Http class, properly
     customized, extended and configured.
 
+    Note in most cases, handlers and other code should use the
+    get_http method of a MobileSite instance, rather than using this
+    function directly, in case the desktop source of a particular
+    mobile site needs further customization.
+
     @return : http object
     @rtype  : httplib2.Http
     
@@ -173,6 +178,7 @@ def get_http():
     from httplib2 import Http
     http = Http()
     http.follow_redirects = False
+    http.force_exception_to_status_code = True
     return http
 
 def dict2list(d):
