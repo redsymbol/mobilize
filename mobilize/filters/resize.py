@@ -3,6 +3,7 @@ Filters whose job is to resize elements
 
 '''
 
+from .filterbase import filterapi
 from mobilize.util import (
     findonetag,
     )
@@ -21,6 +22,7 @@ def setwidth(elem, width):
 
 # Filters
 
+@filterapi
 def resizeobject(elem, width=280):
     '''
     Resize something embedded in an object tag to have a mobile-friendly width
@@ -44,6 +46,7 @@ def resizeobject(elem, width=280):
         if embed_elem is not None:
             setwidth(embed_elem, width)
 
+@filterapi
 def resizeiframe(elem, width=280):
     '''
     Resize an iframe to have a mobile-friendly width

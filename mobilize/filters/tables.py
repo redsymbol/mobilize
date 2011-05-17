@@ -4,6 +4,7 @@ Filters that operate on HTML tables
 '''
 
 import re
+from .filterbase import filterapi
 from mobilize.util import (
     findonetag,
     htmlelem,
@@ -110,6 +111,7 @@ def elementempty(elem, ignore_whitespace = True):
 
 # Filters
 
+@filterapi
 def table2divgroups(elem, specmap, omit_whitespace=True):
     '''
     Extract blocks arranged in a table grid as more semantic elements
@@ -236,6 +238,7 @@ def table2divgroups(elem, specmap, omit_whitespace=True):
     table_elem = findonetag(elem, 'table')
     return _table2divgroups(elem, table_elem, specmap, omit_whitespace)
 
+@filterapi
 def _table2divgroups(elem, table_elem, specmap, omit_whitespace=True):
     import copy
     from lxml import html
@@ -313,6 +316,7 @@ def rcmarkerbase(prefix, row=None, col=None):
         s += '-col%s' % col
     return s
 
+@filterapi
 def table2divs(elem, omit_whitespace=True):
     '''
     Transform a table into a one-dimensional sequence of DIVs
@@ -410,6 +414,7 @@ def table2divs(elem, omit_whitespace=True):
     '''
     return _table2divs(elem, omit_whitespace, 'mwu-table2divs', False)
             
+@filterapi
 def table2divrows(elem, omit_whitespace=True):
     '''
     like table2divs, but rows are organized into their own divs.
@@ -494,6 +499,7 @@ def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
                 container_elem.append(rowcontainer_elem)
         replace_child(elem, table_elem, container_elem)
 
+@filterapi
 def table2divgroupsgs(elem, specmapgen, omit_whitespace=True):
     '''
     Apply the table2divgroups filter with a dynamically generated spec map

@@ -14,7 +14,11 @@ A callable conforms to the filter API if it:
   * operates by making any changes directly on the element as a side effect, and
   * is a no-op if the passed element is somehow not relevant to the particular filter (rather than raising an error).
 
+Callables that are filters are normally marked by the filters.filterbase.filterapi decorator.
+
 '''
+
+# TODO: automatically import all callables matching the filter api from the various submodules
 
 from .remove import (
     nomiscattrib,

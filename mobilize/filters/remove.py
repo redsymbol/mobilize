@@ -2,12 +2,14 @@
 Filters designed to omit or remove certain parts of the source HTML
 '''
 
+from .filterbase import filterapi
 from mobilize.util import (
     findonetag,
     )
 
 # Filters
 
+@filterapi
 def nomiscattrib(root_elem):
     '''
     Apply the nomiscattrib_one filter to all child elements
@@ -16,6 +18,7 @@ def nomiscattrib(root_elem):
     for elem in root_elem.iterdescendants():
         nomiscattrib_one(elem)
         
+@filterapi
 def nomiscattrib_one(elem):
     '''
     Remove certain miscellaneous unwanted attributes
@@ -52,6 +55,7 @@ def nomiscattrib_one(elem):
         if toremove in elem.attrib:
             del elem.attrib[toremove]
 
+@filterapi
 def noevents_one(elem):
     '''
     Removes "onSOMETHING" events
@@ -67,6 +71,7 @@ def noevents_one(elem):
         if attr.startswith('on'):
             del elem.attrib[attr]
 
+@filterapi
 def noevents(parent, xpath):
     '''
     Apply the noevents_one filter on sub-elements matching expression
@@ -75,6 +80,7 @@ def noevents(parent, xpath):
     for elem in parent.iterfind(xpath):
         noevents(elem)
     
+@filterapi
 def noimgsize(elem):
     '''
     Strip the height and width attributes from the first child img tag
@@ -94,6 +100,7 @@ def noimgsize(elem):
             if a in img_elem.attrib:
                 del img_elem.attrib[a]
 
+@filterapi
 def noattribs(parent_elem, tags, attribs):
     '''
     Will recursively delete the indicated attributes from elements of
@@ -119,6 +126,7 @@ def noattribs(parent_elem, tags, attribs):
         for elem in parent_elem.iterfind('.//%s' % tag):
             delattrib(elem)
 
+@filterapi
 def omit(elem, xpaths=None, csspaths=None):
     '''
     Omit child element(s), identified by XPath or CSS path
@@ -154,6 +162,7 @@ def omit(elem, xpaths=None, csspaths=None):
         for child in sel(elem):
             child.drop_tree()
 
+@filterapi
 def squeezebr(elem):
     '''
     Filter that collapses several sequential BR tags into a single BR tag
@@ -169,6 +178,7 @@ def squeezebr(elem):
             if next is not None and 'br' == next.tag:
                 br_elem.drop_tree()
 
+@filterapi
 def noinputwidth(elem):
     '''
     strip the inline size attributes from textual form inputs
@@ -185,6 +195,7 @@ def noinputwidth(elem):
         if 'cols' in textarea_elem.attrib:
             del textarea_elem.attrib['cols']
 
+@filterapi
 def nobr(elem, space=True):
     '''
     Remove all BR tags from the innerHTML of an element.

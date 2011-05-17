@@ -1,8 +1,10 @@
+from .filterbase import filterapi
 _protocols = (
     'http',
     'https',
     'ftp',
     )
+@filterapi
 def absimgsrc(elem, desktop_url):
     '''
     Modify img "src" relative paths to be absolute
@@ -19,6 +21,7 @@ def absimgsrc(elem, desktop_url):
         for img_elem in elem.iterfind('.//img'):
             fiximg(img_elem)
 
+@filterapi
 def abslinkfilesrc(elem, desktop_url, extensions):
     '''
     Make the targets of links to specific file extensions absolute on desktop site
