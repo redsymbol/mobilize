@@ -21,8 +21,29 @@ def absimgsrc(elem, desktop_url):
         for img_elem in elem.iterfind('.//img'):
             fiximg(img_elem)
 
+# Default file extensions to convert to absolute links
+ABSLINK_EXTENSIONS = {
+    '.avi',
+    '.bz2',
+    '.doc',
+    '.flv',
+    '.gif',
+    '.gz',
+    '.iso',
+    '.jpeg',
+    '.jpg',
+    '.mov',
+    '.pdf',
+    '.png',
+    '.ppt',
+    '.ps',
+    '.rar',
+    '.xls',
+    '.zip',
+    }
+
 @filterapi
-def abslinkfilesrc(elem, desktop_url, extensions):
+def abslinkfilesrc(elem, desktop_url, extensions = ABSLINK_EXTENSIONS, ignore_case=True):
     '''
     Make the targets of links to specific file extensions absolute on desktop site
 
@@ -51,24 +72,35 @@ def abslinkfilesrc(elem, desktop_url, extensions):
     -- end --
 
     NOTE: The extensions need to contain the dot, e.g. ".pdf", not
-    "pdf".
+    "pdf".  This gives the flexiblity for matching extensions that
+    don't start with a dot.
+
+    If ignore_case is True, ".pdf" will match both ".pdf" and
+    ".PDF". Otherwise, you'd need to include bot ".pdf" and ".PDF" in
+    extensions explicitly.
 
     @param desktop_url : Full URL of the corresponding current page on the desktop site
     @type  desktop_url : str
 
-    @param extensions : Filename extensions of href values to convert
-    @type  extensions : list of str
+    @param extensions  : Filename extensions of href values to convert
+    @type  extensions  : set of str
+
+    @param ignore_case : Iff True, filename extension matching is case insensitive
+    @type  ignore_case : bool
     
     '''
     fixanchor = _link_converter('href', desktop_url)
     def check_anchor(anchor):
+        url = anchor.attrib.get('href', '')
+        if ignore_case:
+            url = url.lower()
         for ext in extensions:
-            if anchor.attrib.get('href', '').endswith(ext):
+            if url.endswith(ext):
                 fixanchor(anchor)
     if 'a' == elem.tag:
         check_anchor(elem)
     else:
-        for anchor in elem.iterfind('.//a'):
+        for anchor in elem.iterdescendants('a'):
             check_anchor(anchor)
     
 def _link_converter(attribute, desktop_url):

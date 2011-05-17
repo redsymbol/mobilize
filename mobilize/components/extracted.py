@@ -310,7 +310,7 @@ class GoogleAnalytics(Extracted):
                         ]
                     break
         return elems
-        
+
 class BigImage(XPath):
     '''
     Extract and style a large image for mobile
@@ -327,13 +327,16 @@ class BigImage(XPath):
     
     '''
 
-    def __init__(self, csspath=None, xpath=None):
+    def __init__(self, csspath=None, xpath=None, idname=None):
         from mobilize.util import classvalue
         from mobilize.filters import noimgsize
         assert not (csspath is None and xpath is None), 'You must provide either a csspath or an xpath!'
         if xpath is None:
             xpath = _csspath2xpath(csspath)
-        super(BigImage, self).__init__(xpath,
-                                       classvalue=classvalue('bigimage'),
-                                       postfilters=[noimgsize],
-                                       )
+        kwargs = dict(
+            classvalue = classvalue('bigimage'),
+            postfilters = [noimgsize],
+            )
+        if idname is not None:
+            kwargs['idname'] = idname
+        super(BigImage, self).__init__(xpath, **kwargs)
