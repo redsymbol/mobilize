@@ -50,7 +50,18 @@ class WebSourcer(Handler):
     REMOVE_RESP_HEADERS = (
         'transfer-encoding', # What's returned to the client is not actually chunked.
         )
+
+    def fromstring(self, body):
+        '''
+        @param body : body of html
+        @type  body : str
+
+        @return     : HTML element
+        @rtype      : lxml.html.HtmlElement
         
+        '''
+        return _html_fromstring(body)
+    
     def wsgi_response(self, msite, environ, start_response):
         reqinfo = httputil.RequestInfo(environ)
         def log_headers(label, headers, **kw):
@@ -190,7 +201,6 @@ class Moplate(WebSourcer):
         @rtype              : str
 
         '''
-        from lxml import html
         params = dict(self.params)
         if site_filters is None:
             site_filters = []
@@ -198,7 +208,7 @@ class Moplate(WebSourcer):
             params.update(extra_params)
         assert 'elements' not in params # Not yet anyway
         all_filters = list(site_filters) + self.mk_moplate_filters(params)
-        doc = html.fromstring(full_body)
+        doc = self.fromstring(full_body)
         for ii, component in enumerate(self.components):
             if component.extracted:
                 component.extract(doc)
@@ -293,3 +303,24 @@ class PassThrough(WebSourcer):
 # Standard/reusable handler instances
 todesktop = ToDesktop()
 passthrough = PassThrough()
+
+# Supporting code
+
+def _html_fromstring(body):
+    '''
+    Used by, for example, WebSourcer.fromstring.  Separated out here for easier testing
+
+    TODO: write these purported tests
+    '''
+    from lxml import html
+    try:
+        return html.fromstring(body)
+    except ValueError:
+        # Does this have an encoding declaration?
+        dec_key = '<?xml'
+        if body[:len(dec_key)] == dec_key:
+            # yes, it does!
+            body = body[body.find('\n'):]
+            return html.fromstring(body)
+        # No it doesn't, so let the error propagate
+        raise
