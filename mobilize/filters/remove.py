@@ -52,9 +52,6 @@ def nomiscattrib_one(elem):
             for single in singles[elem.tag]:
                 yield single
     omitattrib_one(elem, toremoves())
-    # for toremove in toremoves():
-    #     if toremove in elem.attrib:
-    #         del elem.attrib[toremove]
 
 @filterapi
 def noevents_one(elem):
@@ -79,7 +76,7 @@ def noevents(parent, xpath):
 
     '''
     for elem in parent.iterfind(xpath):
-        noevents(elem)
+        noevents_one(elem)
     
 @filterapi
 def noimgsize(elem):
