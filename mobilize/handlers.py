@@ -201,14 +201,12 @@ class Moplate(WebSourcer):
         @rtype              : str
 
         '''
-        params = dict(self.params)
+        doc = self.fromstring(full_body)
+        params = _rendering_params(doc, [self.params, extra_params])
+        assert 'elements' not in params # Not yet anyway
         if site_filters is None:
             site_filters = []
-        if extra_params:
-            params.update(extra_params)
-        assert 'elements' not in params # Not yet anyway
         all_filters = list(site_filters) + self.mk_moplate_filters(params)
-        doc = self.fromstring(full_body)
         for ii, component in enumerate(self.components):
             if component.extracted:
                 component.extract(doc)
@@ -261,6 +259,27 @@ class Moplate(WebSourcer):
         response_overrides['content-length'] = str(len(final_body))
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         return final_body, final_resp_headers
+
+def _rendering_params(doc, paramdictlist):
+    params = {}
+    for paramdict in paramdictlist:
+        if type(paramdict) is dict:
+            params.update(paramdict)
+    def mk_findtext(tag):
+        def findtext():
+            elem = doc.find('.//' + tag)
+            if elem is not None:
+                return getattr(elem, 'text', '')
+            return ''
+        return findtext
+    source_params = {
+        'title'   : mk_findtext('title'),
+        'heading' : mk_findtext('h1'),
+        }
+    for param, finder in source_params.items():
+        if param not in params:
+            params[param] = finder()
+    return params
 
 class ToDesktop(Handler):
     '''
