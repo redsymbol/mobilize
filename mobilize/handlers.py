@@ -96,11 +96,11 @@ class WebSourcer(Handler):
         else:
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
-        if msite.verboselog:
-            log_headers('final resp headers', final_resp_headers)
         # Omit any contraindicated response header fields
         final_resp_headers = [(header, value) for header, value in final_resp_headers
                               if header not in self.REMOVE_RESP_HEADERS]
+        if msite.verboselog:
+            log_headers('final resp headers', final_resp_headers)
         start_response(status, final_resp_headers)
         return [final_body]
 
