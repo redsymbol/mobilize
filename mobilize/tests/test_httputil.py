@@ -74,6 +74,8 @@ class TestHttp(unittest.TestCase):
              'Referer': 'http://example.mwuclient.com:2280/windsong_place_contact.html',
              'Pragma': 'no-cache',
              'Cache-Control': 'no-cache',
+             'X-Forwarded-For' : '10.0.2.2',
+             'X-MWU-Mobilize' : '1',
              }
         from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ1)

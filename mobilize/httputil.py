@@ -225,6 +225,7 @@ class RequestInfo:
         
         '''
         from .headers import get_request_xform
+        from .headers.request import request_additions
         headers = {}
         for header, value in self.iterrawheaders():
             # We want to preserve the Camel-Casing of the header names
@@ -243,8 +244,11 @@ class RequestInfo:
                     newvalue = override
             else:
                 xformer = get_request_xform(headerkey, self.method)
-                newvalue = xformer(self.wsgienviron, value)
-            headers[header] = newvalue
+            headers[header] = xformer(self.wsgienviron, value)
+        for header, xformer in request_additions:
+            if header not in headers:
+                headerkey = header.lower()
+                headers[header] = xformer(self.wsgienviron, None)
         return headers
 
     def iterrawheaders(self):
