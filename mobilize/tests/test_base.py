@@ -204,7 +204,8 @@ class TestMobileSite(unittest.TestCase):
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
 class TestUtil(unittest.TestCase):
-    def test_mobilize(self):
+    def test_mobilizeable(self):
+        '''tests for mobilize.httputil.mobilizeable'''
         testdata = [
             {'is_m' : False,
              'headers' : dict([('date', 'Tue, 05 Oct 2010 22:32:54 GMT'), ('connection', 'Keep-Alive'), ('etag', '"5e60d8-37e-491aadf613440"'), ('keep-alive', 'timeout=15, max=100'), ('server', 'Apache/2.2.9 (Debian) PHP/5.2.6-1+lenny8 with Suhosin-Patch mod_wsgi/3.2 Python/2.6.6 mod_perl/2.0.4 Perl/v5.10.0'), ('content-type', 'image/x-icon')]),
