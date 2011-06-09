@@ -393,7 +393,10 @@ def mk_wsgi_application(msite):
             return response(handler)
         except Exception as ex:
             # Something went fatally wrong, so attempt to fallback on the passthrough handler.
-            # TODO: log ex
+            # TODO: log exception
+            if not msite.is_production:
+                # Don't mask the problem in development mode
+                raise
             if handler == passthrough:
                 # Nothing to do here...
                 raise

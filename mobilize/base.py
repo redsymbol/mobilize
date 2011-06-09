@@ -14,10 +14,13 @@ class MobileSite:
     '''
 
     #: Desktop website default charset
-    default_charset='utf-8'
+    default_charset = 'utf-8'
     
     #: Enable verbose logging iff true
-    verboselog=False
+    verboselog = False
+
+    #: Signals whether this is a production environment, or we're in development mode
+    is_production = False
     
     def __init__(self, fullsite, handler_map):
         '''

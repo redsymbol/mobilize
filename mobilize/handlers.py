@@ -265,16 +265,30 @@ def _rendering_params(doc, paramdictlist):
     for paramdict in paramdictlist:
         if type(paramdict) is dict:
             params.update(paramdict)
-    def mk_findtext(tag):
+    def mk_findtext(xpath):
+        '''
+        Creates a no-argument callable that extracts the text content of a single element in the source document
+
+        This will operate on the *first* element the supplied xpath
+        expression finds, so normally you will want to use it for
+        unique page elements (e.g., ".//title").
+
+        @param tag : Xpath of element
+        @type  tag : str
+
+        @return    : Text content of said element if found, else empty string
+        @rtype     : str
+        
+        '''
         def findtext():
-            elem = doc.find('.//' + tag)
+            elem = doc.find(xpath)
             if elem is not None:
                 return getattr(elem, 'text', '')
             return ''
         return findtext
     source_params = {
-        'title'   : mk_findtext('title'),
-        'heading' : mk_findtext('h1'),
+        'title'   : mk_findtext('.//title'),
+        'heading' : mk_findtext('.//h1'),
         }
     for param, finder in source_params.items():
         if param not in params:
