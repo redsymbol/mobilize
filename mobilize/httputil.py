@@ -383,9 +383,20 @@ def mk_wsgi_application(msite):
     def application(environ, start_response):
         from mobilize.handlers import passthrough
         from mobilize.exceptions import NoMatchingHandlerException
+        def response(_handler):
+            return _handler.wsgi_response(msite, environ, start_response)
         try:
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         except NoMatchingHandlerException:
             handler = passthrough
-        return handler.wsgi_response(msite, environ, start_response)
+        try:
+            return response(handler)
+        except Exception as ex:
+            # Something went fatally wrong, so attempt to fallback on the passthrough handler.
+            # TODO: log ex
+            if handler == passthrough:
+                # Nothing to do here...
+                raise
+            # TODO: Sometimes this will block, under conditions I haven't characterized yet.  Maybe if start_response is already invoked?
+            return response(passthrough)
     return application
