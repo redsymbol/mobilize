@@ -351,7 +351,7 @@ def _html_fromstring(body):
     except ValueError:
         # Does this have an encoding declaration?
         dec_key = '<?xml'
-        if body[:len(dec_key)] == dec_key:
+        if body[:len(dec_key)].lower() == dec_key:
             # yes, it does!
             body = body[body.find('\n'):]
             return html.fromstring(body)
