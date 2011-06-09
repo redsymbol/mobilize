@@ -251,8 +251,9 @@ class Moplate(WebSourcer):
 
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         extra_params = {
-            'fullsite' : msite.fullsite,
+            'fullsite'     : msite.fullsite,
             'request_path' : reqinfo.rel_uri,
+            'todesktop'    : _todesktoplink(reqinfo.protocol, msite.fullsite, reqinfo.rel_uri),
             }
         final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
         response_overrides = msite.response_overrides(environ)
@@ -357,3 +358,29 @@ def _html_fromstring(body):
             return html.fromstring(body)
         # No it doesn't, so let the error propagate
         raise
+
+def _todesktoplink(protocol, fullsite, rel_uri):
+    '''
+    Calculate the "todesktop" link string
+
+    @param protocol : protocol (http or https)
+    @type  protocol : str
+
+    @param fullsite : Desktop (full) site domain, and port of applicable
+    @type  fullsite : str
+    
+    @return         : rel_uri
+    @rtype          : The relative URI
+
+    @return         : The link the mobile user can follow to view the desktop version of the page
+    @rtype          : str
+    
+    '''
+    link = '{}://{}{}'.format(protocol, fullsite, rel_uri)
+    if '?' in rel_uri:
+        link += '&'
+    else:
+        link += '?'
+    link += 'mredir=0'
+    return link
+

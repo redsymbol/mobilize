@@ -34,3 +34,11 @@ class TestMoplate(unittest.TestCase):
         actual = _rendering_params(doc, [{'title' : 'Override Title'}])
         self.assertEqual(expected, actual)
 
+    def test__todesktoplink(self):
+        from mobilize.handlers import _todesktoplink
+        self.assertEqual('http://example.com/foobar.html?mredir=0',
+                         _todesktoplink('http', 'example.com', '/foobar.html'))
+        self.assertEqual('https://example.com/foobar.html?mredir=0',
+                         _todesktoplink('https', 'example.com', '/foobar.html'))
+        self.assertEqual('http://example.com/foobar.html?baz=2&mredir=0',
+                         _todesktoplink('http', 'example.com', '/foobar.html?baz=2'))

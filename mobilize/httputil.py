@@ -207,6 +207,7 @@ class RequestInfo:
             self.body = None
         self.uri = _get_uri(wsgienviron)
         self.rel_uri = get_rel_uri(wsgienviron)
+        self.protocol = wsgienviron['wsgi.url_scheme']
 
     def headers(self, overrides):
         '''
