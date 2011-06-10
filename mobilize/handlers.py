@@ -261,41 +261,6 @@ class Moplate(WebSourcer):
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
         return final_body, final_resp_headers
 
-def _rendering_params(doc, paramdictlist):
-    params = {}
-    for paramdict in paramdictlist:
-        if type(paramdict) is dict:
-            params.update(paramdict)
-    def mk_findtext(xpath):
-        '''
-        Creates a no-argument callable that extracts the text content of a single element in the source document
-
-        This will operate on the *first* element the supplied xpath
-        expression finds, so normally you will want to use it for
-        unique page elements (e.g., ".//title").
-
-        @param tag : Xpath of element
-        @type  tag : str
-
-        @return    : Text content of said element if found, else empty string
-        @rtype     : str
-        
-        '''
-        def findtext():
-            elem = doc.find(xpath)
-            if elem is not None:
-                return getattr(elem, 'text', '')
-            return ''
-        return findtext
-    source_params = {
-        'title'   : mk_findtext('.//title'),
-        'heading' : mk_findtext('.//h1'),
-        }
-    for param, finder in source_params.items():
-        if param not in params:
-            params[param] = finder()
-    return params
-
 class ToDesktop(Handler):
     '''
     Send the mobile request to the desktop URL
@@ -383,4 +348,39 @@ def _todesktoplink(protocol, fullsite, rel_uri):
         link += '?'
     link += 'mredir=0'
     return link
+
+def _rendering_params(doc, paramdictlist):
+    params = {}
+    for paramdict in paramdictlist:
+        if type(paramdict) is dict:
+            params.update(paramdict)
+    def mk_findtext(xpath):
+        '''
+        Creates a no-argument callable that extracts the text content of a single element in the source document
+
+        This will operate on the *first* element the supplied xpath
+        expression finds, so normally you will want to use it for
+        unique page elements (e.g., ".//title").
+
+        @param tag : Xpath of element
+        @type  tag : str
+
+        @return    : Text content of said element if found, else empty string
+        @rtype     : str
+        
+        '''
+        def findtext():
+            elem = doc.find(xpath)
+            if elem is not None:
+                return getattr(elem, 'text', '')
+            return ''
+        return findtext
+    source_params = {
+        'title'   : mk_findtext('.//title'),
+        'heading' : mk_findtext('.//h1'),
+        }
+    for param, finder in source_params.items():
+        if param not in params:
+            params[param] = finder()
+    return params
 
