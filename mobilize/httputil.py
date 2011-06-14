@@ -238,14 +238,17 @@ class RequestInfo:
             # "headerkey" respectively.
             headerkey = header.lower()
             if headerkey in overrides:
+                # An override has been specified for this request header
                 override = overrides[headerkey]
                 if isinstance(override, collections.Callable):
                     newvalue = override(self.wsgienviron, value)
                 else:
                     newvalue = override
             else:
+                # No override defined, so check whether there is a stock transformer
                 xformer = get_request_xform(headerkey, self.method)
-            headers[header] = xformer(self.wsgienviron, value)
+                newvalue = xformer(self.wsgienviron, value)
+            headers[header] = newvalue
         for header, xformer in request_additions:
             if header not in headers:
                 headerkey = header.lower()
