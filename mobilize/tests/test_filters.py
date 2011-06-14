@@ -1043,3 +1043,44 @@ here's some extra trailing text for you too
             in_elem = html.fragment_fromstring(td['in_str'], create_parent=False)
             table2divrows(in_elem)
             self.assertSequenceEqual(normxml(td['out_str']), normxml(elem2str(in_elem)))
+
+    def test_formcontroltypes(self):
+        from mobilize.filters import formcontroltypes
+        instr = '''<form>
+<dl>
+<dt>Name</dt>
+<dd><input type="text" name="name"/></dd>
+<dt>Email</dt>
+<dd><input type="email" name="email"/></dd>
+<dt>Favorite color</dt>
+<dd>
+  <ul>
+    <li><input type="radio" name="color" value="red" class="nonstandard"/>Red</li>
+    <li><input type="radio" name="color" value="blue" class="nonstandard"/>Blue</li>
+    <li><input type="radio" name="color" value="green" class="nonstandard"/>Green</li>
+  </ul>
+</dd>
+</dl>
+</form>'''
+        
+        expected = '''<form>
+<dl>
+<dt>Name</dt>
+<dd><input type="text" name="name" class="mwu-fc-input-text"/></dd>
+<dt>Email</dt>
+<dd><input type="email" name="email" class="mwu-fc-input-email"/></dd>
+<dt>Favorite color</dt>
+<dd>
+  <ul>
+    <li><input type="radio" name="color" value="red" class="nonstandard mwu-fc-input-radio"/>Red</li>
+    <li><input type="radio" name="color" value="blue" class="nonstandard mwu-fc-input-radio"/>Blue</li>
+    <li><input type="radio" name="color" value="green" class="nonstandard mwu-fc-input-radio"/>Green</li>
+  </ul>
+</dd>
+</dl>
+</form>'''
+        root_elem = html.fromstring(instr)
+        formcontroltypes(root_elem)
+        actual = html.tostring(root_elem)
+        self.assertSequenceEqual(normxml(expected), normxml(actual))
+        

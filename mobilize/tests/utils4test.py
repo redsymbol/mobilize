@@ -18,6 +18,6 @@ def normxml(s):
     '''
     if type(s) is bytes:
         s = s.decode()
-    return ''.join(line.strip() for line in s.split('\n'))
     from lxml import html
-    return html.tostring(html.fromstring(str(s)), pretty_print=True).decode('utf-8')
+    unstripped = html.tostring(html.fromstring(str(s)), pretty_print=True).decode('utf-8')
+    return ''.join(line.strip() for line in unstripped.split('\n'))

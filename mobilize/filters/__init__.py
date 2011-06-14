@@ -48,6 +48,7 @@ from .tables import (
 from .misc import (
     absimgsrc,
     abslinkfilesrc,
+    formcontroltypes,
     )
 
 DEFAULT_FILTERS = [

@@ -102,7 +102,49 @@ def abslinkfilesrc(elem, desktop_url, extensions = ABSLINK_EXTENSIONS, ignore_ca
     else:
         for anchor in elem.iterdescendants('a'):
             check_anchor(anchor)
-    
+
+#: Form control tags (elements) modified by the formcontroltypes and formcontroltypes_one filters.
+FC_TAGS = {
+    'input',
+    }
+from mobilize.util import MWU_PREFIX
+FC_PREFIX = MWU_PREFIX + 'fc-'
+            
+@filterapi
+def formcontroltypes(root_elem):
+    '''
+    Apply the formcontroltypes_one filter to all relevant descendant tags 
+    '''
+    xpath ='.//' + '|'.join(FC_TAGS)
+    for elem in root_elem.iterfind(xpath):
+        formcontroltypes_one(elem)
+
+@filterapi
+def formcontroltypes_one(elem):
+    '''
+    Mark certain form control with a special CSS class indicating type
+
+    This provides a hook for styling form controls by type, by setting
+    a CSS class attribute defining the (tag, type) combination.  The
+    format of the class name is "mwu-fc-{tagname}-{type}".  So for
+    example, an <input type="checkbox"> element will become
+    <input type="checkbox" class="mwu-fc-input-checkbox">.
+
+    These CSS class hooks will be unnecessary when CSS3 type selector
+    support [0] reaches saturation; we can then just style to
+    "input[type=radio]", etc. instead.  As of 2011 at least, not
+    enough mobile browsers support this module well enough for us to
+    rely on it.
+
+    [0] http://www.w3.org/TR/css3-selectors/#attribute-selectors
+    '''
+    if elem.tag in FC_TAGS:
+        marker = '{}{}-{}'.format(FC_PREFIX, elem.tag, elem.attrib.get('type', ''))
+    if 'class' in elem.attrib:
+        elem.attrib['class'] = elem.attrib['class'] + ' ' + marker
+    else:
+        elem.attrib['class'] = marker
+
 def _link_converter(attribute, desktop_url):
     '''
     Create a function that will convert link attributes to absolute desktop urls
