@@ -182,7 +182,19 @@ def get_http():
     return http
 
 def dict2list(d):
-    return list((header, value) for header, value in d.items())
+    '''
+    Convert the type of dictionary we use to represent http headers into a list of (header, value) pairs
+
+    The keys of this dict are strings: header names.  The value can be either a string, or an iterable of strings
+    '''
+    from collections import Iterable
+    def items(header, value):
+        if type(value) not in (str, bytes) and isinstance(value, Iterable):
+            for oneval in value:
+                yield (header, oneval)
+        else:
+            yield (header, value)
+    return [item for header, value in d.items() for item in items(header, value)]
 
 class RequestInfo:
     '''

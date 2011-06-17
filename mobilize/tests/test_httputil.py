@@ -547,3 +547,41 @@ class TestHttp(unittest.TestCase):
                 print(td['environ'])
                 raise
             self.assertSequenceEqual(expected, actual)
+
+    def test_dict2list(self):
+        from collections import OrderedDict
+        from mobilize.httputil import dict2list
+        testdata = [
+            {'dict' : [],
+             'list' : [],
+             },
+            {'dict' : [('alpha', 'beta')],
+             'list' : [('alpha', 'beta')],
+             },
+            {'dict' : [('a', 'b'), ('c', 'd')],
+             'list' : [('a', 'b'), ('c', 'd')],
+             },
+            {'dict' : [('a', ['b', 'c'])],
+             'list' : [('a', 'b'), ('a', 'c')],
+             },
+            {'dict' : [('u', 'v'), ('a', ['b', 'c']), ('z', 'x')],
+             'list' : [('u', 'v'), ('a', 'b'), ('a', 'c'), ('z', 'x')],
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            # We use the ordered dict to make it easier to test
+            dict1 = OrderedDict(td['dict'])
+            expected1 = td['list']
+            actual1 = dict2list(dict1)
+            self.assertListEqual(expected1, actual1, str(ii))
+
+            # It's possible there could somehow be an error that is
+            # masked by the use of OrderedDict rather than dict.  Out
+            # of an abundance of caution, let's do another test that
+            # ignores the ordering info.
+
+            dict2 = dict(td['dict'])
+            expected2 = set(td['list'])
+            actual2 = set(dict2list(dict2))
+            self.assertSetEqual(expected2, actual2, str(ii))
+
