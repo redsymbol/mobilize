@@ -65,3 +65,35 @@ class TestUtil(unittest.TestCase):
             actual = urlbase(td['url'])
             msg = 'e: "%s", a; "%s" [%d]' % (td['base'], actual, ii)
             self.assertSequenceEqual(td['base'], actual, msg)
+
+    def test_isscalar(self):
+        testdata = [
+            {'obj' : 'x',
+             'isscalar' : True,
+             },
+            {'obj' : 'hello',
+             'isscalar' : True,
+             },
+            {'obj' : b'hello',
+             'isscalar' : True,
+             },
+            {'obj' : 42,
+             'isscalar' : True,
+             },
+            {'obj' : ['a', 'b', 'c'],
+             'isscalar' : False,
+             },
+            {'obj' : ('a', 'b', 'c'),
+             'isscalar' : False,
+             },
+            {'obj' : {2: 3, 'a': 'g'},
+             'isscalar' : False,
+             },
+            {'obj' : iter([2, 3, 4]),
+             'isscalar' : False,
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            expected = td['isscalar']
+            actual = util.isscalar(td['obj'])
+            self.assertEqual(expected, actual, td['obj'])

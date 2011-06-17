@@ -379,9 +379,17 @@ def _rendering_params(doc, paramdictlist):
     return params
 
 def _postprocess_response_headers(headers):
+    from mobilize.util import isscalar
     removed = (
         'transfer-encoding', # What's returned to the client is not actually chunked.
         )
+    def expand(items):
+        for k, v in items:
+            if isscalar(v):
+                yield k, v
+            else:
+                for _v in v:
+                    yield k, _v
     def modify(header, value):
         import re
         if 'location' == header:
@@ -390,6 +398,6 @@ def _postprocess_response_headers(headers):
                 value = value.replace(':2443/', ':2280/')
         return (header, value)
     return [modify(header, value)
-            for header, value in headers
+            for header, value in expand(headers)
             if header not in removed]
 

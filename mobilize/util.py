@@ -237,3 +237,24 @@ def urlbase(url):
     else:
         basepath = '/' + '/'.join(parts[:-1]).strip('/') + '/'
     return '%s://%s%s' % (parsed.scheme, parsed.netloc, basepath)
+
+def isscalar(obj):
+    '''
+    Returns True iff the object is a single, scalar value
+
+    This is much like "isinstance(obj, collections.Iterable)", except
+    it will return True for str and byte objects.
+
+    @param obj : Python object
+    @type  obj : object
+
+    @return : True iff the item is scalar by the definition in the description
+    @rtype  : bool
+    
+    '''
+    from collections import Iterable
+    if type(obj) in (str, bytes):
+        return True
+    if isinstance(obj, Iterable):
+        return False
+    return True

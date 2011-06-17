@@ -187,13 +187,13 @@ def dict2list(d):
 
     The keys of this dict are strings: header names.  The value can be either a string, or an iterable of strings
     '''
-    from collections import Iterable
     def items(header, value):
-        if type(value) not in (str, bytes) and isinstance(value, Iterable):
+        from mobilize.util import isscalar
+        if isscalar(value):
+            yield (header, value)
+        else:
             for oneval in value:
                 yield (header, oneval)
-        else:
-            yield (header, value)
     return [item for header, value in d.items() for item in items(header, value)]
 
 class RequestInfo:
