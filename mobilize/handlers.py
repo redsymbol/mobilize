@@ -259,7 +259,7 @@ class ToDesktop(Handler):
     '''
     Send the mobile request to the desktop URL
 
-    Indented to be used where we're intentially not defining a mobile
+    Intended to be used where we're intentially not defining a mobile
     view for certain URLs, sending the visitor to the desktop site.
 
     TODO: what if the device detection redirects them here?  Could get in a redirect loop
