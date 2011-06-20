@@ -209,16 +209,16 @@ class TestFilters(TestCase):
         testdata = [
             {'in_str' : '''<div><table>
       <tr>
-        <td>Eggs</td>
+        <td class="from-poultry 	  roundish">Eggs</td>
         <td>Ham</td>
       </tr>
       <tr>
-        <td>Beer</td>
+        <td class=" ">Beer</td>
         <td>Milk</td>
       </tr>
     </table></div>
 ''',
-             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0">Eggs</div>
+             'out_str' : '''<div><div class="mwu-table2divs"><div class="mwu-table2divs-row0-col0 mwu-table2divs-col0 mwu-table2divs-row0 mwu-td-from-poultry mwu-td-roundish">Eggs</div>
     <div class="mwu-table2divs-row0-col1 mwu-table2divs-col1 mwu-table2divs-row0">Ham</div>
     <div class="mwu-table2divs-row1-col0 mwu-table2divs-col0 mwu-table2divs-row1">Beer</div>
     <div class="mwu-table2divs-row1-col1 mwu-table2divs-col1 mwu-table2divs-row1">Milk</div></div></div>

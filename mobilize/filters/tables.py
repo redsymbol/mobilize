@@ -489,6 +489,9 @@ def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
                     ]
                 if not wrap_rows:
                     markers.append(rcmarker(row=rownum))
+                tdelem_classvalue = tdelem.attrib.get('class', '').strip()
+                if len(tdelem_classvalue) > 0:
+                    markers.extend('mwu-td-' + c for c in tdelem_classvalue.split())
                 cell_elem.attrib['class'] = ' '.join(markers)
                 if wrap_rows:
                     rowcontainer_elem.append(cell_elem)
