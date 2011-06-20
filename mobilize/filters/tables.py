@@ -482,7 +482,6 @@ def _table2divs(elem, omit_whitespace, marker_base, wrap_rows):
                     continue # skip over this empty cell
                 cell_elem = htmlelem(text=tdelem.text)
                 for colchild in tdelem:
-                    anychildren = True
                     cell_elem.append(colchild)
                 markers = [
                     rcmarker(row=rownum, col=colnum),
