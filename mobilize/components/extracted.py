@@ -1,6 +1,5 @@
 import copy
 
-from mobilize.filters import DEFAULT_FILTERS
 from mobilize import util
 from .common import Component
 
@@ -39,6 +38,7 @@ class Extracted(Component):
                  usecopy=False,
                  tag='div',
                  innerhtml=False,
+                 omitfilters=None,
                  ):
         '''
         ctor
@@ -135,16 +135,7 @@ class Extracted(Component):
             self.selectors = list(selector) # casting tuple to list
         else:
             self.selectors = [selector]
-        if filters is None:
-            these_filters = list(DEFAULT_FILTERS)
-        else:
-            assert (prefilters is None) and (postfilters is None),  'If you specify filters, you cannot specify either prefilters or postfilters'
-            these_filters = list(filters)
-        if prefilters is not None:
-            these_filters = prefilters + these_filters
-        if postfilters is not None:
-            these_filters += postfilters
-        self.filters = these_filters
+        self.filters = _pick_filters(filters, prefilters, postfilters, omitfilters)
         if classvalue is None:
             classvalue = util.classvalue()
         self.classvalue = classvalue
@@ -340,3 +331,21 @@ class BigImage(XPath):
         if idname is not None:
             kwargs['idname'] = idname
         super(BigImage, self).__init__(xpath, **kwargs)
+
+# supporting code
+from mobilize.filters import DEFAULT_FILTERS
+def _pick_filters(filters, prefilters, postfilters, omitfilters, _default=DEFAULT_FILTERS):
+    if filters is not None:
+        assert (prefilters is None) and (omitfilters is None) and (postfilters is None),  'If you specify filters, you cannot specify any of prefilters, postfilters or omitfilters.'
+        return list(filters)
+    picked = list(_default)
+    if prefilters is not None:
+        picked = prefilters + picked
+    if postfilters is not None:
+        picked += postfilters
+    if omitfilters is None:
+        omitted = set()
+    else:
+        omitted = set(omitfilters)
+    return [filt for filt in picked
+            if filt not in omitted]

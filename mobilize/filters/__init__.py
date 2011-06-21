@@ -20,6 +20,8 @@ Callables that are filters are normally marked by the filters.filterbase.filtera
 
 # TODO: automatically import all callables matching the filter api from the various submodules
 
+from .filterbase import filterapi
+
 from .remove import (
     nomiscattrib,
     noevents,

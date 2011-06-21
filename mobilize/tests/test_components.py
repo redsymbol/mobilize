@@ -241,3 +241,68 @@ pageTracker._trackPageview();
         c3 = CssPath('nav')
         c3.extract(html.fromstring(src_html))
         c3.process('foo') # no AssertionError on this line meanst the test passes
+
+    def test__pick_filters(self):
+        from mobilize import filters
+        from mobilize.components.extracted import _pick_filters
+
+        # Some filters we'll use in the tests
+        @filters.filterapi
+        def dummyfilter1(elem): pass
+        @filters.filterapi
+        def dummyfilter2(elem): pass
+        @filters.filterapi
+        def dummyfilter3(elem): pass
+        @filters.filterapi
+        def dummyfilter4(elem): pass
+        
+        defaultfilters = [
+            dummyfilter1,
+            dummyfilter2,
+            ]
+        testdata = [
+            {'args' : {'filters' : None,
+                       'prefilters' : None,
+                       'postfilters' : None,
+                       'omitfilters' : None,
+                       },
+             'expected' : list(defaultfilters),
+             },
+            {'args' : {'filters' : [dummyfilter3, dummyfilter1],
+                       'prefilters' : None,
+                       'postfilters' : None,
+                       'omitfilters' : None,
+                       },
+             'expected' : [dummyfilter3, dummyfilter1],
+             },
+            {'args' : {'filters' : None,
+                       'prefilters' : [dummyfilter4],
+                       'postfilters' :[dummyfilter3],
+                       'omitfilters' : None,
+                       },
+             'expected' : [
+                        dummyfilter4,
+                        dummyfilter1,
+                        dummyfilter2,
+                        dummyfilter3,
+                        ]
+             },
+            {'args' : {'filters' : None,
+                       'prefilters' : [dummyfilter4],
+                       'postfilters' :[dummyfilter3],
+                       'omitfilters' : [dummyfilter1],
+                       },
+             'expected' : [
+                        dummyfilter4,
+                        dummyfilter2,
+                        dummyfilter3,
+                        ]
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            args = dict(td['args'])
+            args['_default'] = defaultfilters
+            self.assertListEqual(td['expected'], _pick_filters(**args), ii)
+
+        # Should fail loudly if filters and some other arg are specified
+        # TODO: implement assertRaises tests
