@@ -338,14 +338,14 @@ def _pick_filters(filters, prefilters, postfilters, omitfilters, _default=DEFAUL
     if filters is not None:
         assert (prefilters is None) and (omitfilters is None) and (postfilters is None),  'If you specify filters, you cannot specify any of prefilters, postfilters or omitfilters.'
         return list(filters)
-    picked = list(_default)
+    if omitfilters is None:
+        omitfilters = set()
+    elif type(omitfilters) is not set:
+        omitfilters = set(omitfilters)
+    picked = list(filt for filt in _default
+                  if filt not in omitfilters)
     if prefilters is not None:
         picked = prefilters + picked
     if postfilters is not None:
         picked += postfilters
-    if omitfilters is None:
-        omitted = set()
-    else:
-        omitted = set(omitfilters)
-    return [filt for filt in picked
-            if filt not in omitted]
+    return picked
