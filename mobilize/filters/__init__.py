@@ -23,15 +23,16 @@ Callables that are filters are normally marked by the filters.filterbase.filtera
 from .filterbase import filterapi
 
 from .remove import (
-    nomiscattrib,
+    noattribs,
+    nobr,
     noevents,
     noimgsize,
-    noattribs,
-    omit,
-    squeezebr,
-    nobr,
     noinputwidth,
+    nomiscattrib,
+    nomiscattrib_if,
+    omit,
     omitattrib_one,
+    squeezebr,
     )
 
 from .resize import (

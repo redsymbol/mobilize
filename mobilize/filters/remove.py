@@ -10,6 +10,21 @@ from mobilize.util import (
 # Filters
 
 @filterapi
+def nomiscattrib_if(root_elem, predicate):
+    '''
+    Apply the nomiscattrib_one filter to certain child elements
+
+    predicate is a callable taking a single HtmlElement instance
+    argument, and returns True iff the nomiscattrib_one filter is to
+    be applied.
+    '''
+    if predicate(root_elem):
+        nomiscattrib_one(root_elem)
+    for elem in root_elem.iterdescendants():
+        if predicate(elem):
+            nomiscattrib_one(elem)
+    
+@filterapi
 def nomiscattrib(root_elem):
     '''
     Apply the nomiscattrib_one filter to all child elements
@@ -18,8 +33,16 @@ def nomiscattrib(root_elem):
     for elem in root_elem.iterdescendants():
         nomiscattrib_one(elem)
         
+    # Attributes we want to remove from all elements
+_NOMISCATTRIB_UNIVERSALS = {
+        'align',
+        'border',
+        'valign',
+        'style',
+        }
+
 @filterapi
-def nomiscattrib_one(elem):
+def nomiscattrib_one(elem, universals = _NOMISCATTRIB_UNIVERSALS):
     '''
     Remove certain miscellaneous unwanted attributes
     
@@ -33,13 +56,6 @@ def nomiscattrib_one(elem):
     @type  elem : lxml.html.HTMLElement
 
     '''
-    # Attributes we want to remove from all elements
-    universals = (
-        'align',
-        'border',
-        'valign',
-        'style',
-        )
     # Attributes we want to remove only from certain tags
     # tag name -> list of attributes to remove
     singles = {
@@ -233,3 +249,14 @@ def omitattrib_one(elem, toremove):
     for item in toremove:
         if item in elem.attrib:
             del elem.attrib[item]
+
+# Supporting code
+def applyall_if(root_elem, filt, predicate):
+    '''
+    Apply a filter to certain child elements
+
+    predicate is a callable taking a single HtmlElement instance
+    argument, and returns True iff the nomiscattrib_one filter is to
+    be applied.
+    '''
+    
