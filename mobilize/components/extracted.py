@@ -31,6 +31,7 @@ class Extracted(Component):
                  filters=None,
                  prefilters=None,
                  postfilters=None,
+                 omitfilters=None,
                  classvalue=None,
                  idname=None,
                  style='',
@@ -38,7 +39,6 @@ class Extracted(Component):
                  usecopy=False,
                  tag='div',
                  innerhtml=False,
-                 omitfilters=None,
                  ):
         '''
         ctor
@@ -53,24 +53,38 @@ class Extracted(Component):
         on the subclass, will be to the matches of each selector
         together.
 
+        SPECIFYING FILTERS
+        
         Before final rendering, zero or more filters will be applied
-        to the extracted content. Since each filter may transform the
-        HTML snippet in an arbitrary way, the order matters.
+        to the extracted content. By "filter", we mean some callable
+        that conforms to the Mobilize filter API; read the docs of
+        mobilize.filters for details.  Since each filter may transform
+        the HTML snippet in an arbitrary way, the order matters.
 
-        The filters, prefilters, and postfilters arguments all allow
-        you to control what filters are applied to the extracted
-        content. Each argument, if supplied, must be a list of filter
-        functions or callables. By default, filters.DEFAULT_FILTERS are
-        set to be applied.  If you specify prefilters, that list is
-        prepended to the default list; likewise, postfilters is
-        appended to the default.  If you specify filters, that will
-        *replace* the default.
+        The filters, prefilters, postfilters, and omitfilters
+        arguments all allow you to control what filters are applied to
+        the extracted content. Each argument is optional, and if
+        supplied, is a collection of filter-api callables. By default,
+        filters.DEFAULT_FILTERS are set to be applied.  If you specify
+        prefilters, that list is prepended to the default list;
+        likewise, postfilters is appended to the default.  If you
+        specify filters, that will *replace* the default.
 
-        If you use the filters argument, you cannot specify prefilters
-        or postfilters.  You can use one or both of prefilters or
-        postfilters, but then cannot use filters.  To specify that no
-        filters are to be used at all, pass filters=[].
+        omitfilters is a set of filters, or some sequence convertable
+        to a set (with the set() constructor).  If you specify
+        omitfilters, any filters within (identified by Python's id())
+        will be removed from the default list.  This is convenient if
+        you want to use all default filters except one or two for a
+        component, in a forward-compatible way.
 
+        If you use the filters argument, you cannot specify
+        prefilters, postfilters or omitfilters.  You can use one or
+        more of prefilters, postfilters or omitfilters, but then
+        cannot use filters.  To specify that no filters are to be used
+        at all, pass filters=[].
+
+        OTHER OPTIONS
+        
         filtermode specifies the manner and timing in which filters
         are applied to matching source elements.  In the process of
         creating the final HTML used in the mobile web page, the first
@@ -88,12 +102,11 @@ class Extracted(Component):
         filtermode FILT_EACHELEM, but complexity \Omega(M) for
         FILT_COLLAPSED.
 
-        If innerhtml is False (the default), then the selected element
-        will be extracted.  If innerhtml is True, the actual content
-        of that element is extracted; the parent tag itself is
-        dropped.  This only has an effect if there is exactly one
-        matching element, otherwise the innerhtml=False behavior is
-        forced.
+        If innerhtml is False (the default), the selected element will
+        be extracted.  If innerhtml is True, the actual content of
+        that element is extracted; the parent tag itself is dropped.
+        This only has an effect if there is exactly one matching
+        element, otherwise the innerhtml=False behavior is forced.
 
         TODO: make FILT_COLLAPSED the default filtermode
 
@@ -108,6 +121,9 @@ class Extracted(Component):
         
         @param postfilters : Filters to append to default list
         @type  postfilters : list of function
+
+        @param omitfilters : Filters to omit from default
+        @type  omitfilters : set, or sequence that can be converted to a set
 
         @param classvalue  : Value of "class" attribute for containing div
         @type  classvalue  : str or None (indicating use default)
