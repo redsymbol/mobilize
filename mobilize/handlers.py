@@ -290,14 +290,17 @@ class PassThrough(WebSourcer):
     '''
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         # TODO: if msite.verboselog, log that we're passing through
-        resp_headers = httputil.dict2list(resp)
-        return src_resp_body, resp_headers
+        return _passthrough_response(src_resp_body, resp)
     
 # Standard/reusable handler instances
 todesktop = ToDesktop()
 passthrough = PassThrough()
 
 # Supporting code
+
+def _passthrough_response(body, resp):
+    resp_headers = httputil.dict2list(resp)
+    return body, resp_headers
 
 def _html_fromstring(body):
     '''
