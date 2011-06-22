@@ -291,10 +291,31 @@ class PassThrough(WebSourcer):
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         # TODO: if msite.verboselog, log that we're passing through
         return _passthrough_response(src_resp_body, resp)
-    
+
+class SecurityBlock(Handler):
+    '''
+    Block normal request and response
+
+    This is meant to convey that the http request is effectively being
+    dropped for security reasons.  It's useful, for example, in the
+    context of a secure mobile web server, to prevent exploitation of
+    a hole in the source/desktop site on the client's web server.
+    '''
+    status = '403 Forbidden'
+
+    def wsgi_response(self, msite, environ, start_response):
+        from mobilize.httputil import RequestInfo
+        reqinfo = RequestInfo(environ)
+        message = '''<html><head><title>{status}</title></head><body>
+<h1>{status}</h1>
+The request to {rel_uri} is forbidden as a security measure.'''.format(status=self.status, rel_uri = reqinfo.rel_uri)
+        start_response(self.status, [])
+        return [message]
+
 # Standard/reusable handler instances
 todesktop = ToDesktop()
 passthrough = PassThrough()
+securityblock = SecurityBlock()
 
 # Supporting code
 
