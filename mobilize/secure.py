@@ -43,14 +43,125 @@ or responsibility; we make it OUR responsibility, as far as the
 security of the client's mobile web presence is concerned.
  
 '''
+import re
+
+class SecurityException(Exception):
+    pass
+
+class DropResponseSignal(SecurityException):
+    pass
+
+from collections import OrderedDict
+
+class HeaderDict(OrderedDict):
+    pass
 
 def nopoweredby(response_headers):
     '''
     Removes any X-Powered-By: response header
 
-    This frustrates certain information disclosure based attacks.
+    This frustrates certain information disclosures that could inform possible attacks.
     
     '''
     if 'x-powered-by' in response_headers:
         del response_headers['x-powered-by']
     
+def wptaglisting(get_param_keys : list):
+    '''
+    Directory listing through wp tag: wp-cs-dump and wp-ver-info 
+
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2000-0236
+    '''
+    forbiddens = {
+        'wp-cs-dump',
+        'wp-ver-info',
+        }
+    if forbiddens.isdisjoint(get_param_keys):
+        raise DropResponseSignal()
+
+def squirrelmail_misc(rel_uri : str):
+    '''
+    Attempts to protect against or mitigate vulnerabilities related to older versions of Squirrelmail
+
+    There are many possible vulnerabilities covered by this, including:
+
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-0519
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-0520
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-0521
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-1036
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-1769
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2095
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2006-3665
+
+    The best solution is for the client to either upgrade or remove
+    the old version of squirrelmail installed on their server hosting
+    the full site.  If that is not happening, this security filter at
+    least prevents some of its vulnerabilities from being
+    exploited through the mobile site.
+    
+    '''
+    # Drop requests to URLs related to squirrelmail
+    # Example URL that discloses the installed squirrelmail version:
+    #   http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
+    if rel_uri.startswith('/mail/src/redirect.php'):
+        raise DropResponseSignal()
+
+def phpinfo(rel_uri : str):
+    '''
+    Block a commonly used PHP info URL
+
+    Some PHP-based servers in the wild will return a well-formatted
+    information dump of the server's software and configuration with
+    an HTTP request to /phpinfo.php .  As this provides a rich set of
+    valuable information for an attacker, we want to block this.
+    
+    '''
+    if rel_uri.startswith('/phpinfo.php'):
+        raise DropResponseSignal()
+
+def phpeastereggs(get_param_keys : list):
+    '''
+    Blocks some PHP easter eggs that might disclose info or otherwise enable an exploit
+    More info at http://www.0php.com/php_easter_egg.php
+
+    '''
+    forbiddens = {
+        'PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000',
+        'PHPE9568F34-D428-11d2-A769-00AA001ACF42',
+        'PHPE9568F35-D428-11d2-A769-00AA001ACF42',
+        'PHPE9568F36-D428-11d2-A769-00AA001ACF42',
+        }
+    if forbiddens.isdisjoint(get_param_keys):
+        raise DropResponseSignal()
+
+def phpnuke(rel_uri: str):
+    '''
+    Protects against some phpnuke related vulnerabilites.
+
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-0269
+    '''
+    if _phpnuke_sqlinjection_urlmatch(rel_uri):
+        raise DropResponseSignal()
+
+_PHPNUKE_SQLINJECTION_REGEXES = set(map(re.compile, {
+        r'(?i)^/modules.php\?.*select.*nuke_',
+        r'(?i)^/index.php\?.*select.*nuke_authors',
+        }))
+
+def _phpnuke_sqlinjection_urlmatch(rel_uri: str):
+    '''
+    Check whether the relative uri matches some known phpnuke sql injection vectors
+    '''
+    return any(regex.search(rel_uri) is not None
+               for regex in _PHPNUKE_SQLINJECTION_REGEXES)
+
+def tomcatnull(rel_uri: list):
+    '''
+    Protects against some Tomcat directory listing/read priv escalation attacks
+    
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0043
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0042
+    '''
+    if rel_uri.endswith('%00') or rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
+        raise DropResponseSignal()
+        
