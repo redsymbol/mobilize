@@ -60,13 +60,13 @@ class SecurityHook:
     #: Tags of vulnerabilites addressed by this hook
     vulntags = {}
 
-    def response(self, response_headers):
+    def response(self, headers):
         '''
         Handle security needs for response headers
         
         May alter the headers.
         '''
-        return response_headers
+        return headers
 
     def check_request(self, reqinfo: httputil.RequestInfo):
         '''
@@ -98,8 +98,8 @@ class NoPoweredBy(SecurityHook):
     This frustrates certain information disclosures that could inform possible attacks.
     
     '''
-    def response(self, response_headers: list):
-        return [(header, value) for header, value in response_headers
+    def response(self, headers: list):
+        return [(header, value) for header, value in headers
                 if 'x-powered-by' != header]
 
 class WpTagListing(SecurityHook):
@@ -118,16 +118,7 @@ class WpTagListing(SecurityHook):
         if not forbiddens.isdisjoint(reqinfo.queryparams.keys()):
             raise DropResponseSignal()
 
-@vulntag(
-    'cve-2004-0519',
-    'cve-2004-0520',
-    'cve-2004-0521',
-    'cve-2004-1036',
-    'cve-2005-1769',
-    'cve-2005-2095',
-    'cve-2006-3665',
-    )
-def squirrelmail_misc(rel_uri : str):
+class SquirrelMailMisc(SecurityHook):
     '''
     Attempts to protect against or mitigate vulnerabilities related to older versions of Squirrelmail
 
@@ -148,11 +139,22 @@ def squirrelmail_misc(rel_uri : str):
     exploited through the mobile site.
     
     '''
-    # Drop requests to URLs related to squirrelmail
-    # Example URL that discloses the installed squirrelmail version:
-    #   http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
-    if rel_uri.startswith('/mail/src/redirect.php'):
-        raise DropResponseSignal()
+    
+    vulntags = {
+        'cve-2004-0519',
+        'cve-2004-0520',
+        'cve-2004-0521',
+        'cve-2004-1036',
+        'cve-2005-1769',
+        'cve-2005-2095',
+        'cve-2006-3665',
+        }
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        # Drop requests to URLs related to squirrelmail
+        # Example URL that discloses the installed squirrelmail version:
+        #   http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
+        if reqinfo.rel_uri.startswith('/mail/src/redirect.php'):
+            raise DropResponseSignal()
 
 def phpinfo(rel_uri : str):
     '''
