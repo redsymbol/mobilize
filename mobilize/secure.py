@@ -143,6 +143,18 @@ def phpnuke(rel_uri: str):
     if _phpnuke_sqlinjection_urlmatch(rel_uri):
         raise DropResponseSignal()
 
+def tomcatnull(rel_uri: list):
+    '''
+    Protects against some Tomcat directory listing/read priv escalation attacks
+    
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0043
+    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0042
+    '''
+    if rel_uri.endswith('%00') or rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
+        raise DropResponseSignal()
+        
+# supporting code
+
 _PHPNUKE_SQLINJECTION_REGEXES = set(map(re.compile, {
         r'(?i)^/modules.php\?.*select.*nuke_',
         r'(?i)^/index.php\?.*select.*nuke_authors',
@@ -155,13 +167,3 @@ def _phpnuke_sqlinjection_urlmatch(rel_uri: str):
     return any(regex.search(rel_uri) is not None
                for regex in _PHPNUKE_SQLINJECTION_REGEXES)
 
-def tomcatnull(rel_uri: list):
-    '''
-    Protects against some Tomcat directory listing/read priv escalation attacks
-    
-    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0043
-    http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0042
-    '''
-    if rel_uri.endswith('%00') or rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
-        raise DropResponseSignal()
-        
