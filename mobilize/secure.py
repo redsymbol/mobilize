@@ -156,18 +156,22 @@ class SquirrelMailMisc(SecurityHook):
         if reqinfo.rel_uri.startswith('/mail/src/redirect.php'):
             raise DropResponseSignal()
 
-def phpinfo(rel_uri : str):
+class PhpInfo(SecurityHook):
     '''
-    Block a commonly used PHP info URL
+    Block commonly used PHP info URLs
 
     Some PHP-based servers in the wild will return a well-formatted
     information dump of the server's software and configuration with
     an HTTP request to /phpinfo.php .  As this provides a rich set of
     valuable information for an attacker, we want to block this.
     
+    Example exploit URL:
+      http://m.example.com/phpinfo.php
+      
     '''
-    if rel_uri.startswith('/phpinfo.php'):
-        raise DropResponseSignal()
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        if reqinfo.rel_uri.startswith('/phpinfo.php'):
+            raise DropResponseSignal()
 
 def phpeastereggs(get_param_keys : list):
     '''
