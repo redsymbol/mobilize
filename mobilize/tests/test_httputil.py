@@ -585,3 +585,10 @@ class TestHttp(unittest.TestCase):
             actual2 = set(dict2list(dict2))
             self.assertSetEqual(expected2, actual2, str(ii))
 
+    def test_queryparams(self):
+        from mobilize.httputil import QueryParams
+        self.assertDictEqual({}, QueryParams())
+        self.assertDictEqual({'foo' : ['bar']}, QueryParams('foo=bar'))
+        self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('foo=bar&baz=42'))
+        self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('baz=42&foo=bar'))
+        self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42', '21']}, QueryParams('baz=42&foo=bar&baz=21'))

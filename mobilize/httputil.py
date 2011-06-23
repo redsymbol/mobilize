@@ -196,6 +196,29 @@ def dict2list(d):
                 yield (header, oneval)
     return [item for header, value in d.items() for item in items(header, value)]
 
+class QueryParams(dict):
+    '''
+    Request query parameters and their values
+
+    This dictionary-like data structure has keys of unescaped query string parameters.
+    The values are lists
+
+    '''
+    def __init__(self, querystring=''):
+        from urllib.parse import unquote
+        for pair in querystring.split('&'):
+            try:
+                k, v = map(unquote, pair.split('='))
+            except ValueError:
+                k = unquote(pair)
+                v = None
+            if '' == k:
+                continue
+            if k not in self:
+                self[k] = []
+            if v is not None:
+                self[k].append(v)
+    
 class RequestInfo:
     '''
     Encapsulates information about an incoming HTTP request.
@@ -217,6 +240,7 @@ class RequestInfo:
             self.body = wsgienviron['wsgi.input'].read()
         else:
             self.body = None
+        self.queryparams = QueryParams(wsgienviron['QUERY_STRING'])
         self.uri = _get_uri(wsgienviron)
         self.rel_uri = get_rel_uri(wsgienviron)
         self.protocol = wsgienviron['wsgi.url_scheme']
@@ -397,7 +421,11 @@ def mk_wsgi_application(msite):
     
     '''
     def application(environ, start_response):
-        from mobilize.handlers import passthrough
+        from mobilize.handlers import (
+            passthrough,
+            securityblock,
+            )
+        from mobilize.secure import DropResponseSignal
         from mobilize.exceptions import NoMatchingHandlerException
         def response(_handler):
             return _handler.wsgi_response(msite, environ, start_response)
@@ -405,8 +433,11 @@ def mk_wsgi_application(msite):
             handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
         except NoMatchingHandlerException:
             handler = passthrough
+        
         try:
             return response(handler)
+        except DropResponseSignal:
+            return response(securityblock)
         except Exception as ex:
             # Something went fatally wrong, so attempt to fallback on the passthrough handler.
             # TODO: log exception

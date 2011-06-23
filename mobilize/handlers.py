@@ -60,6 +60,8 @@ class WebSourcer(Handler):
     
     def wsgi_response(self, msite, environ, start_response):
         reqinfo = httputil.RequestInfo(environ)
+        for sechook in msite.sechooks():
+            sechook.check_request(reqinfo)
         def log_headers(label, headers, **kw):
             from mobilize.log import mk_wsgi_log
             log = mk_wsgi_log(environ)

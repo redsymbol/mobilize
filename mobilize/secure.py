@@ -44,6 +44,7 @@ security of the client's mobile web presence is concerned.
  
 '''
 import re
+from mobilize import httputil
 
 class SecurityException(Exception):
     pass
@@ -64,6 +65,15 @@ class SecurityHook:
         Handle security needs for response headers
         
         May alter the headers.
+        '''
+        return response_headers
+
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        '''
+        Checks for any security issues at the initial http request phase
+
+        @raises DropResponseSignal : appears to be an incoming security attack worthy of dropping a response entirely
+        
         '''
         pass
 
@@ -92,19 +102,21 @@ class NoPoweredBy(SecurityHook):
         return [(header, value) for header, value in response_headers
                 if 'x-powered-by' != header]
 
-@vulntag('cve-2000-0236')
-def wptaglisting(get_param_keys : list):
+class WpTagListing(SecurityHook):
     '''
     Directory listing through wp tag: wp-cs-dump and wp-ver-info 
 
     http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2000-0236
     '''
-    forbiddens = {
-        'wp-cs-dump',
-        'wp-ver-info',
-        }
-    if forbiddens.isdisjoint(get_param_keys):
-        raise DropResponseSignal()
+    vulntags = { 'cve-2000-0236' }
+    
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        forbiddens = {
+            'wp-cs-dump',
+            'wp-ver-info',
+            }
+        if not forbiddens.isdisjoint(reqinfo.queryparams.keys()):
+            raise DropResponseSignal()
 
 @vulntag(
     'cve-2004-0519',
