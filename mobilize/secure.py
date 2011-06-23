@@ -181,15 +181,15 @@ def tomcatnull(rel_uri: list):
         
 # supporting code
 
-_PHPNUKE_SQLINJECTION_REGEXES = set(map(re.compile, {
-        r'(?i)^/modules.php\?.*select.*nuke_',
-        r'(?i)^/index.php\?.*select.*nuke_authors',
-        }))
-
 def _phpnuke_sqlinjection_urlmatch(rel_uri: str):
     '''
     Check whether the relative uri matches some known phpnuke sql injection vectors
     '''
+    regexes = map(re.compile, {
+            r'(?i)^/modules.php\?.*select.*nuke_',
+            r'(?i)^/index.php\?.*select.*nuke_authors',
+            })
+
     return any(regex.search(rel_uri) is not None
-               for regex in _PHPNUKE_SQLINJECTION_REGEXES)
+               for regex in regexes)
 
