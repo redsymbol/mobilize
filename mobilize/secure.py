@@ -79,7 +79,8 @@ def nopoweredby(response_headers):
     '''
     if 'x-powered-by' in response_headers:
         del response_headers['x-powered-by']
-    
+
+@vulntag('cve-2000-0236')
 def wptaglisting(get_param_keys : list):
     '''
     Directory listing through wp tag: wp-cs-dump and wp-ver-info 
@@ -93,6 +94,15 @@ def wptaglisting(get_param_keys : list):
     if forbiddens.isdisjoint(get_param_keys):
         raise DropResponseSignal()
 
+@vulntag(
+    'cve-2004-0519',
+    'cve-2004-0520',
+    'cve-2004-0521',
+    'cve-2004-1036',
+    'cve-2005-1769',
+    'cve-2005-2095',
+    'cve-2006-3665',
+    )
 def squirrelmail_misc(rel_uri : str):
     '''
     Attempts to protect against or mitigate vulnerabilities related to older versions of Squirrelmail
@@ -148,6 +158,7 @@ def phpeastereggs(get_param_keys : list):
     if forbiddens.isdisjoint(get_param_keys):
         raise DropResponseSignal()
 
+@vulntag('cve-2004-0269')
 def phpnuke(rel_uri: str):
     '''
     Protects against some phpnuke related vulnerabilites.
@@ -157,6 +168,7 @@ def phpnuke(rel_uri: str):
     if _phpnuke_sqlinjection_urlmatch(rel_uri):
         raise DropResponseSignal()
 
+@vulntag('cve-2003-0043', 'cve-2003-0042')
 def tomcatnull(rel_uri: list):
     '''
     Protects against some Tomcat directory listing/read priv escalation attacks
