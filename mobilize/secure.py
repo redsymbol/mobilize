@@ -43,3 +43,14 @@ or responsibility; we make it OUR responsibility, as far as the
 security of the client's mobile web presence is concerned.
  
 '''
+
+def nopoweredby(response_headers):
+    '''
+    Removes any X-Powered-By: response header
+
+    This frustrates certain information disclosure based attacks.
+    
+    '''
+    if 'x-powered-by' in response_headers:
+        del response_headers['x-powered-by']
+    
