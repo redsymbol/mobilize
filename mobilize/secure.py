@@ -56,6 +56,20 @@ from collections import OrderedDict
 class HeaderDict(OrderedDict):
     pass
 
+def vulntag(*tags):
+    '''
+    Set tags of vulnerabilities addressed by a security filter
+    '''
+    def helper1(func):
+        if not hasattr(func, '_vulntags'):
+            func._vulntags = set()
+            func._vulntags.update(tag.strip().lower() for tag in tags)
+            return func
+    return helper1
+
+def get_vultags(func):
+    return getattr(func, '_vulntags', set())
+
 def nopoweredby(response_headers):
     '''
     Removes any X-Powered-By: response header
