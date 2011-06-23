@@ -117,6 +117,19 @@ class MobileSite:
         from .httputil import get_http
         return get_http()
 
+    def sechooks(self):
+        '''
+        Security hooks applicable for this site
+
+        To include security hooks for the site, override this method
+        in a subclass.
+
+        @return : SecurityHook instances to apply
+        @rtype  : ordered sequence
+
+        '''
+        return []
+
 class HandlerMap:
     '''
     Represents a mapping between pages (URLs) and their handlers

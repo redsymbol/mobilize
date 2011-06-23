@@ -51,14 +51,25 @@ class SecurityException(Exception):
 class DropResponseSignal(SecurityException):
     pass
 
-from collections import OrderedDict
+class SecurityHook:
+    '''
+    Represents a single security hook designed to protect against one or more vulnerabilities
+    '''
 
-class HeaderDict(OrderedDict):
-    pass
+    #: Tags of vulnerabilites addressed by this hook
+    vulntags = {}
+
+    def response(self, response_headers):
+        '''
+        Handle security needs for response headers
+        
+        May alter the headers.
+        '''
+        pass
 
 def vulntag(*tags):
     '''
-    Set tags of vulnerabilities addressed by a security filter
+    Set tags of vulnerabilities addressed by a security hook
     '''
     def helper1(func):
         if not hasattr(func, '_vulntags'):
@@ -70,15 +81,16 @@ def vulntag(*tags):
 def get_vultags(func):
     return getattr(func, '_vulntags', set())
 
-def nopoweredby(response_headers):
+class NoPoweredBy(SecurityHook):
     '''
     Removes any X-Powered-By: response header
 
     This frustrates certain information disclosures that could inform possible attacks.
     
     '''
-    if 'x-powered-by' in response_headers:
-        del response_headers['x-powered-by']
+    def response(self, response_headers: list):
+        return [(header, value) for header, value in response_headers
+                if 'x-powered-by' != header]
 
 @vulntag('cve-2000-0236')
 def wptaglisting(get_param_keys : list):
@@ -119,7 +131,7 @@ def squirrelmail_misc(rel_uri : str):
 
     The best solution is for the client to either upgrade or remove
     the old version of squirrelmail installed on their server hosting
-    the full site.  If that is not happening, this security filter at
+    the full site.  If that is not happening, this security hook at
     least prevents some of its vulnerabilities from being
     exploited through the mobile site.
     

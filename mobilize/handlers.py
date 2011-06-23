@@ -92,7 +92,7 @@ class WebSourcer(Handler):
         else:
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
-        final_resp_headers = _postprocess_response_headers(final_resp_headers)
+        final_resp_headers = _postprocess_response_headers(final_resp_headers, msite.sechooks())
         if msite.verboselog:
             log_headers('final resp headers', final_resp_headers)
         start_response(status, final_resp_headers)
@@ -402,7 +402,7 @@ def _rendering_params(doc, paramdictlist):
             params[param] = finder()
     return params
 
-def _postprocess_response_headers(headers):
+def _postprocess_response_headers(headers, hooks):
     from mobilize.util import isscalar
     removed = (
         'transfer-encoding', # What's returned to the client is not actually chunked.
@@ -421,7 +421,10 @@ def _postprocess_response_headers(headers):
             if re.match(r'http://[^/]*:2443/', value):
                 value = value.replace(':2443/', ':2280/')
         return (header, value)
-    return [modify(header, value)
-            for header, value in expand(headers)
-            if header not in removed]
+    modified = [modify(header, value)
+                for header, value in expand(headers)
+                if header not in removed]
+    for hook in hooks:
+        modified = hook.response(modified)
+    return modified
 
