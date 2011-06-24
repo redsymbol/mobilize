@@ -44,7 +44,6 @@ security of the client's mobile web presence is concerned.
  
 '''
 import re
-from mobilize import httputil
 
 class SecurityException(Exception):
     pass
@@ -68,7 +67,7 @@ class SecurityHook:
         '''
         return headers
 
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         '''
         Checks for any security issues at the initial http request phase
 
@@ -110,7 +109,7 @@ class WpTagListing(SecurityHook):
     '''
     vulntags = { 'cve-2000-0236' }
     
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         forbiddens = {
             'wp-cs-dump',
             'wp-ver-info',
@@ -149,7 +148,7 @@ class SquirrelMailMisc(SecurityHook):
         'cve-2005-2095',
         'cve-2006-3665',
         }
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         # Drop requests to URLs related to squirrelmail
         # Example URL that discloses the installed squirrelmail version:
         #   http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
@@ -169,7 +168,7 @@ class PhpInfo(SecurityHook):
       http://m.example.com/phpinfo.php
       
     '''
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         if reqinfo.rel_uri.startswith('/phpinfo.php'):
             raise DropResponseSignal()
 
@@ -182,7 +181,7 @@ class PhpEasterEggs(SecurityHook):
       http://m.example.com/?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000
 
     '''
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         forbiddens = {
             'PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000',
             'PHPE9568F34-D428-11d2-A769-00AA001ACF42',
@@ -205,7 +204,7 @@ class PhpNuke(SecurityHook):
     '''
     vulntags = { 'cve-2004-0269' }
     
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         if _phpnuke_sqlinjection_urlmatch(reqinfo.rel_uri):
             raise DropResponseSignal()
 
@@ -224,7 +223,7 @@ class TomcatNull(SecurityHook):
         'cve-2003-0043',
         'cve-2003-0042',
         }
-    def check_request(self, reqinfo: httputil.RequestInfo):
+    def check_request(self, reqinfo):
         if reqinfo.rel_uri.endswith('%00') or reqinfo.rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
             raise DropResponseSignal()
         
