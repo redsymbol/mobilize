@@ -1,4 +1,7 @@
 '''
+TODO: update vulntags cruft
+TODO: rename SecurityHook.check_request to something more consistent
+
 Security protections
 
 This module provides tools for preventing the exploit of security
