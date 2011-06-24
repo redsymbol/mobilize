@@ -173,20 +173,25 @@ class PhpInfo(SecurityHook):
         if reqinfo.rel_uri.startswith('/phpinfo.php'):
             raise DropResponseSignal()
 
-def phpeastereggs(get_param_keys : list):
+class PhpEasterEggs(SecurityHook):
     '''
-    Blocks some PHP easter eggs that might disclose info or otherwise enable an exploit
+    Blocks some PHP easter eggs that might disclose info or otherwise assist an exploit
     More info at http://www.0php.com/php_easter_egg.php
 
+    Example exploit URL:
+      http://m.example.com/?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000
+
     '''
-    forbiddens = {
-        'PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000',
-        'PHPE9568F34-D428-11d2-A769-00AA001ACF42',
-        'PHPE9568F35-D428-11d2-A769-00AA001ACF42',
-        'PHPE9568F36-D428-11d2-A769-00AA001ACF42',
-        }
-    if forbiddens.isdisjoint(get_param_keys):
-        raise DropResponseSignal()
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        forbiddens = {
+            'PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000',
+            'PHPE9568F34-D428-11d2-A769-00AA001ACF42',
+            'PHPE9568F35-D428-11d2-A769-00AA001ACF42',
+            'PHPE9568F36-D428-11d2-A769-00AA001ACF42',
+            }
+        if '' in reqinfo.queryparams:
+            if not forbiddens.isdisjoint(reqinfo.queryparams['']):
+                raise DropResponseSignal()
 
 @vulntag('cve-2004-0269')
 def phpnuke(rel_uri: str):

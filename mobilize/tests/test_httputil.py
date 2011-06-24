@@ -588,6 +588,7 @@ class TestHttp(unittest.TestCase):
     def test_queryparams(self):
         from mobilize.httputil import QueryParams
         self.assertDictEqual({}, QueryParams())
+        self.assertDictEqual({'' : ['foo']}, QueryParams('=foo'))
         self.assertDictEqual({'foo' : ['bar']}, QueryParams('foo=bar'))
         self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('foo=bar&baz=42'))
         self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('baz=42&foo=bar'))

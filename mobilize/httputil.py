@@ -207,13 +207,13 @@ class QueryParams(dict):
     def __init__(self, querystring=''):
         from urllib.parse import unquote
         for pair in querystring.split('&'):
+            if '' == pair:
+                continue
             try:
                 k, v = map(unquote, pair.split('='))
             except ValueError:
                 k = unquote(pair)
                 v = None
-            if '' == k:
-                continue
             if k not in self:
                 self[k] = []
             if v is not None:
@@ -240,7 +240,8 @@ class RequestInfo:
             self.body = wsgienviron['wsgi.input'].read()
         else:
             self.body = None
-        self.queryparams = QueryParams(wsgienviron['QUERY_STRING'])
+        self.querystring = wsgienviron['QUERY_STRING']
+        self.queryparams = QueryParams(self.querystring)
         self.uri = _get_uri(wsgienviron)
         self.rel_uri = get_rel_uri(wsgienviron)
         self.protocol = wsgienviron['wsgi.url_scheme']
