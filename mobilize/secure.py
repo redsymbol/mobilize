@@ -209,16 +209,24 @@ class PhpNuke(SecurityHook):
         if _phpnuke_sqlinjection_urlmatch(reqinfo.rel_uri):
             raise DropResponseSignal()
 
-@vulntag('cve-2003-0043', 'cve-2003-0042')
-def tomcatnull(rel_uri: list):
+class TomcatNull(SecurityHook):
     '''
     Protects against some Tomcat directory listing/read priv escalation attacks
     
     http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0043
     http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2003-0042
+
+    Example exploit urls:
+      http://m.example.com/index.php?template=../../../loudblog/custom/config.php%00
+      http://m.example.com/cgi-bin/tomcat_proxy_directory_traversal
     '''
-    if rel_uri.endswith('%00') or rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
-        raise DropResponseSignal()
+    vulntags = {
+        'cve-2003-0043',
+        'cve-2003-0042',
+        }
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        if reqinfo.rel_uri.endswith('%00') or reqinfo.rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
+            raise DropResponseSignal()
         
 # supporting code
 
