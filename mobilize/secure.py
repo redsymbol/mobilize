@@ -193,15 +193,21 @@ class PhpEasterEggs(SecurityHook):
             if not forbiddens.isdisjoint(reqinfo.queryparams['']):
                 raise DropResponseSignal()
 
-@vulntag('cve-2004-0269')
-def phpnuke(rel_uri: str):
+class PhpNuke(SecurityHook):
     '''
     Protects against some phpnuke related vulnerabilites.
 
     http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2004-0269
+
+    Example exploit urls:
+      http://m.example.com/modules.php?name=Downloads&d_op=modifydownloadrequest&lid=-1%20UNION%20SELECT%200,username,user_id,user_password,name,user_email,user_level,0,0%20FROM%20nuke_users
+      http://m.example.com/index.php?kala=p0hh+UNION+ALL+SELECT+1,2,3,pwd,5+FROM+nuke_authors/*
     '''
-    if _phpnuke_sqlinjection_urlmatch(rel_uri):
-        raise DropResponseSignal()
+    vulntags = { 'cve-2004-0269' }
+    
+    def check_request(self, reqinfo: httputil.RequestInfo):
+        if _phpnuke_sqlinjection_urlmatch(reqinfo.rel_uri):
+            raise DropResponseSignal()
 
 @vulntag('cve-2003-0043', 'cve-2003-0042')
 def tomcatnull(rel_uri: list):
