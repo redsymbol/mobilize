@@ -79,20 +79,6 @@ class SecurityHook:
         '''
         pass
 
-def vulntag(*tags):
-    '''
-    Set tags of vulnerabilities addressed by a security hook
-    '''
-    def helper1(func):
-        if not hasattr(func, '_vulntags'):
-            func._vulntags = set()
-            func._vulntags.update(tag.strip().lower() for tag in tags)
-            return func
-    return helper1
-
-def get_vultags(func):
-    return getattr(func, '_vulntags', set())
-
 class NoPoweredBy(SecurityHook):
     '''
     Removes any X-Powered-By: response header

@@ -13,18 +13,3 @@ class TestSecurity(unittest.TestCase):
             }
         for testurl in testurls:
             self.assertTrue(_phpnuke_sqlinjection_urlmatch(testurl), testurl)
-
-    def test_vulntag(self):
-        from mobilize.secure import (
-            vulntag,
-            get_vultags,
-            )
-        def dummy1():
-            pass
-        self.assertSetEqual(set(), get_vultags(dummy1))
-                            
-        @vulntag('mwu-foo', 'CVE-1234-567')
-        def dummy2():
-            pass
-        self.assertSetEqual({'mwu-foo', 'cve-1234-567'},
-                            get_vultags(dummy2))
