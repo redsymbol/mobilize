@@ -140,6 +140,9 @@ class SquirrelMailMisc(SecurityHook):
     least prevents some of its vulnerabilities from being
     exploited through the mobile site.
     
+    Example URLs that disclose the installed squirrelmail version:
+      http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
+      http://m.example.com/mail/src/login.php
     '''
     
     vulntags = {
@@ -153,9 +156,7 @@ class SquirrelMailMisc(SecurityHook):
         }
     def check_request(self, reqinfo):
         # Drop requests to URLs related to squirrelmail
-        # Example URL that discloses the installed squirrelmail version:
-        #   http://m.example.com/mail/src/redirect.php?base_uri=squirrelmail_redirect_cookie_theft.nasl
-        if reqinfo.rel_uri.startswith('/mail/src/redirect.php'):
+        if reqinfo.rel_uri.startswith('/mail/src/'):
             raise DropResponseSignal()
 
 class PhpInfo(SecurityHook):
