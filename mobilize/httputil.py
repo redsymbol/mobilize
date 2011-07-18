@@ -190,10 +190,10 @@ def dict2list(d):
     def items(header, value):
         from mobilize.util import isscalar
         if isscalar(value):
-            yield (header, value)
+            yield (header, str(value))
         else:
             for oneval in value:
-                yield (header, oneval)
+                yield (header, str(oneval))
     return [item for header, value in d.items() for item in items(header, value)]
 
 class QueryParams(dict):

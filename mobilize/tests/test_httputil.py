@@ -567,6 +567,13 @@ class TestHttp(unittest.TestCase):
             {'dict' : [('u', 'v'), ('a', ['b', 'c']), ('z', 'x')],
              'list' : [('u', 'v'), ('a', 'b'), ('a', 'c'), ('z', 'x')],
              },
+            # Convert all values to string
+            {'dict' : [('content-length', 42)],
+             'list' : [('content-length', '42')],
+             },
+            {'dict' : [('a', [7, 9])],
+             'list' : [('a', '7'), ('a', '9')],
+             },
             ]
         for ii, td in enumerate(testdata):
             # We use the ordered dict to make it easier to test
