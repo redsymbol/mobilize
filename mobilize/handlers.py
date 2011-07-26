@@ -47,67 +47,67 @@ class WebSourcer(Handler):
 
     '''
 
-    _source_url_mapper = None
+    _source_uri_mapper = None
 
-    def __init__(self, source_url_mapper = None):
+    def __init__(self, source_uri_mapper = None):
         '''
         ctor
         
-        source_url_mapper defines the mapping between incoming request
+        source_uri_mapper defines the mapping between incoming request
         URLs and the corresponding URL from the source, as
-        encapsulated by the source_url method of this class.  See that
+        encapsulated by the source_uri method of this class.  See that
         method's documentation for more info.
 
-        @param source_url_mapper : Specifies source URI mapping policy 
-        @type  source_url_mapper : mixed; see documention for self.source_url
+        @param source_uri_mapper : Specifies source URI mapping policy 
+        @type  source_uri_mapper : mixed; see documention for self.source_uri
         
         
         '''
-        self._source_url_mapper = source_url_mapper
+        self._source_uri_mapper = source_uri_mapper
 
-    def source_url(self, requested_url):
+    def source_rel_uri(self, requested_uri):
         '''
         Return the relative URI to fetch from the source site
 
         This method calculates the relative URI of the resource to
         fetch on the source site, based on the incoming request URI to
         the mobile site. The default case is to return the value of
-        requested_url unmodified, but you also can specify arbitrary
+        requested_uri unmodified, but you also can specify arbitrary
         transformation rules. Its behavior depends on the value of
-        source_url_mapper passed to the instance's constructor.
+        source_uri_mapper passed to the instance's constructor.
 
-        If source_url_mapper is not supplied, or is None, then the
+        If source_uri_mapper is not supplied, or is None, then the
         relative URI of the source is the same as for the incoming
-        request.  In other words, source_url will return the value of
-        requested_url.  For many websites this simple case is all you
+        request.  In other words, source_uri will return the value of
+        requested_uri.  For many websites this simple case is all you
         need.
 
-        If source_url_mapper is a string, this is used as the value of
+        If source_uri_mapper is a string, this is used as the value of
         the relative URI in the source document, regardless of what
         request_url's value is.  Typically this will be used for a handler
         that is always routed from a specific URL.
 
-        If source_url_mapper is a callable, it must accept
-        requested_url as an argument, and return a modified URL value.
+        If source_uri_mapper is a callable, it must accept
+        requested_uri as an argument, and return a modified URL value.
 
         Note: all references to URLs in this description are meant to
         be relative URLs, not absolute.
 
-        @param requested_url : Incoming relative URI
-        @type  requested_url : str
+        @param requested_uri : Incoming relative URI
+        @type  requested_uri : str
 
         @return : Relative URI to fetch from source
         @rtype  : str
         
         '''
         
-        url = requested_url
-        if self._source_url_mapper is not None:
-            if callable(self._source_url_mapper):
-                url = self._source_url_mapper(requested_url)
+        url = requested_uri
+        if self._source_uri_mapper is not None:
+            if callable(self._source_uri_mapper):
+                url = self._source_uri_mapper(requested_uri)
             else:
-                assert type(self._source_url_mapper) is str
-                url = self._source_url_mapper
+                assert type(self._source_uri_mapper) is str
+                url = self._source_uri_mapper
         return url
 
     def fromstring(self, body):
