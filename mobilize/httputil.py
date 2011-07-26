@@ -112,10 +112,13 @@ def mobilizeable(resp):
     @rtype  : bool
     
     '''
+    is_mob = False
     contenttype = resp.get('content-type', '')
     if 'xml' in contenttype or 'html' in contenttype:
-        return True
-    return False
+        is_mob = True
+    if 'XMLHttpRequest' == resp.get('x-requested-with', None):
+        is_mob = False
+    return is_mob
 
 def srchostport(environ):
     '''

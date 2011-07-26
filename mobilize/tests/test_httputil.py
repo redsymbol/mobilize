@@ -600,3 +600,23 @@ class TestHttp(unittest.TestCase):
         self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('foo=bar&baz=42'))
         self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42']}, QueryParams('baz=42&foo=bar'))
         self.assertDictEqual({'foo' : ['bar'], 'baz' : ['42', '21']}, QueryParams('baz=42&foo=bar&baz=21'))
+
+    def test_mobilizeable(self):
+        from mobilize.httputil import mobilizeable
+        # Test requests that are expected to be mobilizeable
+        testdata_yes = [
+            {'content-type' : 'text/html'},
+            {'content-type' : 'application/xhtml+xml'},
+            ]
+
+        testdata_no = [
+            {'content-type' : 'text/css'},
+            {'content-type' : 'image/png'},
+            {'content-type' : 'text/html',
+            'x-requested-with': 'XMLHttpRequest',
+             },
+            ]
+        for ii, headers in enumerate(testdata_yes):
+            self.assertTrue(mobilizeable(headers), ii)
+        for ii, headers in enumerate(testdata_no):
+            self.assertFalse(mobilizeable(headers), ii)
