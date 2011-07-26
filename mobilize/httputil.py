@@ -22,7 +22,7 @@ def _name2field(name, prefix=''):
     field = '-'.join(part.capitalize() for part in parts)
     return field
 
-def _get_uri(environ):
+def _get_root_uri(environ):
     '''
     Get the incoming request URI
     
@@ -38,7 +38,6 @@ def _get_uri(environ):
     stdport = portmap.get(proto, False)
     if stdport and port != stdport:
         uri += ':' + str(port)
-    uri += get_rel_uri(environ)
     return uri
 
 def get_response_headers(resp_headers, environ, overrides):
@@ -242,8 +241,9 @@ class RequestInfo:
             self.body = None
         self.querystring = wsgienviron['QUERY_STRING']
         self.queryparams = QueryParams(self.querystring)
-        self.uri = _get_uri(wsgienviron)
+        self.root_uri = _get_root_uri(wsgienviron)
         self.rel_uri = get_rel_uri(wsgienviron)
+        self.uri = self.root_uri + self.rel_uri
         self.protocol = wsgienviron['wsgi.url_scheme']
 
     def headers(self, overrides):

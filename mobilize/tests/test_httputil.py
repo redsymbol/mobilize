@@ -508,8 +508,8 @@ class TestHttp(unittest.TestCase):
         actual = netbytes2str(src, 'utf-8')
         self.assertEquals(expected, actual)
 
-    def test__get_uri(self):
-        from mobilize.httputil import _get_uri
+    def test__get_root_uri(self):
+        from mobilize.httputil import _get_root_uri
         def env(**kw):
             environ = {
             'MWU_OTHER_DOMAIN' : 'www.example.com',
@@ -524,25 +524,25 @@ class TestHttp(unittest.TestCase):
             return environ
         testdata = [
             {'environ' : env(),
-             'uri'     : 'http://www.example.com/',
+             'uri'     : 'http://www.example.com',
              },
             {'environ' : env(REQUEST_URI='/foo/bar'),
-             'uri'     : 'http://www.example.com/foo/bar',
+             'uri'     : 'http://www.example.com',
              },
             {'environ' : env(REQUEST_URI='/foo/bar', SERVER_PORT=42),
-             'uri'     : 'http://www.example.com:42/foo/bar',
+             'uri'     : 'http://www.example.com:42',
              },
             {'environ' : env(),
-             'uri'     : 'http://www.example.com/',
+             'uri'     : 'http://www.example.com',
              },
             {'environ' : env(proto='https', SERVER_PORT=443),
-             'uri'     : 'https://www.example.com/',
+             'uri'     : 'https://www.example.com',
              },
             ]
         for ii, td in enumerate(testdata):
             expected = td['uri']
             try:
-                actual = _get_uri(td['environ'])
+                actual = _get_root_uri(td['environ'])
             except AttributeError:
                 print(td['environ'])
                 raise
