@@ -155,7 +155,9 @@ class WebSourcer(Handler):
             contenttype = resp.get('content-type', '')
             log_headers('hack', {}, contenttype=contenttype)
         status = '%s %s' % (resp.status, resp.reason)
-        if httputil.mobilizeable(resp):
+        # Note that for us to mobilize the response, both the request
+        # AND the response must be "mobilizeable".
+        if reqinfo.mobilizeable and httputil.mobilizeable(resp):
             src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
             final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
         else:

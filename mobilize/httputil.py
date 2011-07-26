@@ -113,11 +113,9 @@ def mobilizeable(resp):
     
     '''
     is_mob = False
-    # Is this an AJAX request?
-    if 'XMLHttpRequest' != resp.get('x-requested-with', None):
-        contenttype = resp.get('content-type', '')
-        if 'xml' in contenttype or 'html' in contenttype:
-            is_mob = True
+    contenttype = resp.get('content-type', '')
+    if 'xml' in contenttype or 'html' in contenttype:
+        is_mob = True
     return is_mob
 
 def srchostport(environ):
@@ -237,7 +235,18 @@ class RequestInfo:
     Encapsulates information about an incoming HTTP request.
 
     This is for the request directly from the client, prior to any handler.
-    
+
+    Properties:
+      body         : The request body, or None if not applicable
+      method       : the request method: 'GET', 'POST', etc.
+      mobilizeable : whether the request is mobilizeable or not
+      protocol     : request protocol (http, https, etc.)
+      queryparams  : query params (a QueryParams instance)
+      querystring  : query string
+      rel_uri      : the relative request URI
+      root_uri     : the request URI sans the request path
+      uri          : full request URI
+
     '''
     def __init__(self, wsgienviron):
         '''
@@ -259,6 +268,7 @@ class RequestInfo:
         self.rel_uri = get_rel_uri(wsgienviron)
         self.uri = self.root_uri + self.rel_uri
         self.protocol = wsgienviron['wsgi.url_scheme']
+        self.mobilizeable = wsgienviron.get('HTTP_X_REQUESTED_WITH', None) != 'XMLHttpRequest'
 
     def headers(self, overrides):
         '''
