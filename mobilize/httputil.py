@@ -24,7 +24,18 @@ def _name2field(name, prefix=''):
 
 def _get_root_uri(environ):
     '''
-    Get the incoming request URI
+    Get the root URI of the incoming request
+
+    The "root URI" is defined as the full url with the request path
+    trunacted.  So the root URI of
+    "http://example.com/foo/bar?answer=42" is simply
+    "http://example.com".
+
+    @param environ : wsgi environment
+    @type  environ : quackslike(dict)
+
+    @return : root URI
+    @rtype  : str
     
     '''
     portmap = {
