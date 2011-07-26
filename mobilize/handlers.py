@@ -47,6 +47,69 @@ class WebSourcer(Handler):
 
     '''
 
+    _source_url_mapper = None
+
+    def __init__(self, source_url_mapper = None):
+        '''
+        ctor
+        
+        source_url_mapper defines the mapping between incoming request
+        URLs and the corresponding URL from the source, as
+        encapsulated by the source_url method of this class.  See that
+        method's documentation for more info.
+
+        @param source_url_mapper : Specifies source URI mapping policy 
+        @type  source_url_mapper : mixed; see documention for self.source_url
+        
+        
+        '''
+        self._source_url_mapper = source_url_mapper
+
+    def source_url(self, requested_url):
+        '''
+        Return the relative URI to fetch from the source site
+
+        This method calculates the relative URI of the resource to
+        fetch on the source site, based on the incoming request URI to
+        the mobile site. The default case is to return the value of
+        requested_url unmodified, but you also can specify arbitrary
+        transformation rules. Its behavior depends on the value of
+        source_url_mapper passed to the instance's constructor.
+
+        If source_url_mapper is not supplied, or is None, then the
+        relative URI of the source is the same as for the incoming
+        request.  In other words, source_url will return the value of
+        requested_url.  For many websites this simple case is all you
+        need.
+
+        If source_url_mapper is a string, this is used as the value of
+        the relative URI in the source document, regardless of what
+        request_url's value is.  Typically this will be used for a handler
+        that is always routed from a specific URL.
+
+        If source_url_mapper is a callable, it must accept
+        requested_url as an argument, and return a modified URL value.
+
+        Note: all references to URLs in this description are meant to
+        be relative URLs, not absolute.
+
+        @param requested_url : Incoming relative URI
+        @type  requested_url : str
+
+        @return : Relative URI to fetch from source
+        @rtype  : str
+        
+        '''
+        
+        url = requested_url
+        if self._source_url_mapper is not None:
+            if callable(self._source_url_mapper):
+                url = self._source_url_mapper(requested_url)
+            else:
+                assert type(self._source_url_mapper) is str
+                url = self._source_url_mapper
+        return url
+
     def fromstring(self, body):
         '''
         @param body : body of html
@@ -82,11 +145,15 @@ class WebSourcer(Handler):
         request_headers = reqinfo.headers(request_overrides)
         if msite.verboselog:
             log_headers('modified request headers', request_headers)
-        resp, src_resp_bytes = http.request(reqinfo.uri, method=reqinfo.method, body=reqinfo.body,
+        source_uri = reqinfo.uri
+        resp, src_resp_bytes = http.request(source_uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         if msite.verboselog:
             log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
+        if msite.verboselog:
+            contenttype = resp.get('content-type', '')
+            log_headers('hack', {}, contenttype=contenttype)
         status = '%s %s' % (resp.status, resp.reason)
         if httputil.mobilizeable(resp):
             src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
@@ -154,7 +221,7 @@ class Moplate(WebSourcer):
     must implement at least self._render().
 
     '''
-    def __init__(self, template_name, components, params=None):
+    def __init__(self, template_name, components, params=None, **kw):
         '''
         ctor
         
@@ -168,6 +235,7 @@ class Moplate(WebSourcer):
         @type  params        : dict (str -> mixed)
         
         '''
+        super(Moplate, self).__init__(**kw)
         self.template_name = template_name
         self.components = components
         if params:
