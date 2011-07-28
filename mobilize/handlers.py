@@ -151,9 +151,6 @@ class WebSourcer(Handler):
         if msite.verboselog:
             log_headers('raw response headers', resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
-        if msite.verboselog:
-            contenttype = resp.get('content-type', '')
-            log_headers('hack', {}, contenttype=contenttype)
         status = '%s %s' % (resp.status, resp.reason)
         # Note that for us to mobilize the response, both the request
         # AND the response must be "mobilizeable".
