@@ -246,11 +246,12 @@ def _link_converter(attribute, desktop_url):
     return convert
 
 def _relhyperlinks_prefixes(root_elem, prefixes):
-    for anchor in root_elem.iterfind('.//a'):
-        link = anchor.attrib.get('href', '')
+    def rewriter(link):
         for prefix in prefixes:
             if link.startswith(prefix):
-                newlink = link[len(prefix):]
-                if '' == newlink:
-                    newlink = '/'
-                anchor.attrib['href'] = newlink
+                link = link[len(prefix):]
+                if '' == link:
+                    link = '/'
+                break
+        return link
+    root_elem.rewrite_links(rewriter)
