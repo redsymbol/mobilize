@@ -168,15 +168,8 @@ def relhyperlinks_full(root_elem, domains, protocols):
     prefixes = {'{}://{}'.format(protocol, domain)
                 for domain in domains
                 for protocol in protocols}
-    for anchor in root_elem.iterfind('.//a'):
-        link = anchor.attrib.get('href', '')
-        for prefix in prefixes:
-            if link.startswith(prefix):
-                newlink = link[len(prefix):]
-                if '' == newlink:
-                    newlink = '/'
-                anchor.attrib['href'] = newlink
-    
+    return _relhyperlinks_prefixes(root_elem, prefixes)
+
 @filterapi
 def relhyperlinks(root_elem, domain, protocol='http'):
     '''
@@ -204,15 +197,7 @@ def relhyperlinks(root_elem, domain, protocol='http'):
     @type  protocol  : list of str
 
     '''
-    prefix = '{}://{}'.format(protocol, domain)
-    for anchor in root_elem.iterfind('.//a'):
-        link = anchor.attrib.get('href', '')
-        if link.startswith(prefix):
-            newlink = link[len(prefix):]
-            if '' == newlink:
-                newlink = '/'
-            anchor.attrib['href'] = newlink
-
+    return _relhyperlinks_prefixes(root_elem, {'{}://{}'.format(protocol, domain)})
 
 # Supporting code
 
@@ -259,3 +244,13 @@ def _link_converter(attribute, desktop_url):
                 else:
                     elem.attrib[attribute] = base_url + elem.attrib[attribute]
     return convert
+
+def _relhyperlinks_prefixes(root_elem, prefixes):
+    for anchor in root_elem.iterfind('.//a'):
+        link = anchor.attrib.get('href', '')
+        for prefix in prefixes:
+            if link.startswith(prefix):
+                newlink = link[len(prefix):]
+                if '' == newlink:
+                    newlink = '/'
+                anchor.attrib['href'] = newlink
