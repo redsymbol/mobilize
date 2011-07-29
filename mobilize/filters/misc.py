@@ -245,7 +245,7 @@ def _link_converter(attribute, desktop_url):
                     elem.attrib[attribute] = base_url + elem.attrib[attribute]
     return convert
 
-def _relhyperlinks_prefixes(root_elem, prefixes):
+def _relhyperlinks_prefixes(root_elem: 'lxml.html.HtmlElement', prefixes : set) -> None:
     def rewriter(link):
         for prefix in prefixes:
             if link.startswith(prefix):
