@@ -145,6 +145,77 @@ def formcontroltypes_one(elem):
     else:
         elem.attrib['class'] = marker
 
+@filterapi
+def relhyperlinks_full(root_elem, domains, protocols):
+    '''
+    Convert absolute hyperlinks to relative - full control interface
+
+    This provides a richer interface to the engine behind the
+    relhyperlinks filter, recognizing links for multiple domains and
+    protocols.  For example:
+      relhyperlinks_full(elem, ['www.example.com', 'example.com'], ['http', 'https'])
+
+    @param root_elem : Root of document fragment
+    @type  root_elem : HtmlElement
+
+    @param domains   : Domain names of absolute links to convert
+    @type  domains   : list of str
+
+    @param protocols : Protocols to check for
+    @type  protocols : sequence of str
+
+    '''
+    prefixes = {'{}://{}'.format(protocol, domain)
+                for domain in domains
+                for protocol in protocols}
+    for anchor in root_elem.iterfind('.//a'):
+        link = anchor.attrib.get('href', '')
+        for prefix in prefixes:
+            if link.startswith(prefix):
+                newlink = link[len(prefix):]
+                if '' == newlink:
+                    newlink = '/'
+                anchor.attrib['href'] = newlink
+    
+@filterapi
+def relhyperlinks(root_elem, domain, protocol='http'):
+    '''
+    Convert absolute hyperlinks to relative
+    
+    This will cycle through the A tags in the tree, find those whose
+    HREF attribute is an absolute link on the given domain, and
+    convert it to a relative link.
+
+    Some CMSs, notably Wordpress, will render the HREF attribute of A
+    tags as full absolute hyperlinks, even if they are on the same
+    domain.  For a mobile site, it's better if these URLs are relative
+    so that someone viewing the mobile page will go to another mobile
+    page when clicking on the link.  (If the href is a absolute link
+    to the desktop view, at best they will have to suffer the extra
+    latency of another device redirection.)
+
+    @param root_elem : Root of document fragment
+    @type  root_elem : HtmlElement
+
+    @param domain    : Domain name of absolute links to convert
+    @type  domain    : list of str
+
+    @param protocol  : Protocol of absolute link to convert
+    @type  protocol  : list of str
+
+    '''
+    prefix = '{}://{}'.format(protocol, domain)
+    for anchor in root_elem.iterfind('.//a'):
+        link = anchor.attrib.get('href', '')
+        if link.startswith(prefix):
+            newlink = link[len(prefix):]
+            if '' == newlink:
+                newlink = '/'
+            anchor.attrib['href'] = newlink
+
+
+# Supporting code
+
 def _link_converter(attribute, desktop_url):
     '''
     Create a function that will convert link attributes to absolute desktop urls

@@ -52,6 +52,8 @@ from .misc import (
     absimgsrc,
     abslinkfilesrc,
     formcontroltypes,
+    relhyperlinks,
+    relhyperlinks_full,
     )
 
 DEFAULT_FILTERS = [

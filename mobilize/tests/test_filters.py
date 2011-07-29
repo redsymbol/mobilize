@@ -1084,3 +1084,49 @@ here's some extra trailing text for you too
         actual = html.tostring(root_elem)
         self.assertSequenceEqual(normxml(expected), normxml(actual))
         
+    def test_relhyperlinks(self):
+        from mobilize.filters import (
+            relhyperlinks,
+            relhyperlinks_full,
+            )
+        htmlA='''
+<div>
+<ul>
+  <li><a href="http://alpha.com">Alpha home page</a></li>
+  <li><a href="http://www.alpha.com">Alt Alpha home page</a></li>
+  <li><a href="http://beta.com">Beta home page</a></li>
+</ul>
+
+<p>The beautiful <a href="/about/birds/cranes">white cranes</a> of <a href="http://alpha.com/places/Lancashire">Lancashire</a> drink surprising amounts of <a href="https://alpha.com/secure/about/drinks/coffee">coffee</a>.</p> </div>
+'''
+
+        root1 = html.fromstring(htmlA)
+        relhyperlinks(root1, 'alpha.com')
+        actual1 = html.tostring(root1)
+        expected1 = '''
+<div>
+<ul>
+  <li><a href="/">Alpha home page</a></li>
+  <li><a href="http://www.alpha.com">Alt Alpha home page</a></li>
+  <li><a href="http://beta.com">Beta home page</a></li>
+</ul>
+
+<p>The beautiful <a href="/about/birds/cranes">white cranes</a> of <a href="/places/Lancashire">Lancashire</a> drink surprising amounts of <a href="https://alpha.com/secure/about/drinks/coffee">coffee</a>.</p> </div>
+'''
+        self.assertSequenceEqual(normxml(expected1), normxml(actual1))
+
+        root2 = html.fromstring(htmlA)
+        relhyperlinks_full(root2, ['alpha.com', 'www.alpha.com'], ['http', 'https'])
+        actual2 = html.tostring(root2)
+        expected2 = '''
+<div>
+<ul>
+  <li><a href="/">Alpha home page</a></li>
+  <li><a href="/">Alt Alpha home page</a></li>
+  <li><a href="http://beta.com">Beta home page</a></li>
+</ul>
+
+<p>The beautiful <a href="/about/birds/cranes">white cranes</a> of <a href="/places/Lancashire">Lancashire</a> drink surprising amounts of <a href="/secure/about/drinks/coffee">coffee</a>.</p> </div>
+'''
+        self.assertSequenceEqual(normxml(expected2), normxml(actual2))
+        
