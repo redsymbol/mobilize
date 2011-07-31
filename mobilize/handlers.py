@@ -322,6 +322,12 @@ class Moplate(WebSourcer):
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(final_body))
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
+        
+        # convert type of final_body from type django.utils.safestring.SafeUnicode to network-friendly bytes
+        # (Someday if/when we are no longer always using Django templates, need to omit or move this conversion.)
+        assert 'SafeUnicode' == type(final_body).__name__, type(final_body).__name__
+        final_body = bytes(final_body, 'utf-8')
+        
         return final_body, final_resp_headers
 
 class ToDesktop(Handler):
