@@ -328,7 +328,8 @@ class Moplate(WebSourcer):
         from django.utils.safestring import SafeUnicode
         assert SafeUnicode == type(final_body), type(final_body).__name__
         final_body = bytes(final_body, 'utf-8')
-        
+
+        assert type(final_body) is bytes
         return final_body, final_resp_headers
 
 class ToDesktop(Handler):
