@@ -325,7 +325,8 @@ class Moplate(WebSourcer):
         
         # convert type of final_body from type django.utils.safestring.SafeUnicode to network-friendly bytes
         # (Someday if/when we are no longer always using Django templates, need to omit or move this conversion.)
-        assert 'SafeUnicode' == type(final_body).__name__, type(final_body).__name__
+        from django.utils.safestring import SafeUnicode
+        assert SafeUnicode == type(final_body), type(final_body).__name__
         final_body = bytes(final_body, 'utf-8')
         
         return final_body, final_resp_headers
