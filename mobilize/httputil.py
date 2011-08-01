@@ -22,7 +22,7 @@ def _name2field(name, prefix=''):
     field = '-'.join(part.capitalize() for part in parts)
     return field
 
-def _get_root_uri(environ):
+def _get_root_uri(environ, use_defined_fullsite=True):
     '''
     Get the root URI of the incoming request
 
@@ -38,15 +38,11 @@ def _get_root_uri(environ):
     @rtype  : str
     
     '''
-    portmap = {
-        'http'  : 80,
-        'https' : 443,
-        }
     proto = environ.get('wsgi.url_scheme', 'http')
     host, port = srchostport(environ)
     assert type(port) is int, type(port)
     uri = '%s://%s' % (proto, host)
-    stdport = portmap.get(proto, False)
+    stdport = PROTOMAP.get(proto, False)
     if stdport and port != stdport:
         uri += ':' + str(port)
     return uri
@@ -118,7 +114,7 @@ def mobilizeable(resp):
         is_mob = True
     return is_mob
 
-def srchostport(environ):
+def srchostport(environ, use_defined_fullsite=True):
     '''
     Calculate/choose source hostname and port
 
@@ -140,7 +136,8 @@ def srchostport(environ):
     @rtype       : tuple(str, int)
     
     '''
-    full_host = environ['MWU_OTHER_DOMAIN']
+    hostkey = 'MWU_OTHER_DOMAIN' if use_defined_fullsite else 'SERVER_NAME'
+    full_host = environ[hostkey]
     if ':' in full_host:
         full_host, full_port = full_host.split(':')
         full_port = int(full_port)
@@ -482,3 +479,17 @@ HTTP_STATUSES = dict((code, '{} {}'.format(code, message))
         301 : 'Moved Permanently',
         302 : 'Found',
         }.items())
+
+# Mapping of protocol port numbers to names
+PORTMAP = {
+    21  : 'ftp',
+    80  : 'http',
+    115 : 'sftp',
+    443 : 'https',
+    }
+
+# Mapping of protocol port names to numbers.  Just the inverse of PORTMAP
+PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
+
+assert set(PORTMAP.keys()) == set(PROTOMAP.values())
+assert set(PORTMAP.values()) == set(PROTOMAP.keys())

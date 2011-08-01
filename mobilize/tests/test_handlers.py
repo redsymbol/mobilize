@@ -76,6 +76,22 @@ class TestRedirect(unittest.TestCase):
             redirect_to,
             Redirect,
             )
+        testenviron = {
+            'wsgi.url_scheme'  : 'https',
+            'SERVER_PORT'      : '443',
+            'MWU_OTHER_DOMAIN' : 'www.example.com',
+            'SERVER_NAME' : 'www.example.com',
+            }
+        def mk_start_response(expected_status, expected_location):
+            def start_response(status, headers):
+                self.assertEqual(expected_status, status)
+                hdict = dict(headers)
+                assert 'Location' in hdict
+                self.assertEqual(expected_location, hdict['Location'])
+            return start_response
+        class FakeMsite:
+            def __init__(mobiledomain):
+                self.mobiledomain 
         handler = redirect_to('/foo/bar')
         self.assertTrue(isinstance(handler, Redirect), handler)
         self.assertEqual('302 Found', handler.status)
@@ -83,7 +99,10 @@ class TestRedirect(unittest.TestCase):
         handler = redirect_to('/foo/bar', 302)
         self.assertTrue(isinstance(handler, Redirect), handler)
         self.assertEqual('302 Found', handler.status)
+        sr = mk_start_response('302 Found', 'https://www.example.com/foo/bar')
+        handler.wsgi_response(None, testenviron, sr)
 
-        handler = redirect_to('/foo/bar', 301)
+        handler = redirect_to('http://mobilewebup.com/baz', 301)
         self.assertTrue(isinstance(handler, Redirect), handler)
         self.assertEqual('301 Moved Permanently', handler.status)
+

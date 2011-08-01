@@ -390,23 +390,36 @@ The request to {rel_uri} is forbidden as a security measure.'''.format(status=se
         return [message]
 
 class Redirect(Handler):
+    '''
+    General redirect handeler
+
+    destination is either 
+    '''
     status = None
-    destination = None
+    where = None
 
     def __init__(self, *a):
         assert self.status is not None, 'subclass must define self.status'
-        assert self.destination is not None, 'subclass must define self.destination'
+        assert self.where is not None, 'subclass must define self.where'
         super(Redirect, self).__init__(*a)
     
     def wsgi_response(self, msite, environ, start_response):
-        pass
+        from mobilize.httputil import _get_root_uri
+        location = _get_root_uri(environ) + self.where
+        start_response(self.status, [('Location', location)])
+        return ['<html><body><a href="{}">Go to page</a>'.format(location)]
 
-def redirect_to(where, status_code=302):
+def redirect_to(whereto, status_code=302):
     '''
     Returns a redirect handler for a specific url.
 
-    @param where       : URL to redirect to
-    @type  where       : str
+    whereto is either a relative URI, or can be a full absolute URI.
+    See the documentation of the where attribute of the Redirect class
+    for more information (whereto is basically copied to
+    Redirect.where).
+
+    @param whereto       : URL to redirect to
+    @type  whereto       : str
 
     @param status_code : Status code of response
     @type  status_code : int: 301 or 302
@@ -419,7 +432,7 @@ def redirect_to(where, status_code=302):
     assert status_code in {301, 302}, status_code
     class ThisRedirect(Redirect):
         status = HTTP_STATUSES[status_code]
-        destination = ''
+        where = whereto
     return ThisRedirect()
 
 # Standard/reusable handler instances
