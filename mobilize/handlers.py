@@ -404,8 +404,15 @@ class Redirect(Handler):
         super(Redirect, self).__init__(*a)
     
     def wsgi_response(self, msite, environ, start_response):
+        import re
         from mobilize.httputil import _get_root_uri
-        location = _get_root_uri(environ) + self.where
+        if re.match(r'\w+://', self.where):
+            # Has explicit protocol, so must be an absolute uri
+            location = self.where
+        else:
+            # Relative URI; construct relative URI from current request
+            # TODO: I think there may be bug here regarding the desktop vs. mobile domain.
+            location = _get_root_uri(environ, use_defined_fullsite=False) + self.where
         start_response(self.status, [('Location', location)])
         return ['<html><body><a href="{}">Go to page</a>'.format(location)]
 

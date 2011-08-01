@@ -79,7 +79,6 @@ class TestRedirect(unittest.TestCase):
         testenviron = {
             'wsgi.url_scheme'  : 'https',
             'SERVER_PORT'      : '443',
-            'MWU_OTHER_DOMAIN' : 'www.example.com',
             'SERVER_NAME' : 'www.example.com',
             }
         def mk_start_response(expected_status, expected_location):
@@ -105,4 +104,6 @@ class TestRedirect(unittest.TestCase):
         handler = redirect_to('http://mobilewebup.com/baz', 301)
         self.assertTrue(isinstance(handler, Redirect), handler)
         self.assertEqual('301 Moved Permanently', handler.status)
+        sr = mk_start_response('301 Moved Permanently', 'http://mobilewebup.com/baz')
+        handler.wsgi_response(None, testenviron, sr)
 

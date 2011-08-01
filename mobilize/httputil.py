@@ -39,7 +39,7 @@ def _get_root_uri(environ, use_defined_fullsite=True):
     
     '''
     proto = environ.get('wsgi.url_scheme', 'http')
-    host, port = srchostport(environ)
+    host, port = srchostport(environ, use_defined_fullsite)
     assert type(port) is int, type(port)
     uri = '%s://%s' % (proto, host)
     stdport = PROTOMAP.get(proto, False)
