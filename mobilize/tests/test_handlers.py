@@ -78,3 +78,4 @@ class TestRedirect(unittest.TestCase):
             )
         handler = redirect_to('/foo/bar')
         self.assertTrue(isinstance(handler, Redirect), handler)
+        self.assertEqual('302 Found', handler.status)

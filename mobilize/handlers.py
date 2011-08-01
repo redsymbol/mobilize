@@ -405,19 +405,20 @@ def redirect_to(where, status_code=302):
     '''
     Returns a redirect handler for a specific url.
 
-    @param where : URL to redirect to
-    @type  where : str
+    @param where       : URL to redirect to
+    @type  where       : str
 
     @param status_code : Status code of response
     @type  status_code : int: 301 or 302
 
-    @return : redirect handler
-    @rtype  : Redirect
+    @return            : redirect handler
+    @rtype             : Redirect
     
     '''
-    assert status_code in {301, 302}
+    from mobilize.httputil import HTTP_STATUSES
+    assert status_code in {302,}, status_code
     class ThisRedirect(Redirect):
-        status = ''
+        status = HTTP_STATUSES[status_code]
         destination = ''
     return ThisRedirect()
 

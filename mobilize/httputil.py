@@ -475,3 +475,8 @@ def mk_wsgi_application(msite):
             # TODO: Sometimes this will block, under conditions I haven't characterized yet.  Maybe when start_response is already invoked?
             return response(passthrough)
     return application
+
+# HTTP status codes, mapping numbers to the full string response
+HTTP_STATUSES = {
+    302 : '302 Found',
+    }
