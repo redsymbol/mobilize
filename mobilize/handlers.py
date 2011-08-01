@@ -416,17 +416,17 @@ class Redirect(Handler):
         start_response(self.status, [('Location', location)])
         return ['<html><body><a href="{}">Go to page</a>'.format(location)]
 
-def redirect_to(whereto, status_code=302):
+def redirect_to(where, status_code=302):
     '''
-    Returns a redirect handler for a specific url.
+    Returns a redirect handler for a specific url
 
-    whereto is either a relative URI, or can be a full absolute URI.
+    where is either a relative URI, or can be a full absolute URI.
     See the documentation of the where attribute of the Redirect class
-    for more information (whereto is basically copied to
+    for more information (where is basically copied to
     Redirect.where).
 
-    @param whereto       : URL to redirect to
-    @type  whereto       : str
+    @param where       : URL to redirect to - absolute, or relative
+    @type  where       : str
 
     @param status_code : Status code of response
     @type  status_code : int: 301 or 302
@@ -437,9 +437,10 @@ def redirect_to(whereto, status_code=302):
     '''
     from mobilize.httputil import HTTP_STATUSES
     assert status_code in {301, 302}, status_code
+    _where = where # Just to avoid a NameError in the subclass below
     class ThisRedirect(Redirect):
         status = HTTP_STATUSES[status_code]
-        where = whereto
+        where = _where
     return ThisRedirect()
 
 # Standard/reusable handler instances
