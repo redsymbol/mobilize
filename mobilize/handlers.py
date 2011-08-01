@@ -389,6 +389,38 @@ The request to {rel_uri} is forbidden as a security measure.'''.format(status=se
         start_response(self.status, [])
         return [message]
 
+class Redirect(Handler):
+    status = None
+    destination = None
+
+    def __init__(self, *a):
+        assert self.status is not None, 'subclass must define self.status'
+        assert self.destination is not None, 'subclass must define self.destination'
+        super(Redirect, self).__init__(*a)
+    
+    def wsgi_response(self, msite, environ, start_response):
+        pass
+
+def redirect_to(where, status_code=302):
+    '''
+    Returns a redirect handler for a specific url.
+
+    @param where : URL to redirect to
+    @type  where : str
+
+    @param status_code : Status code of response
+    @type  status_code : int: 301 or 302
+
+    @return : redirect handler
+    @rtype  : Redirect
+    
+    '''
+    assert status_code in {301, 302}
+    class ThisRedirect(Redirect):
+        status = ''
+        destination = ''
+    return ThisRedirect()
+
 # Standard/reusable handler instances
 todesktop = ToDesktop()
 passthrough = PassThrough()

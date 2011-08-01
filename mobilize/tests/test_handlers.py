@@ -69,3 +69,12 @@ class TestWebSourcer(unittest.TestCase):
             expected = td['rel_uri_out']
             actual = ws.source_rel_uri(td['rel_uri_in'])
             self.assertSequenceEqual(expected, actual, ii)
+
+class TestRedirect(unittest.TestCase):
+    def test_mk_redirect(self):
+        from mobilize.handlers import (
+            redirect_to,
+            Redirect,
+            )
+        handler = redirect_to('/foo/bar')
+        self.assertTrue(isinstance(handler, Redirect), handler)
