@@ -27,7 +27,7 @@ from .remove import (
     nobr,
     noevents,
     noimgsize,
-    noinputwidth,
+    noinputsize,
     nomiscattrib,
     nomiscattrib_if,
     omit,

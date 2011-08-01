@@ -193,21 +193,22 @@ def squeezebr(elem):
                 br_elem.drop_tree()
 
 @filterapi
-def noinputwidth(elem):
+def noinputsize(elem):
     '''
     strip the inline size attributes from textual form inputs
 
     This will remove the following attributes from the following tags:
 
      - SIZE from INPUT
-     - COLS from TEXTAREA
+     - COLS and ROWS from TEXTAREA
     '''
     for input_elem in elem.findall('.//input'):
         if 'size' in input_elem.attrib:
             del input_elem.attrib['size']
     for textarea_elem in elem.findall('.//textarea'):
-        if 'cols' in textarea_elem.attrib:
-            del textarea_elem.attrib['cols']
+        for attrib in {'cols', 'rows'}:
+            if attrib in textarea_elem.attrib:
+                del textarea_elem.attrib[attrib]
 
 @filterapi
 def nobr(elem, space=True):
