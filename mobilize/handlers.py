@@ -416,7 +416,7 @@ def redirect_to(where, status_code=302):
     
     '''
     from mobilize.httputil import HTTP_STATUSES
-    assert status_code in {302,}, status_code
+    assert status_code in {301, 302}, status_code
     class ThisRedirect(Redirect):
         status = HTTP_STATUSES[status_code]
         destination = ''

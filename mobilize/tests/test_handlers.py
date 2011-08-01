@@ -79,3 +79,11 @@ class TestRedirect(unittest.TestCase):
         handler = redirect_to('/foo/bar')
         self.assertTrue(isinstance(handler, Redirect), handler)
         self.assertEqual('302 Found', handler.status)
+
+        handler = redirect_to('/foo/bar', 302)
+        self.assertTrue(isinstance(handler, Redirect), handler)
+        self.assertEqual('302 Found', handler.status)
+
+        handler = redirect_to('/foo/bar', 301)
+        self.assertTrue(isinstance(handler, Redirect), handler)
+        self.assertEqual('301 Moved Permanently', handler.status)

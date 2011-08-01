@@ -477,6 +477,8 @@ def mk_wsgi_application(msite):
     return application
 
 # HTTP status codes, mapping numbers to the full string response
-HTTP_STATUSES = {
-    302 : '302 Found',
-    }
+HTTP_STATUSES = dict((code, '{} {}'.format(code, message))
+                     for code, message in {
+        301 : 'Moved Permanently',
+        302 : 'Found',
+        }.items())
