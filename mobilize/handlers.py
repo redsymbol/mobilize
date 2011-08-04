@@ -53,9 +53,12 @@ class WebSourcer(Handler):
         '''
         ctor
         
-        source defines the mapping between incoming request
-        URLs and the corresponding URL from the source, as
-        encapsulated by the source_uri method of this class.  See that
+        source defines the policy mapping between incoming request
+        URLs and the corresponding URL from the source.  Normally,
+        this is just going to be the default value of None, indicating
+        that the requested relative URI is the same as the relative
+        URI on the source.  Arbitrary alternatives are possible, as
+        encapsulated by the source_uri method of this class. See that
         method's documentation for more info.
 
         @param source : Specifies source URI mapping policy 
