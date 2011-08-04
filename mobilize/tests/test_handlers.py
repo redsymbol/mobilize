@@ -47,25 +47,25 @@ class TestWebSourcer(unittest.TestCase):
     def test_source_uri(self):
         from mobilize.handlers import WebSourcer
         testdata = [
-            {'source_uri_mapper' : None,
-             'rel_uri_in' : '/foo/bar',
+            {'source'      : None,
+             'rel_uri_in'  : '/foo/bar',
              'rel_uri_out' : '/foo/bar',
              },
-            {'source_uri_mapper' : '/baz',
-             'rel_uri_in' : '/foo/bar',
+            {'source'      : '/baz',
+             'rel_uri_in'  : '/foo/bar',
              'rel_uri_out' : '/baz',
              },
-            {'source_uri_mapper' : lambda u: u.replace('.php', '.html', 1),
-             'rel_uri_in' : '/foo.php',
+            {'source'      : lambda u: u.replace('.php', '.html', 1),
+             'rel_uri_in'  : '/foo.php',
              'rel_uri_out' : '/foo.html',
              },
-            {'source_uri_mapper' : lambda u: u,
-             'rel_uri_in' : '/foo/bar',
+            {'source'      : lambda u: u,
+             'rel_uri_in'  : '/foo/bar',
              'rel_uri_out' : '/foo/bar',
              },
             ]
         for ii, td in enumerate(testdata):
-            ws = WebSourcer(source_uri_mapper = td['source_uri_mapper'])
+            ws = WebSourcer(source = td['source'])
             expected = td['rel_uri_out']
             actual = ws.source_rel_uri(td['rel_uri_in'])
             self.assertSequenceEqual(expected, actual, ii)
