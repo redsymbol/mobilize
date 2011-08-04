@@ -136,6 +136,8 @@ class WebSourcer(Handler):
         if msite.verboselog:
             log.headers('modified request headers', reqinfo, request_headers)
         source_uri = reqinfo.root_uri + self.source_rel_uri(reqinfo.rel_uri)
+        if reqinfo.querystring:
+            source_uri += '?' + reqinfo.querystring
         resp, src_resp_bytes = http.request(source_uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         if msite.verboselog:
