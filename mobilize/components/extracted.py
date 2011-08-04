@@ -302,20 +302,25 @@ class GoogleAnalytics(Extracted):
 
     def _extract(self, source):
         '''
-        Current implementation is for older two-script-tag synchronous GA tracking
-        TODO: perceive modern single-script-tag, async GA tracking
-        TODO: any others we need to recognize?
+        TODO: any incarnations of GA we still need to recognize?
         '''
         elems = []
         for script_elem in source.iterfind('.//script'):
-            if script_elem.text is not None and script_elem.text.lstrip().startswith('var gaJsHost'):
-                next_elem = script_elem.getnext()
-                if next_elem is not None and 'script' == next_elem.tag:
-                    elems = [
-                        script_elem,
-                        next_elem,
-                        ]
-                    break
+            if len(elems) > 0:
+                break
+            if script_elem.text is not None:
+                scripttext = script_elem.text.lstrip()
+                if scripttext.startswith('var _gaq ='):
+                    # newer ga version
+                    elems = [script_elem]
+                elif scripttext.startswith('var gaJsHost'):
+                    # older ga version
+                    next_elem = script_elem.getnext()
+                    if next_elem is not None and 'script' == next_elem.tag:
+                        elems = [
+                            script_elem,
+                            next_elem,
+                            ]
         return elems
 
 class BigImage(XPath):

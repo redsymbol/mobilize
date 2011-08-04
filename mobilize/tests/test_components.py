@@ -107,7 +107,7 @@ class TestExtracted(unittest.TestCase):
 
     def test_GoogleAnalytics(self):
         from mobilize.components import GoogleAnalytics
-        # Check positive case, where we expect to find the GA tracking code
+        # Check positive case, where we expect to find the GA tracking code (older version)
         doc_str = open(data_file_path('whole-html', 'luxwny.html')).read()
         doc = html.fromstring(doc_str)
         ga = GoogleAnalytics()
@@ -128,6 +128,30 @@ pageTracker._trackPageview();
 ''')
         self.assertSequenceEqual(expected, actual)
 
+        # Check positive case, where we expect to find the GA tracking code (newer version)
+        doc_str = open(data_file_path('whole-html', 'msia.org.html')).read()
+        doc = html.fromstring(doc_str)
+        ga = GoogleAnalytics()
+        ga.extract(doc)
+        ga.process()
+        actual = normxml(ga.html())
+        expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga">
+<script type="text/javascript"> 
+
+  var _gaq = _gaq || []; 
+  _gaq.push(['_setAccount', 'UA-17055085-1']); 
+  _gaq.push(['_trackPageview']); 
+
+  (function() { 
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; 
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; 
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); 
+  })(); 
+</script>
+</div>
+''')
+        self.assertSequenceEqual(expected, actual)
+        
         # Check negative case where we expect to not find any code
         doc_str = open(data_file_path('whole-html', 'cnn.html')).read()
         doc = html.fromstring(doc_str)
