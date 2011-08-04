@@ -3,7 +3,7 @@ Mobilize logging facilities
 
 '''
 
-def mk_wsgi_log(environ):
+def wsgilog(environ):
     '''
     Create a webserver logging function for a wsgi environment
 
@@ -21,8 +21,7 @@ def mk_wsgi_log(environ):
     @type  environ : dict
     
     '''
-    logger = Logger(environ['wsgi.errors'])
-    return logger.log
+    return Logger(environ['wsgi.errors'])
     
 class Logger:
     '''
@@ -39,10 +38,25 @@ class Logger:
         '''
         self.outf = outf
 
-    def log(self, msg):
+    def msg(self, msg):
         '''
         Write a message
         '''
         if not msg.endswith('\n'):
             msg += '\n'
         self.outf.write(msg)
+
+    def headers(self, label, reqinfo, headers, **kw):
+        '''
+        Log http headers
+        '''
+        msg = '%s (%s %s): %s' % (
+            label,
+            reqinfo.method,
+            reqinfo.uri,
+            str(headers),
+            )
+        for k, v in kw.items():
+            msg += ', %s=%s' % (k, v)
+        self.msg(msg)
+

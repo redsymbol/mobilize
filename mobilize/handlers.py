@@ -122,34 +122,24 @@ class WebSourcer(Handler):
         return _html_fromstring(body)
     
     def wsgi_response(self, msite, environ, start_response):
+        from mobilize.log import wsgilog
+        log = wsgilog(environ)
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
-        def log_headers(label, headers, **kw):
-            from mobilize.log import mk_wsgi_log
-            log = mk_wsgi_log(environ)
-            msg = '%s (%s %s): %s' % (
-                label,
-                reqinfo.method,
-                reqinfo.uri,
-                str(headers),
-                )
-            for k, v in kw.items():
-                msg += ', %s=%s' % (k, v)
-            log(msg)
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
         request_overrides['X-MWU-Mobilize'] = '1'
         if msite.verboselog:
-            log_headers('NEW: raw request headers', list(reqinfo.iterrawheaders()))
+            log.headers('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders()))
         request_headers = reqinfo.headers(request_overrides)
         if msite.verboselog:
-            log_headers('modified request headers', request_headers)
+            log.headers('modified request headers', reqinfo, request_headers)
         source_uri = reqinfo.root_uri + self.source_rel_uri(reqinfo.rel_uri)
         resp, src_resp_bytes = http.request(source_uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         if msite.verboselog:
-            log_headers('raw response headers', resp, status=resp.status)
+            log.headers('raw response headers', reqinfo, resp, status=resp.status)
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
         # Note that for us to mobilize the response, both the request
@@ -162,7 +152,7 @@ class WebSourcer(Handler):
             final_body = src_resp_bytes
         final_resp_headers = _postprocess_response_headers(final_resp_headers, msite.sechooks())
         if msite.verboselog:
-            log_headers('final resp headers', final_resp_headers)
+            log.headers('final resp headers', reqinfo, final_resp_headers)
         start_response(status, final_resp_headers)
         return [final_body]
 
