@@ -63,6 +63,10 @@ class WebSourcer(Handler):
         
         
         '''
+        from mobilize.httputil import NewBaseUri
+        if type(source) is str:
+            source = NewBaseUri(source)
+        assert source is None or callable(source), source
         self._source = source
 
     def source_rel_uri(self, requested_uri):
@@ -82,13 +86,16 @@ class WebSourcer(Handler):
         requested_uri.  For many websites this simple case is all you
         need.
 
-        If source is a string, this is used as the value of
-        the relative URI in the source document, regardless of what
-        request_url's value is.  Typically this will be used for a handler
-        that is always routed from a specific URL.
-
-        If source is a callable, it must accept
-        requested_uri as an argument, and return a modified URL value.
+        Otherwise, source must be a SourceUriMapper instance (or quack
+        like one - see below).  As a special case
+        exception/convenience/shortcut, if source is a string, an
+        instance of NewBaseUri (with source as an argument) will be
+        used instead.
+        
+        Source must be a callable that accepts requested_uri as an
+        argument, and return a modified URL value. SourceUriMapper
+        objects meet this interface, though any callable that behaves
+        this way can be used instead.
 
         Note: all references to URLs in this description are meant to
         be relative URLs, not absolute.
@@ -103,11 +110,7 @@ class WebSourcer(Handler):
         
         url = requested_uri
         if self._source is not None:
-            if callable(self._source):
-                url = self._source(requested_uri)
-            else:
-                assert type(self._source) is str
-                url = self._source
+            url = self._source(requested_uri)
         return url
 
     def fromstring(self, body):

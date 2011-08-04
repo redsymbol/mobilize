@@ -494,17 +494,28 @@ PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
 assert set(PORTMAP.keys()) == set(PROTOMAP.values())
 assert set(PORTMAP.values()) == set(PROTOMAP.keys())
 
-class NewBaseUri:
+class SourceUriMapper:
     '''
-    Rewrite the base URI, preserving GET params
+    Base class for source URI remappings
 
-    This is useful when you don't want to just replace the incoming
-    uri with a different static value, because you want to keep any
-    GET parameters.
+    Instances must be callable, accepting requested_uri as an
+    argument, and returning the new value.
     
     Usable as the value of the source argument in the Moplate constructor.
     
     '''
+    def __call__(self, requested_uri):
+        '''
+        @param requested_uri : Incoming URI
+        @type  requested_uri : str
+
+        @return              : Source URI
+        @rtype               : str
+        
+        '''
+        assert False, 'subclass must implement'
+
+class RequestedUriModifier(SourceUriMapper):
     def __init__(self, new_rel_uri):
         '''
         @param new_rel_uri : New relative URI
@@ -513,6 +524,16 @@ class NewBaseUri:
         '''
         self.new_rel_uri = new_rel_uri
         
+    
+class NewBaseUri(RequestedUriModifier):
+    '''
+    Rewrite the base URI, preserving GET params
+
+    This is useful when you don't want to just replace the incoming
+    uri with a different static value, because you want to keep any
+    GET parameters.
+    
+    '''
     def __call__(self, requested_uri):
         '''
         @param requested_uri : Incoming URI
@@ -527,3 +548,10 @@ class NewBaseUri:
         if pos > -1:
             uri += requested_uri[pos:]
         return uri
+
+class ForceUri(RequestedUriModifier):
+    '''
+    Hard remaps to a new static source URI, discarding GET parameters
+    '''
+    def __call__(self, requested_uri):
+        return self.new_rel_uri
