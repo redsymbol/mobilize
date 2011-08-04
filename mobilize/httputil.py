@@ -493,3 +493,14 @@ PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
 
 assert set(PORTMAP.keys()) == set(PROTOMAP.values())
 assert set(PORTMAP.values()) == set(PROTOMAP.keys())
+
+class UriRewriter:
+    def __init__(self, new_rel_uri):
+        self.new_rel_uri = new_rel_uri
+        
+    def __call__(self, requested_uri):
+        uri = self.new_rel_uri
+        pos = requested_uri.find('?')
+        if pos > -1:
+            uri += requested_uri[pos:]
+        return uri

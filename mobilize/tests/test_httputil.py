@@ -629,3 +629,11 @@ class TestHttp(unittest.TestCase):
             self.assertTrue(mobilizeable(headers), ii)
         for ii, headers in enumerate(testdata_no):
             self.assertFalse(mobilizeable(headers), ii)
+
+    def test_UriRewriter(self):
+        from mobilize.httputil import UriRewriter
+        requested_uri = '/Event/browse?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
+        ur = UriRewriter('/Event/browseMobile')
+        expected = '/Event/browseMobile?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
+        actual = ur(requested_uri)
+        self.assertEqual(expected, actual)
