@@ -494,11 +494,34 @@ PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
 assert set(PORTMAP.keys()) == set(PROTOMAP.values())
 assert set(PORTMAP.values()) == set(PROTOMAP.keys())
 
-class UriRewriter:
+class NewBaseUri:
+    '''
+    Rewrite the base URI, preserving GET params
+
+    This is useful when you don't want to just replace the incoming
+    uri with a different static value, because you want to keep any
+    GET parameters.
+    
+    Usable as the value of the source argument in the Moplate constructor.
+    
+    '''
     def __init__(self, new_rel_uri):
+        '''
+        @param new_rel_uri : New relative URI
+        @type  new_rel_uri : str
+        
+        '''
         self.new_rel_uri = new_rel_uri
         
     def __call__(self, requested_uri):
+        '''
+        @param requested_uri : Incoming URI
+        @type  requested_uri : str
+
+        @return              : Source URI
+        @rtype               : str
+        
+        '''
         uri = self.new_rel_uri
         pos = requested_uri.find('?')
         if pos > -1:
