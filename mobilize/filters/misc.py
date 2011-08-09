@@ -1,3 +1,4 @@
+# Copyright 2010-2011 Mobile Web Up. All rights reserved.
 from .filterbase import filterapi
 _protocols = (
     'http',

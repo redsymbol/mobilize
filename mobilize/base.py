@@ -1,3 +1,4 @@
+# Copyright 2010-2011 Mobile Web Up. All rights reserved.
 import types
 import re
 from collections import OrderedDict

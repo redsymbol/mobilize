@@ -1,3 +1,4 @@
+# Copyright 2010-2011 Mobile Web Up. All rights reserved.
 import unittest
 from utils4test import data_file_path, normxml
 from mobilize.components import Extracted

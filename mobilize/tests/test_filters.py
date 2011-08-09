@@ -1,3 +1,4 @@
+# Copyright 2010-2011 Mobile Web Up. All rights reserved.
 from unittest import TestCase
 from mobilize.util import elem2str
 from lxml import html

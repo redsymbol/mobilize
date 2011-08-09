@@ -1,3 +1,4 @@
+# Copyright 2010-2011 Mobile Web Up. All rights reserved.
 #!/usr/bin/env python3
 import os
 from lxml import html
