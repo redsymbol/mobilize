@@ -239,7 +239,7 @@ class Moplate(WebSourcer):
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
 
-    def render(self, full_body, extra_params=None, site_filters=None):
+    def render(self, full_body, extra_params=None, site_filters=None, reqinfo=None):
         '''
         Render the moplate for a particular HTML document body
 
@@ -266,11 +266,13 @@ class Moplate(WebSourcer):
         if site_filters is None:
             site_filters = []
         all_filters = list(site_filters) + self.mk_moplate_filters(params)
-        for ii, component in enumerate(self.components):
+        components = [c for c in self.components
+                      if c.relevant(reqinfo)]
+        for ii, component in enumerate(components):
             if component.extracted:
                 component.extract(doc)
                 component.process(util.idname(ii), all_filters)
-        params['elements'] = [component.html() for component in self.components]
+        params['elements'] = [component.html() for component in components]
         return self._render(params)
 
     def _render(self, params):
@@ -314,7 +316,7 @@ class Moplate(WebSourcer):
             'request_path' : reqinfo.rel_uri,
             'todesktop'    : _todesktoplink(reqinfo.protocol, msite.fullsite, reqinfo.rel_uri),
             }
-        final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params))
+        final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params), reqinfo)
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(final_body))
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
