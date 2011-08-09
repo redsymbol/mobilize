@@ -198,7 +198,7 @@ class Extracted(Component):
                 self.elems[ii] = copy.deepcopy(elem)
         return self.elems
 
-    def process(self, default_idname=None, extra_filters=None):
+    def process(self, default_idname=None, extra_filters=None, reqinfo=None):
         '''
         Process the extracted element, before rendering as a string
 
@@ -231,10 +231,16 @@ class Extracted(Component):
         if extra_filters is None:
             extra_filters = []
         def applyfilters(elem):
-            for filt in self.filters:
-                filt(elem)
-            for filt in extra_filters:
-                filt(elem)
+            from itertools import chain
+            def relevant(filt):
+                _is_relevant = True
+                if hasattr(filt, 'relevant'):
+                    assert callable(filt.relevant), filt.relevant
+                    _is_relevant = filt.relevant(reqinfo)
+                return _is_relevant
+            for filt in chain(self.filters, extra_filters):
+                if relevant(filt):
+                    filt(elem)
         assert type(self.elems) is list, self.elems
         if self.idname is None:
             assert default_idname is not None, 'cannot determine an idname!'

@@ -33,6 +33,12 @@ class Component:
         True, the default, the component is included; on False, the
         component is left out of the rendering.
 
+        Note the component-rendering mechanism must support this
+        relevance check.  All such mechanisms in Mobilize are supposed
+        to; if you find a place that it doesn't, that is a bug.  Any
+        custom mechanism (e.g, a Handler not subclassing Moplate) will
+        need to explictly invoke relevant() and handle it correctly.
+
         @param reqinfo : Request info (for the current request)
         @type  reqinfo : mobilize.httputil.RequestInfo
 

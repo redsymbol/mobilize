@@ -272,7 +272,7 @@ class Moplate(WebSourcer):
         for ii, component in enumerate(components):
             if component.extracted:
                 component.extract(doc)
-                component.process(util.idname(ii), all_filters)
+                component.process(util.idname(ii), all_filters, reqinfo)
         params['elements'] = [component.html() for component in components]
         return self._render(params)
 
