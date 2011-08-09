@@ -1131,3 +1131,33 @@ here's some extra trailing text for you too
 '''
         self.assertSequenceEqual(normxml(expected2), normxml(actual2))
         
+    def test_relevant_filter(self):
+        '''
+        Tests for Filter.relevant
+        '''
+        from mobilize.filters import filterapi, Filter
+        from mobilize.components import CssPath
+        # test filters
+        # The three test filters t1, t2, and t3 mark a div with an attribute.
+        # Only t1 and t3 are meant to be relevant; t2 is not.
+        @filterapi
+        def tf1(elem):
+            elem.attrib['tf1'] = '1'
+        class TF2(Filter):
+            def __call__(self, elem):
+                elem.attrib['tf2'] = '2'
+            def relevant(self, reqinfo):
+                return False
+        tf2 = TF2()
+        class TF3(Filter):
+            def __call__(self, elem):
+                elem.attrib['tf3'] = '3'
+            def relevant(self, reqinfo):
+                return True
+        tf3 = TF3()
+        root = html.fromstring('<div id="foo">Hello.</div>')
+        component = CssPath('div#foo')
+        component.extract(root)
+        actual = component.process('idname', extra_filters=[tf1, tf2, tf3])
+        actual_str = html.tostring(actual).decode('utf-8')
+        self.assertSequenceEqual('<div class="mwu-elem" id="idname"><div id="foo" tf1="1" tf3="3">Hello.</div></div>', actual_str)
