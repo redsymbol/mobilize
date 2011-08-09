@@ -246,6 +246,7 @@ class RequestInfo:
       uri          : full request URI
 
     '''
+    _rawheaders = None
     def __init__(self, wsgienviron):
         '''
         ctor
@@ -287,7 +288,7 @@ class RequestInfo:
         from .headers import get_request_xform
         from .headers.request import request_additions
         headers = {}
-        for header, value in self.iterrawheaders():
+        for header, value in self.rawheaders().items():
             # We want to preserve the Camel-Casing of the header names
             # we're about to send, because who knows what web server
             # or gateway will randomly go crazy if we don't.  But for
@@ -313,6 +314,11 @@ class RequestInfo:
                 headerkey = header.lower()
                 headers[header] = xformer(self.wsgienviron, None)
         return headers
+
+    def rawheaders(self):
+        if self._rawheaders is None:
+            self._rawheaders = dict(self.iterrawheaders())
+        return self._rawheaders
 
     def iterrawheaders(self):
         '''

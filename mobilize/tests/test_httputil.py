@@ -638,3 +638,12 @@ class TestHttp(unittest.TestCase):
         expected = '/Event/browseMobile?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
         actual = ur(requested_uri)
         self.assertEqual(expected, actual)
+
+class TestRequestInfo(unittest.TestCase):
+    def test_rawheaders(self):
+        from mobilize.httputil import RequestInfo
+        reqinfo = RequestInfo(environ1)
+        rawheaders = reqinfo.rawheaders()
+        self.assertTrue(type(rawheaders) is dict, type(rawheaders))
+        self.assertSequenceEqual('Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.7) Gecko/20100710 Firefox/3.6.7', rawheaders['User-Agent'])
+        
