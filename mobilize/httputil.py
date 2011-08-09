@@ -474,14 +474,15 @@ def mk_wsgi_application(msite):
             return response(passthrough)
     return application
 
-# HTTP status codes, mapping numbers to the full string response
+#: HTTP status codes, mapping numbers (int's) to the full string response. e.g., HTTP_STATUSES[302] == '302 Found'
 HTTP_STATUSES = dict((code, '{} {}'.format(code, message))
                      for code, message in {
         301 : 'Moved Permanently',
         302 : 'Found',
+        403 : 'Forbidden',
         }.items())
 
-# Mapping of protocol port numbers to names
+#: Mapping of protocol port numbers (int) to names (str)
 PORTMAP = {
     21  : 'ftp',
     80  : 'http',
@@ -489,7 +490,7 @@ PORTMAP = {
     443 : 'https',
     }
 
-# Mapping of protocol port names to numbers.  Just the inverse of PORTMAP
+#: Mapping of protocol port names (str) to numbers (int).  Just the inverse of PORTMAP
 PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
 
 assert set(PORTMAP.keys()) == set(PROTOMAP.values())

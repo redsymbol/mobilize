@@ -343,7 +343,7 @@ class ToDesktop(Handler):
     '''
 
     #: HTTP response status
-    status = '302 FOUND'
+    status = httputil.HTTP_STATUSES[302]
     
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
@@ -358,7 +358,7 @@ class ToDesktopPermanent(ToDesktop):
     
     '''
     
-    status = '301 MOVED PERMANENTLY'
+    status = httputil.HTTP_STATUSES[301]
 
 class PassThrough(WebSourcer):
     '''
@@ -377,7 +377,7 @@ class SecurityBlock(Handler):
     context of a secure mobile web server, to prevent exploitation of
     a hole in the source/desktop site on the client's web server.
     '''
-    status = '403 Forbidden'
+    status = httputil.HTTP_STATUSES[403]
 
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
