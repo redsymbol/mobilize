@@ -238,7 +238,7 @@ def _link_converter(attribute, desktop_url):
     desktop_root_url = '%s://%s' % (parsed.scheme, parsed.netloc)
     base_url = urlbase(desktop_url)
     def convert(elem):
-        if attribute in elem.attrib:
+        if attribute in elem.attrib and '' != elem.attrib[attribute]:
             if is_desktop_relative(elem.attrib[attribute]):
                 if elem.attrib[attribute].startswith('/'):
                     elem.attrib[attribute] = desktop_root_url + elem.attrib[attribute]

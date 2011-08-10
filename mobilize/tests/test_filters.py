@@ -861,6 +861,7 @@ here's some extra trailing text for you too
 <img src="/fruitpics/strawberry.jpg" alt="berry good">
 <p>and then:
 <img src="standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+<img src="" alt="Pathological HTML!">
 </p>
 </div>'''
         html1_out = '''<div>
@@ -871,6 +872,7 @@ here's some extra trailing text for you too
 <img src="http://desktop.example.com/fruitpics/strawberry.jpg" alt="berry good">
 <p>and then:
 <img src="http://desktop.example.com/articles/standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+<img src="" alt="Pathological HTML!">
 </p>
 </div>'''
         desktop_url = 'http://desktop.example.com/articles/delicious.html'
@@ -886,11 +888,13 @@ here's some extra trailing text for you too
     <p><a href="marketstudy.xls">Market Study</a></p>
     <p><a href="/whitepapers/fill-in-blank.doc">Make your own white paper!</a></p>
     <p><a href="/whitepapers/widgets.pdf">Widget White Paper</a></p>
+    <p><a href="">HTML Pathology 101</a></p>
 </div>'''
         html_out ='''<div>
     <p><a href="http://example.com/about/marketstudy.xls">Market Study</a></p>
     <p><a href="/whitepapers/fill-in-blank.doc">Make your own white paper!</a></p>
     <p><a href="http://example.com/whitepapers/widgets.pdf">Widget White Paper</a></p>
+    <p><a href="">HTML Pathology 101</a></p>
 </div>'''
         desktop_url = 'http://example.com/about/papers.html'
         extensions=['.xls', '.pdf']
