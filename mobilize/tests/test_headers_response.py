@@ -15,8 +15,14 @@ class TestResponse(unittest.TestCase):
             {'in' : 'zed=1; Domain=foo.example.org',
              'out' : 'zed=1; Domain=.example.org',
              },
+            {'in' : 'zed=1; Domain=.example.org',
+             'out' : 'zed=1; Domain=.example.org',
+             },
             {'in' : 'zed=1; Domain=example.org',
              'out' : 'zed=1; Domain=example.org',
+             },
+            {'in' : 'zed=1; Domain=foo.baz.example.org',
+             'out' : 'zed=1; Domain=.example.org',
              },
             ]
         from mobilize.headers.response import set_cookie

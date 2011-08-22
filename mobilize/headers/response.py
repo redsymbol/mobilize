@@ -6,9 +6,10 @@ import re
 _set_cookie_re = re.compile(r'(?P<prefix>\bdomain\s*=\s*)(?P<domain>[^ ;]+)', re.I)
 def _set_cookie_repl(match):
     domain = match.group('domain')
-    pos = domain.find('.')
-    if pos > 1 and (domain.count('.') == 2):
-        domain = domain[pos:]
+    if not domain.startswith('.'):
+        parts = domain.split('.')
+        if len(parts) > 2:
+            domain = '.' + '.'.join(parts[-2:])
     return match.group('prefix') + domain
 
 def set_cookie(environ, value):
