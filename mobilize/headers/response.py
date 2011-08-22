@@ -13,6 +13,16 @@ def _set_cookie_repl(match):
     return match.group('prefix') + domain
 
 def set_cookie(environ, value):
+    '''
+    Modify the set-cookie value.
+
+    Currently, all this does is check the Domain: morsel, if it
+    exists.  If the value is specific to a subdomain
+    (e.g. "Domain=foo.example.com"), rewrite it to be
+    subdomain-agnostic ("Domain=.example.com").  This is so that
+    cookies set on www.example.com will work correctly on
+    m.example.com, etc.
+    '''
     return _set_cookie_re.sub(_set_cookie_repl, value, count=1)
 
 response_xforms = {
