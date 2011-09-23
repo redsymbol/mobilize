@@ -160,6 +160,7 @@ class WebSourcer(Handler):
         final_resp_headers = _postprocess_response_headers(final_resp_headers, msite.sechooks())
         if msite.verboselog:
             log.headers('final resp headers', reqinfo, final_resp_headers)
+        # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
         start_response(status, final_resp_headers)
         return [final_body]
 
