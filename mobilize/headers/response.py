@@ -26,5 +26,4 @@ def set_cookie(environ, value):
 
 response_xforms = {
     'location'   : location,
-    'set-cookie' : set_cookie,
     }
