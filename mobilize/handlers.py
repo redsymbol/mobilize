@@ -10,6 +10,7 @@ reusable (e.g., todesktop, which is an instance of ToDesktop)
 '''
 from . import util
 from . import httputil
+from django.utils.safestring import SafeUnicode
 
 class Handler:
     '''
@@ -262,6 +263,17 @@ class Moplate(WebSourcer):
         @rtype              : str
 
         '''
+        if '' == full_body:
+            rendered = SafeUnicode('')
+        else:
+            rendered = self._render_str(full_body, extra_params, site_filters, reqinfo)
+        return rendered
+    
+    def _render_str(self, full_body, extra_params, site_filters, reqinfo):
+        '''
+        Workhorse for render() method
+        '''
+        assert '' != full_body
         doc = self.fromstring(full_body)
         params = _rendering_params(doc, [self.params, extra_params])
         assert 'elements' not in params # Not yet anyway
@@ -325,7 +337,6 @@ class Moplate(WebSourcer):
         
         # convert type of final_body from type django.utils.safestring.SafeUnicode to network-friendly bytes
         # (Someday if/when we are no longer always using Django templates, need to omit or move this conversion.)
-        from django.utils.safestring import SafeUnicode
         assert SafeUnicode == type(final_body), type(final_body).__name__
         final_body = bytes(final_body, 'utf-8')
 
