@@ -30,6 +30,33 @@ class TestExtracted(unittest.TestCase):
             self.assertEqual(html.HtmlElement, type(component.elem))
             self.assertSequenceEqual(td['newelem_str'], elem2str(component.elem))
 
+    def test_keep_if(self):
+        from mobilize.components import CssPath
+        from lxml import html
+        html = html.fromstring('''<!doctype html>
+<html>
+<body>
+<div id="foo">
+  <a href="/beta">Read Beta</a>
+  <a href="/alpha">Download Alpha</a>
+  <a href="/gamma/">Experience Gamma</a>
+</div>
+</body>
+</html>
+''')
+        # verify default is to keep everything
+        component_all = CssPath('div#foo a')
+        extracted_all = component_all.extract(html)
+        self.assertEqual(3, len(extracted_all))
+
+        # keep only the "download" link
+        def pred(elem):
+            return 'download' in elem.text.lower()
+        component = CssPath('div#foo a', keep_if=pred)
+        extracted = component.extract(html)
+        self.assertEqual(1, len(extracted))
+        self.assertEqual('/alpha', extracted[0].attrib['href'])
+        
     def test_extract_csspath(self):
         from mobilize.components import CssPath
 

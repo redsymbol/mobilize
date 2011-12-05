@@ -27,6 +27,9 @@ class Extracted(Component):
     #: What becomes the processed element for the mobile page
     elem = None
 
+    #: Element selection predicate.  None means keep everything
+    keep_if = None
+
     def __init__(self,
                  selector,
                  filters=None,
@@ -40,6 +43,7 @@ class Extracted(Component):
                  usecopy=False,
                  tag='div',
                  innerhtml=False,
+                 keep_if=None,
                  ):
         '''
         ctor
@@ -109,6 +113,12 @@ class Extracted(Component):
         This only has an effect if there is exactly one matching
         element, otherwise the innerhtml=False behavior is forced.
 
+        keep_if is, if supplied, a function taking an HtmlElement
+        argument, and returning True or False.  The function is called
+        on every matching element; if False, the element is discarded
+        before proceeding.  All this happens before any filters are
+        applied.
+
         TODO: make FILT_COLLAPSED the default filtermode
 
         @param selector    : What part of the document to extract
@@ -144,6 +154,9 @@ class Extracted(Component):
         @param tag         : Name of containing tag
         @type  tag         : str
 
+        @param keep_if     : Selection predicate
+        @type  keep_if     : function: HtmlElement -> bool
+    
         @param innerhtml   : If true, select the matching element's content only
         @type  innerhtml   : bool
         
@@ -162,6 +175,7 @@ class Extracted(Component):
         self.usecopy = usecopy
         self.tag = tag
         self.innerhtml = innerhtml
+        self.keep_if = keep_if
 
     def _extract(self, source):
         '''
@@ -192,7 +206,12 @@ class Extracted(Component):
         @rtype        : lxml.html.HtmlElement
         
         '''
-        self.elems = self._extract(source)
+        if self.keep_if is None:
+            keepable = lambda elem: True
+        else:
+            keepable = self.keep_if
+        self.elems = [elem for elem in self._extract(source)
+                      if keepable(elem)]
         if self.usecopy:
             for ii, elem in enumerate(self.elems):
                 self.elems[ii] = copy.deepcopy(elem)
