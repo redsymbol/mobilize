@@ -12,8 +12,8 @@ doc-api:
 	mkdir -p $(API_DOC_DIR)
 	epydoc -v --output $(API_DOC_DIR) mobilize
 
-devpublish: clean
-	scp -P 2222 -pr mobilize default@localhost:/var/www/share/mobilize-libs/dev/
+locdevpublish: clean
+	locdevpublish.sh ./mobilize /var/www/share/mobilize-libs/dev/
 
 co:
 	rm -rf pack pack.tgz
