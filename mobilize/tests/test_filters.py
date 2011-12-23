@@ -1165,3 +1165,20 @@ here's some extra trailing text for you too
         actual = component.process('idname', extra_filters=[tf1, tf2, tf3])
         actual_str = html.tostring(actual).decode('utf-8')
         self.assertSequenceEqual('<div class="mwu-elem" id="idname"><div id="foo" tf1="1" tf3="3">Hello.</div></div>', actual_str)
+
+    def test_formaction(self):
+        from mobilize.filters import formaction
+        testdata = [
+            {'form_html_in'  : '''<div><form action="http://example.com/foo/" ><input type="text" name="bar"></form></div>''',
+             'form_html_out' : '''<div><form action="/foo/" ><input type="text" name="bar"></form></div>''',
+             },
+            {'form_html_in'  : '''<div><form action="/foo/" ><input type="text" name="bar"></form></div>''',
+             'form_html_out' : '''<div><form action="/foo/" ><input type="text" name="bar"></form></div>''',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            elem = html.fromstring(td['form_html_in'])
+            formaction(elem)
+            expected = normxml(td['form_html_out'])
+            actual = normxml(html.tostring(elem))
+            self.assertSequenceEqual(expected, actual)

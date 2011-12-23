@@ -252,6 +252,22 @@ def omitattrib_one(elem, toremove):
         if item in elem.attrib:
             del elem.attrib[item]
 
+@filterapi
+def formaction(elem):
+    '''
+    Modify FORM elements so that their action value is mobile-friendly
+
+    This mainly means: if the action URL is an absolute, full URL onto
+    the desktop site, change it into a relative url, so that it's
+    domain-independent.
+    
+    '''
+    import re
+    from mobilize.httputil import is_absolute_url
+    for form in elem.iterfind('.//form'):
+        if 'action' in form.attrib and is_absolute_url(form.attrib['action']):
+            form.attrib['action'] = re.sub(r'^\w+://[^/]+/', '/', form.attrib['action'], 1)
+        
 # Supporting code
 def applyall_if(root_elem, filt, predicate):
     '''

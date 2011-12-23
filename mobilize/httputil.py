@@ -563,3 +563,16 @@ class ForceUri(RequestedUriModifier):
     '''
     def __call__(self, requested_uri):
         return self.new_rel_uri
+
+def is_absolute_url(url):
+    protocols = {
+        'http',
+        'https',
+        'ftp',
+        }
+    is_abs = False
+    for protocol in protocols:
+        if url.startswith(protocol + '://'):
+            is_abs = True
+            break
+    return is_abs

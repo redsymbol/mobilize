@@ -37,6 +37,7 @@ from .remove import (
     omit,
     omitattrib_one,
     squeezebr,
+    formaction,
     )
 
 from .resize import (
