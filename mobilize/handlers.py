@@ -467,8 +467,6 @@ def _passthrough_response(body, resp):
 def _html_fromstring(body):
     '''
     Used by, for example, WebSourcer.fromstring.  Separated out here for easier testing
-
-    TODO: write these purported tests
     '''
     from lxml import html
     try:
@@ -476,9 +474,11 @@ def _html_fromstring(body):
     except ValueError:
         # Does this have an encoding declaration?
         dec_key = '<?xml'
-        if body[:len(dec_key)].lower() == dec_key:
+        if body[:128].lstrip()[:len(dec_key)].lower() == dec_key:
             # yes, it does!
-            body = body[body.find('\n'):]
+            enc_start = body.find('<?')
+            enc_end = body.find('\n', enc_start)
+            body = body[enc_end:]
             return html.fromstring(body)
         # No it doesn't, so let the error propagate
         raise

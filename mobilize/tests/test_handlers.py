@@ -1,7 +1,7 @@
 # Copyright 2010-2011 Mobile Web Up. All rights reserved.
 import unittest
 from lxml import html
-
+from utils4test import normxml
 
 class TestMoplate(unittest.TestCase):
     def test_render_empty(self):
@@ -118,4 +118,55 @@ class TestRedirect(unittest.TestCase):
         self.assertEqual('301 Moved Permanently', handler.status)
         sr = mk_start_response('301 Moved Permanently', 'http://mobilewebup.com/baz')
         handler.wsgi_response(None, testenviron, sr)
+
+
+class TestHandlers(unittest.TestCase):
+    def test__html_fromstring(self):
+        from mobilize.handlers import _html_fromstring
+        html_ref = '''<!doctype html>
+<html>
+  <head><title>Hey</title></head>
+  <body>
+    <h1>Test Page</h1>
+    <p>Have a nice day!</p>
+  </body>
+</html>'''
+        # With XML encoding
+        html_xml_encoding1 = '''<?xml version="1.0" encoding="UTF-8"?>
+<!doctype html>
+<html>
+  <head><title>Hey</title></head>
+  <body>
+    <h1>Test Page</h1>
+    <p>Have a nice day!</p>
+  </body>
+</html>'''
+
+        # With XML encoding, but with leading newline thrown in for good measure
+        html_xml_encoding2 = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<!doctype html>
+<html>
+  <head><title>Hey</title></head>
+  <body>
+    <h1>Test Page</h1>
+    <p>Have a nice day!</p>
+  </body>
+</html>'''
+
+        # simple case
+        expected_html = normxml(html_ref)
+        actual = _html_fromstring(html_ref)
+        actual_html = normxml(html.tostring(actual))
+        self.assertEqual(expected_html, actual_html)
+
+        # xml encodings
+        actual = _html_fromstring(html_xml_encoding1)
+        actual_html = normxml(html.tostring(actual))
+        self.assertEqual(expected_html, actual_html)
+
+        # xml encodings
+        actual = _html_fromstring(html_xml_encoding2)
+        actual_html = normxml(html.tostring(actual))
+        self.assertEqual(expected_html, actual_html)
 
