@@ -137,7 +137,6 @@ class WebSourcer(Handler):
             sechook.check_request(reqinfo)
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
-#        request_overrides['X-MWU-Mobilize'] = '1'
         if msite.verboselog:
             log.headers('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders()))
         request_headers = reqinfo.headers(request_overrides)
