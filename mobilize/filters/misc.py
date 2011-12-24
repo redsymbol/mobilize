@@ -200,6 +200,25 @@ def relhyperlinks(root_elem, domain, protocol='http'):
     '''
     return _relhyperlinks_prefixes(root_elem, {'{}://{}'.format(protocol, domain)})
 
+
+@filterapi
+def formaction(elem, urlprefix='/'):
+    '''
+    Modify FORM elements so that their action value is mobile-friendly
+
+    This mainly means: if the action URL is an absolute, full URL onto
+    the desktop site, change it to be prefixed by urlprefix.  By
+    default that's "/", making the link domain-independent.
+
+    Note that normally urlprefix should have a trailing slash.
+    
+    '''
+    import re
+    from mobilize.httputil import is_absolute_url
+    for form in elem.iterfind('.//form'):
+        if 'action' in form.attrib and is_absolute_url(form.attrib['action']):
+            form.attrib['action'] = re.sub(r'^\w+://[^/]+/', urlprefix, form.attrib['action'], 1)
+        
 # Supporting code
 
 def _link_converter(attribute, desktop_url):

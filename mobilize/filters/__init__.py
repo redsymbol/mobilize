@@ -37,7 +37,6 @@ from .remove import (
     omit,
     omitattrib_one,
     squeezebr,
-    formaction,
     )
 
 from .resize import (
@@ -59,6 +58,7 @@ from .misc import (
     formcontroltypes,
     relhyperlinks,
     relhyperlinks_full,
+    formaction,
     )
 
 DEFAULT_FILTERS = [

@@ -1175,10 +1175,17 @@ here's some extra trailing text for you too
             {'form_html_in'  : '''<div><form action="/foo/" ><input type="text" name="bar"></form></div>''',
              'form_html_out' : '''<div><form action="/foo/" ><input type="text" name="bar"></form></div>''',
              },
+            {'form_html_in'  : '''<div><form action="http://example.com/foo/" ><input type="text" name="bar"></form></div>''',
+             'urlprefix'     : 'https://mobilewebup.com/',
+             'form_html_out' : '''<div><form action="https://mobilewebup.com/foo/" ><input type="text" name="bar"></form></div>''',
+             },
             ]
         for ii, td in enumerate(testdata):
             elem = html.fromstring(td['form_html_in'])
-            formaction(elem)
+            if 'urlprefix' in td:
+                formaction(elem, td['urlprefix'])
+            else:
+                formaction(elem)
             expected = normxml(td['form_html_out'])
             actual = normxml(html.tostring(elem))
             self.assertSequenceEqual(expected, actual)
