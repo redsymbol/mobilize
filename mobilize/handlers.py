@@ -8,6 +8,7 @@ Also includes some standard instances that are generally useful and
 reusable (e.g., todesktop, which is an instance of ToDesktop)
 
 '''
+import re
 from . import util
 from . import httputil
 from django.utils.safestring import SafeUnicode
@@ -464,6 +465,7 @@ def _passthrough_response(body, resp):
     resp_headers = httputil.dict2list(resp)
     return body, resp_headers
 
+_HTML_FROMSTRING_ENCODING_RE = re.compile(r'^\s*<\?xml', re.I)
 def _html_fromstring(body):
     '''
     Used by, for example, WebSourcer.fromstring.  Separated out here for easier testing
@@ -473,8 +475,7 @@ def _html_fromstring(body):
         return html.fromstring(body)
     except ValueError:
         # Does this have an encoding declaration?
-        dec_key = '<?xml'
-        if body[:128].lstrip()[:len(dec_key)].lower() == dec_key:
+        if _HTML_FROMSTRING_ENCODING_RE.match(body):
             # yes, it does!
             enc_start = body.find('<?')
             enc_end = body.find('\n', enc_start)
