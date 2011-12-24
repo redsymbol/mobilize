@@ -123,6 +123,7 @@ class TestRedirect(unittest.TestCase):
 class TestHandlers(unittest.TestCase):
     def test__html_fromstring(self):
         from mobilize.handlers import _html_fromstring
+
         html_ref = '''<!doctype html>
 <html>
   <head><title>Hey</title></head>
@@ -131,30 +132,7 @@ class TestHandlers(unittest.TestCase):
     <p>Have a nice day!</p>
   </body>
 </html>'''
-
-        # with leading newlines
-        html_plain1 = '''
-
-
-<!doctype html>
-<html>
-  <head><title>Hey</title></head>
-  <body>
-    <h1>Test Page</h1>
-    <p>Have a nice day!</p>
-  </body>
-</html>'''
         
-        # no doctype
-        html_plain2 = '''<html>
-  <head><title>Hey</title></head>
-  <body>
-    <h1>Test Page</h1>
-    <p>Have a nice day!</p>
-  </body>
-</html>'''
-        
-        # With XML encoding
         html_xml_encoding1 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!doctype html>
 <html>
@@ -164,9 +142,37 @@ class TestHandlers(unittest.TestCase):
     <p>Have a nice day!</p>
   </body>
 </html>'''
+        
+        testdata = [
+        ('html_ref', html_ref),
+
+        # with leading newlines
+        ('html_plain1', '''
+
+
+<!doctype html>
+<html>
+  <head><title>Hey</title></head>
+  <body>
+    <h1>Test Page</h1>
+    <p>Have a nice day!</p>
+  </body>
+</html>'''),
+        
+        # no doctype
+        ('html_plain2', '''<html>
+  <head><title>Hey</title></head>
+  <body>
+    <h1>Test Page</h1>
+    <p>Have a nice day!</p>
+  </body>
+</html>'''),
+        
+        # With XML encoding
+        ('html_xml_encoding1', html_xml_encoding1),
 
         # With XML encoding, but with leading newline thrown in for good measure
-        html_xml_encoding2 = '''
+        ('html_xml_encoding2', '''
 <?xml version="1.0" encoding="UTF-8"?>
 <!doctype html>
 <html>
@@ -175,13 +181,13 @@ class TestHandlers(unittest.TestCase):
     <h1>Test Page</h1>
     <p>Have a nice day!</p>
   </body>
-</html>'''
+</html>'''),
 
         # With XML encoding, but with a truly disturbing number of leading newlines.  IT WILL HAPPEN
-        html_xml_encoding3 = '\n' * 1024 + html_xml_encoding1
+        ('html_xml_encoding3', '\n' * 1024 + html_xml_encoding1),
         
         # With XML encoding and generous newlines interspersed
-        html_xml_encoding4 = '''
+        ('html_xml_encoding4', '''
 
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -195,9 +201,9 @@ class TestHandlers(unittest.TestCase):
     <h1>Test Page</h1>
     <p>Have a nice day!</p>
   </body>
-</html>'''
+</html>'''),
         # mix case
-        html_xml_mixcase1 = '''<?XML version="1.0" encoding="UTF-8"?>
+        ('html_xml_mixcase1', '''<?XML version="1.0" encoding="UTF-8"?>
 <!doctype html>
 <html>
   <head><title>Hey</title></head>
@@ -205,9 +211,9 @@ class TestHandlers(unittest.TestCase):
     <h1>Test Page</h1>
     <p>Have a nice day!</p>
   </body>
-</html>'''
+</html>'''),
 
-        html_xml_mixcase2 = '''<?Xml version="1.0" encoding="UTF-8"?>
+        ('html_xml_mixcase2', '''<?Xml version="1.0" encoding="UTF-8"?>
 <!doctype html>
 <html>
   <head><title>Hey</title></head>
@@ -215,33 +221,12 @@ class TestHandlers(unittest.TestCase):
     <h1>Test Page</h1>
     <p>Have a nice day!</p>
   </body>
-</html>'''
-
-        testcases = [
-            html_ref,
-            html_plain1,
-            html_plain2,
-            html_xml_encoding1,
-            html_xml_encoding2,
-            html_xml_encoding3,
-            html_xml_encoding4,
-            html_xml_mixcase1,
-            html_xml_mixcase2,
-            ]
-
+</html>'''),
+        ]
+        
         expected_html = normxml(html_ref)
-
-        for ii, html_input in enumerate(testcases):
+        for ii, td in enumerate(testdata):
+            label, html_input = td
             actual = _html_fromstring(html_input)
             actual_html = normxml(html.tostring(actual))
-            self.assertEqual(expected_html, actual_html, ii)
-
-        actual = _html_fromstring(html_xml_encoding1)
-        actual_html = normxml(html.tostring(actual))
-        self.assertEqual(expected_html, actual_html)
-
-        # xml encodings
-        actual = _html_fromstring(html_xml_encoding2)
-        actual_html = normxml(html.tostring(actual))
-        self.assertEqual(expected_html, actual_html)
-
+            self.assertEqual(expected_html, actual_html, '{} [{}]'.format(label, ii))
