@@ -16,6 +16,22 @@ class Domains:
     def __init__(self, desktop, mobile):
         self.desktop = desktop
         self.mobile = mobile
+
+    @classmethod
+    def from_defs(cls, defs):
+        '''
+        Attempt to create a Domains instance from the site's defs module
+
+        @param defs : definitions module
+        @type  defs : module
+
+        @return     : domains instance
+        @rtype      : Domains
+        
+        '''
+        domains = cls(desktop = defs.DESKTOP_DOMAIN,
+                      mobile = defs.MOBILE_DOMAIN)
+        return domains
         
 class MobileSite:
     '''
