@@ -13,9 +13,11 @@ class Domains:
     Represents the various domains involved in mobilization
     '''
 
-    def __init__(self, desktop, mobile):
+    def __init__(self, desktop, mobile, production_http_desktop=None, production_https_desktop=None):
         self.desktop = desktop
         self.mobile = mobile
+        self.production_http_desktop = production_http_desktop
+        self.production_https_desktop = production_https_desktop
 
     @classmethod
     def from_defs(cls, defs):
@@ -31,6 +33,10 @@ class Domains:
         '''
         domains = cls(desktop = defs.DESKTOP_DOMAIN,
                       mobile = defs.MOBILE_DOMAIN)
+        if hasattr(defs, 'PRODUCTION_HTTP_DESKTOP_DOMAIN'):
+            domains.production_http_desktop = defs.PRODUCTION_HTTP_DESKTOP_DOMAIN
+        if hasattr(defs, 'PRODUCTION_HTTPS_DESKTOP_DOMAIN'):
+            domains.production_https_desktop = defs.PRODUCTION_HTTPS_DESKTOP_DOMAIN
         return domains
         
 class MobileSite:

@@ -565,7 +565,7 @@ def postprocess_response_headers(msite, headers, status):
         if 'location' == header:
             # rewrite domain on redirect
             if status in {301, 302}:
-                value = value.replace(msite.domains.desktop, msite.domains.mobile, 1)
+                value = _new_location(value, msite.domains)
             # Development hook
             if re.match(r'http://[^/]*:2443/', value):
                 value = value.replace(':2443/', ':2280/')
@@ -577,3 +577,34 @@ def postprocess_response_headers(msite, headers, status):
         modified = hook.response(modified)
     return modified
 
+def _new_location(location, domains):
+    '''
+    Calculate the new value of the Location: response header
+
+    @param location : Unmodified value of Location: header
+    @type  location : str
+
+    @param domains  : The mobile site's Domains object
+    @type  domains  : mobilize.base.Domains
+    
+    @return         : altered location
+    @rtype          : str
+    
+    '''
+    from urllib.parse import urlsplit
+    scheme = urlsplit(location)[0]
+    if scheme not in {'http', 'https'}:
+        # Only know how to deal with http and https
+        return location
+    
+    new_domain = domains.mobile
+    if 'http' == scheme:
+        production_desktop = domains.production_http_desktop
+    else:
+        production_desktop = domains.production_https_desktop
+    if production_desktop:
+        old_domain = production_desktop
+    else:
+        old_domain = domains.desktop
+    location = location.replace(old_domain, new_domain, 1)
+    return location

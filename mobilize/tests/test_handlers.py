@@ -266,3 +266,26 @@ class TestHandlers(unittest.TestCase):
         self.assertEqual('http://m.example.com/path/to/file', location_values[0])
 
 
+    def test__new_location(self):
+        from mobilize.handlers import _new_location
+        from mobilize.base import Domains
+        # basic case
+        domains = Domains('www.example.com', 'm.example.com')
+        location = 'http://www.example.com/something'
+        expected = 'http://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
+        # production overrides
+        domains = Domains('www.example.com', 'm.example.com', production_http_desktop='www.mobilewebup.com')
+        location = 'http://www.mobilewebup.com/something'
+        expected = 'http://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
+        # https
+        domains = Domains('www.example.com', 'm.example.com', production_https_desktop='www.mobilewebup.com')
+        location = 'https://www.mobilewebup.com/something'
+        expected = 'https://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
