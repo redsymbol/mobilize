@@ -289,3 +289,10 @@ class TestHandlers(unittest.TestCase):
         expected = 'https://m.example.com/something'
         actual = _new_location(location, domains)
         self.assertSequenceEqual(expected, actual)
+
+        # https w/ development overrides
+        domains = Domains('www.example.com', 'm.example.com', https_mobile = 'secure-mobile.example.com', production_https_desktop='www.mobilewebup.com')
+        location = 'https://www.mobilewebup.com/something'
+        expected = 'https://secure-mobile.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)

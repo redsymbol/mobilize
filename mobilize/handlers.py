@@ -602,6 +602,7 @@ def _new_location(location, domains):
         production_desktop = domains.production_http_desktop
     else:
         production_desktop = domains.production_https_desktop
+        new_domain = domains.https_mobile
     if production_desktop:
         old_domain = production_desktop
     else:
