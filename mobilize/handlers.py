@@ -159,7 +159,7 @@ class WebSourcer(Handler):
             # TODO: must apply response overrides, at least for 301/302 redirs for one specific client
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
-        final_resp_headers = postprocess_response_headers(msite, final_resp_headers, resp.status)
+        final_resp_headers = msite.postprocess_response_headers(final_resp_headers, resp.status)
         if msite.verboselog:
             log.headers('final resp headers', reqinfo, final_resp_headers)
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
@@ -544,68 +544,3 @@ def _rendering_params(doc, paramdictlist):
         if param not in params:
             params[param] = finder()
     return params
-
-def postprocess_response_headers(msite, headers, status):
-    '''
-    Apply any final universal postprocessing to response headers
-    '''
-    from mobilize.util import isscalar
-    removed = (
-        'transfer-encoding', # What's returned to the client is not actually chunked.
-        )
-    def expand(items):
-        for k, v in items:
-            if isscalar(v):
-                yield k, v
-            else:
-                for _v in v:
-                    yield k, _v
-    def modify(header, value):
-        import re
-        if 'location' == header:
-            # rewrite domain on redirect
-            if status in {301, 302}:
-                value = _new_location(value, msite.domains)
-            # Development hook
-            if re.match(r'http://[^/]*:2443/', value):
-                value = value.replace(':2443/', ':2280/')
-        return (header, value)
-    modified = [modify(header, value)
-                for header, value in expand(headers)
-                if header not in removed]
-    for hook in msite.sechooks():
-        modified = hook.response(modified)
-    return modified
-
-def _new_location(location, domains):
-    '''
-    Calculate the new value of the Location: response header
-
-    @param location : Unmodified value of Location: header
-    @type  location : str
-
-    @param domains  : The mobile site's Domains object
-    @type  domains  : mobilize.base.Domains
-    
-    @return         : altered location
-    @rtype          : str
-    
-    '''
-    from urllib.parse import urlsplit
-    scheme = urlsplit(location)[0]
-    if scheme not in {'http', 'https'}:
-        # Only know how to deal with http and https
-        return location
-    
-    new_domain = domains.mobile
-    if 'http' == scheme:
-        production_desktop = domains.production_http_desktop
-    else:
-        production_desktop = domains.production_https_desktop
-        new_domain = domains.https_mobile
-    if production_desktop:
-        old_domain = production_desktop
-    else:
-        old_domain = domains.desktop
-    location = location.replace(old_domain, new_domain, 1)
-    return location

@@ -205,6 +205,73 @@ class TestMobileSite(unittest.TestCase):
         actual = moplate.render(full_body, params)
         self.assertSequenceEqual(norm_html(expected), norm_html(actual))
         
+    def test_postprocess_response_headers(self):
+        '''test that we rewrite the Location: header on 301 or 302 redirect, that we drop the transfer-encoding header, and other postprocessing of headers for all content (not just that which is mobilizeable'''
+        from mobilize.base import MobileSite, Domains
+        domains = Domains(mobile='m.example.com', desktop='www.example.com')
+        msite = MobileSite(domains, [])
+
+        # drop transfer-encoding header
+        headers = [
+            ('transfer-encoding' , 'chunked'),
+            ('host'              , 'www.example.com'),
+            ]
+        modified = msite.postprocess_response_headers(headers, 200)
+        modified_keys = set(k for k, v in modified)
+        self.assertTrue('transfer-encoding' not in modified_keys)
+
+        # rewrite location on 301
+        headers = [
+            ('host'     , 'www.example.com'),
+            ('location' , 'http://www.example.com/path/to/file'),
+            ]
+        modified = msite.postprocess_response_headers(headers, 301)
+        location_values = list(v for k, v in modified if 'location' == k)
+        # Should just find one match...
+        assert len(location_values) == 1, len(location_values)
+        self.assertEqual('http://m.example.com/path/to/file', location_values[0])
+                        
+        # same for 302
+        modified = msite.postprocess_response_headers(headers, 302)
+        location_values = list(v for k, v in modified if 'location' == k)
+        # Should just find one match...
+        assert len(location_values) == 1, len(location_values)
+        self.assertEqual('http://m.example.com/path/to/file', location_values[0])
+
+
+    def test__new_location(self):
+        from mobilize.base import (
+            Domains,
+            _new_location,
+            )
+        # basic case
+        domains = Domains('m.example.com', 'www.example.com')
+        location = 'http://www.example.com/something'
+        expected = 'http://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
+        # production overrides
+        domains = Domains('m.example.com', 'www.example.com',  production_http_desktop='www.mobilewebup.com')
+        location = 'http://www.mobilewebup.com/something'
+        expected = 'http://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
+        # https
+        domains = Domains('m.example.com', 'www.example.com', production_https_desktop='www.mobilewebup.com')
+        location = 'https://www.mobilewebup.com/something'
+        expected = 'https://m.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
+        # https w/ development overrides
+        domains = Domains('m.example.com', 'www.example.com', https_mobile = 'secure-mobile.example.com', production_https_desktop='www.mobilewebup.com')
+        location = 'https://www.mobilewebup.com/something'
+        expected = 'https://secure-mobile.example.com/something'
+        actual = _new_location(location, domains)
+        self.assertSequenceEqual(expected, actual)
+
 class TestUtil(unittest.TestCase):
     def test_mobilizeable(self):
         '''tests for mobilize.httputil.mobilizeable'''
