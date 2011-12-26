@@ -14,8 +14,8 @@ class Domains:
     '''
 
     def __init__(self,
-                 desktop,
                  mobile,
+                 desktop,
                  production_http_desktop=None,
                  production_https_desktop=None,
                  https_mobile=None,
@@ -44,8 +44,7 @@ class Domains:
         @rtype      : Domains
         
         '''
-        domains = cls(desktop = defs.DESKTOP_DOMAIN,
-                      mobile = defs.MOBILE_DOMAIN)
+        domains = cls(mobile = defs.MOBILE_DOMAIN, desktop = defs.DESKTOP_DOMAIN)
         if hasattr(defs, 'PRODUCTION_HTTP_DESKTOP_DOMAIN'):
             domains.production_http_desktop = defs.PRODUCTION_HTTP_DESKTOP_DOMAIN
         if hasattr(defs, 'PRODUCTION_HTTPS_DESKTOP_DOMAIN'):

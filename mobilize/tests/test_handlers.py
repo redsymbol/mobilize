@@ -235,7 +235,7 @@ class TestHandlers(unittest.TestCase):
         '''test that we rewrite the Location: header on 301 or 302 redirect, that we drop the transfer-encoding header, and other postprocessing of headers for all content (not just that which is mobilizeable'''
         from mobilize.handlers import postprocess_response_headers
         from mobilize.base import MobileSite, Domains
-        domains = Domains(desktop='www.example.com', mobile='m.example.com')
+        domains = Domains(mobile='m.example.com', desktop='www.example.com')
         msite = MobileSite(domains, [])
 
         # drop transfer-encoding header
@@ -270,28 +270,28 @@ class TestHandlers(unittest.TestCase):
         from mobilize.handlers import _new_location
         from mobilize.base import Domains
         # basic case
-        domains = Domains('www.example.com', 'm.example.com')
+        domains = Domains('m.example.com', 'www.example.com')
         location = 'http://www.example.com/something'
         expected = 'http://m.example.com/something'
         actual = _new_location(location, domains)
         self.assertSequenceEqual(expected, actual)
 
         # production overrides
-        domains = Domains('www.example.com', 'm.example.com', production_http_desktop='www.mobilewebup.com')
+        domains = Domains('m.example.com', 'www.example.com',  production_http_desktop='www.mobilewebup.com')
         location = 'http://www.mobilewebup.com/something'
         expected = 'http://m.example.com/something'
         actual = _new_location(location, domains)
         self.assertSequenceEqual(expected, actual)
 
         # https
-        domains = Domains('www.example.com', 'm.example.com', production_https_desktop='www.mobilewebup.com')
+        domains = Domains('m.example.com', 'www.example.com', production_https_desktop='www.mobilewebup.com')
         location = 'https://www.mobilewebup.com/something'
         expected = 'https://m.example.com/something'
         actual = _new_location(location, domains)
         self.assertSequenceEqual(expected, actual)
 
         # https w/ development overrides
-        domains = Domains('www.example.com', 'm.example.com', https_mobile = 'secure-mobile.example.com', production_https_desktop='www.mobilewebup.com')
+        domains = Domains('m.example.com', 'www.example.com', https_mobile = 'secure-mobile.example.com', production_https_desktop='www.mobilewebup.com')
         location = 'https://www.mobilewebup.com/something'
         expected = 'https://secure-mobile.example.com/something'
         actual = _new_location(location, domains)
