@@ -19,4 +19,5 @@ from .handlers import (
 __all__ = [
     'MobileSite',
     'DjangoMoplate',
+    'Domains',
     ]

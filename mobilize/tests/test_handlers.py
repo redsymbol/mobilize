@@ -230,3 +230,39 @@ class TestHandlers(unittest.TestCase):
             actual = _html_fromstring(html_input)
             actual_html = normxml(html.tostring(actual))
             self.assertEqual(expected_html, actual_html, '{} [{}]'.format(label, ii))
+
+    def test_postprocess_response_headers(self):
+        '''test that we rewrite the Location: header on 301 or 302 redirect, that we drop the transfer-encoding header, and other postprocessing of headers for all content (not just that which is mobilizeable'''
+        from mobilize.handlers import postprocess_response_headers
+        from mobilize.base import MobileSite, Domains
+        domains = Domains(desktop='www.example.com', mobile='m.example.com')
+        msite = MobileSite(domains, [])
+
+        # drop transfer-encoding header
+        headers = [
+            ('transfer-encoding' , 'chunked'),
+            ('host'              , 'www.example.com'),
+            ]
+        modified = postprocess_response_headers(msite, headers, 200)
+        modified_keys = set(k for k, v in modified)
+        self.assertTrue('transfer-encoding' not in modified_keys)
+
+        # rewrite location on 301
+        headers = [
+            ('host'     , 'www.example.com'),
+            ('location' , 'http://www.example.com/path/to/file'),
+            ]
+        modified = postprocess_response_headers(msite, headers, 301)
+        location_values = list(v for k, v in modified if 'location' == k)
+        # Should just find one match...
+        assert len(location_values) == 1, len(location_values)
+        self.assertEqual('http://m.example.com/path/to/file', location_values[0])
+                        
+        # same for 302
+        modified = postprocess_response_headers(msite, headers, 302)
+        location_values = list(v for k, v in modified if 'location' == k)
+        # Should just find one match...
+        assert len(location_values) == 1, len(location_values)
+        self.assertEqual('http://m.example.com/path/to/file', location_values[0])
+
+

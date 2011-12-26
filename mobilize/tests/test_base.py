@@ -198,7 +198,8 @@ class TestMobileSite(unittest.TestCase):
             }
         moplate = DjangoMoplate('one.html', components, params)
         tmap = mobilize.HandlerMap([('/foo$', moplate)])
-        msite = mobilize.MobileSite('example.com', tmap)
+        domains = mobilize.Domains(desktop='example.com', mobile='m.example.com')
+        msite = mobilize.MobileSite(domains, tmap)
 
         expected = mobile_body
         actual = moplate.render(full_body, params)

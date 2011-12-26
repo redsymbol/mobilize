@@ -156,9 +156,10 @@ class WebSourcer(Handler):
             src_resp_body = httputil.netbytes2str(src_resp_bytes, charset)
             final_body, final_resp_headers = self._final_wsgi_response(environ, msite, reqinfo, resp, src_resp_body)
         else:
+            # TODO: must apply response overrides, at least for 301/302 redirs for one specific client
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
-        final_resp_headers = _postprocess_response_headers(final_resp_headers, msite.sechooks())
+        final_resp_headers = postprocess_response_headers(msite, final_resp_headers, resp.status)
         if msite.verboselog:
             log.headers('final resp headers', reqinfo, final_resp_headers)
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
@@ -544,7 +545,10 @@ def _rendering_params(doc, paramdictlist):
             params[param] = finder()
     return params
 
-def _postprocess_response_headers(headers, hooks):
+def postprocess_response_headers(msite, headers, status):
+    '''
+    Apply any final universal postprocessing to response headers
+    '''
     from mobilize.util import isscalar
     removed = (
         'transfer-encoding', # What's returned to the client is not actually chunked.
@@ -559,6 +563,9 @@ def _postprocess_response_headers(headers, hooks):
     def modify(header, value):
         import re
         if 'location' == header:
+            # rewrite domain on redirect
+            if status in {301, 302}:
+                value = value.replace(msite.domains.desktop, msite.domains.mobile, 1)
             # Development hook
             if re.match(r'http://[^/]*:2443/', value):
                 value = value.replace(':2443/', ':2280/')
@@ -566,7 +573,7 @@ def _postprocess_response_headers(headers, hooks):
     modified = [modify(header, value)
                 for header, value in expand(headers)
                 if header not in removed]
-    for hook in hooks:
+    for hook in msite.sechooks():
         modified = hook.response(modified)
     return modified
 

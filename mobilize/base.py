@@ -8,6 +8,15 @@ from mobilize import (
     filters,
     )
 
+class Domains:
+    '''
+    Represents the various domains involved in mobilization
+    '''
+
+    def __init__(self, desktop, mobile):
+        self.desktop = desktop
+        self.mobile = mobile
+        
 class MobileSite:
     '''
     Represents a mobile website
@@ -23,18 +32,19 @@ class MobileSite:
     #: Signals whether this is a production environment, or we're in development mode
     is_production = False
     
-    def __init__(self, fullsite, handler_map):
+    def __init__(self, domains, handler_map):
         '''
         ctor
         
-        @param fullsite     : domain of corresponding full (desktop) website
-        @type  fullsite     : str
+        @param domains     : Domains instance specifying domains for desktop, mobile, etc.
+        @type  domains     : str
 
         @param handler_map : Handler/moplate mapping
         @type  handler_map : HandlerMap
         
         '''
-        self.fullsite = fullsite
+        self.domains = domains
+        self.fullsite = domains.desktop
         self.handler_map = handler_map
 
     def mk_site_filters(self, params):
@@ -85,7 +95,7 @@ class MobileSite:
 
     def response_overrides(self, wsgienviron):
         '''
-        Site-specific HTTP response overrides
+        Site-specific HTTP response overrides for mobilizeable content
 
         Overriding this method allows custom overrides to the mobile
         site response headers under particular conditions.  This
@@ -93,6 +103,11 @@ class MobileSite:
         pairs.  The keys are lowercased HTTP response header names.
         The values are overrides; see
         mobilize.httputil.get_response_headers for documentation.
+
+        These overrides are only applied to responses that are
+        mobilizeable, in the sense of mobilize.httputil.mobilizeable.
+        Use universal_response_overrides for overrides that must
+        always be applied.
 
         @param wsgienviron : WSGI environment for this request/response cycle
         @type  wsgienviron : dict
@@ -103,6 +118,26 @@ class MobileSite:
         '''
         return {}
 
+    def universal_response_overrides(self, wsgienviron):
+        '''
+        Site-specific HTTP response overrides applied to all response types
+
+        This is much like response_overrides, except that it is
+        applied to all responses from the source webserver - not just
+        for "mobilizeable" responses.  An example use case is in the
+        case of 301 or 302 redirects, where you need to alter the
+        value of the Location: response header to point to the mobile
+        domain.
+
+        @param wsgienviron : WSGI environment for this request/response cycle
+        @type  wsgienviron : dict
+
+        @return : Overrides
+        @rtype  : dict
+        
+        '''
+        return {}
+    
     def get_http(self):
         '''
         Get the Http object used for making source requests
