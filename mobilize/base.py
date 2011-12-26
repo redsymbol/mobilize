@@ -11,15 +11,90 @@ from mobilize import (
 class Domains:
     '''
     Represents the various domains involved in mobilization
+
+    This encapsulates reasoning on the different domain names involved
+    in the client's web presence - desktop, mobile and everything in
+    between.
+
+    In general, there will be four canonical domains for a client's site:
+      - the HTTP desktop (www.example.com)
+      - the HTTPS desktop (secure.example.com)
+      - the HTTP mobile (m.example.com)
+      - the HTTPS mobile (m.secure.example.com)
+
+    In many cases, the HTTPS and HTTP domains will be the same, so
+    there are only two (www.example.com and m.example.com).  And of
+    course for non-ecommerce sites, only the HTTP domains are needed,
+    so again two.  At the other extreme, there may more (e.g. if there
+    are desktop, tablet and mobile versions).
+
+    For now, let's assume there are four domains to balance.
+
+    Within these four, we have to make additional distinctions.  The
+    best use case is in dealing with 301 and 302 redirects that send
+    the Location: header during development.  In development, you'll
+    need to use alternate domains (such as example.mwuclient.com:2280
+    and example.mwuclient.com:2443 for the regular and secure mobile
+    sites, respectively).  And if you hit a 301 that sends a
+    "Location: http://example.com/foo/bar" header, you want Mobilize
+    to recognize that and replace it with "Location:
+    http://example.mwuclient.com:2280/foo/bar" - but only during
+    development.
+
+    The Domains instance manages the info needed to make all this
+    happen.  Different parts of Mobilize use it whenever they need to
+    calculate based on what the different domains are.
+
+    The only values you need to supply to the constructor are mobile
+    and desktop.  For simple regular and ecommerce websites, the
+    Domains ctor will be able to correctly guess at the other values.
+
+    In practice when configuring real mobilize sites, you'll want to
+    often use the from_defs class method.
+
+    The Domains object will have str-valued attributes representing
+    all the distinctions Mobilize may need.  These are exactly the
+    same as the arguments to the constructor (not repeating here so
+    the two lists won't get out of sync).  You can always access any
+    of these properties; in simple cases they will just have the same
+    value as either the mobile or desktop domain.
+
     '''
 
     def __init__(self,
                  mobile,
                  desktop,
+                 https_mobile=None,
                  production_http_desktop=None,
                  production_https_desktop=None,
-                 https_mobile=None,
                  ):
+        '''
+        ctor
+
+        By convention, arguments prefixed with "https_" refer to HTTPS
+        domains, while those with no prefix refer to HTTP. Only the
+        arguments mobile and desktop are required: the ctor will make
+        an educated guess on any values not supplied.
+
+        Note there is no argument for https_desktop right now.  We can
+        add it at some point if a client's site needs it.
+        
+        @param mobile                   : The HTTP mobile domain (m.example.com)
+        @type  mobile                   : str
+
+        @param desktop                  : The HTTP desktop domain, i.e. the full "source" site (www.example.com)
+        @type  desktop                  : str
+
+        @param https_mobile             : The HTTPS mobile domains (m.secure.example.com)
+        @type  https_mobile             : str
+        
+        @param production_http_desktop  : The HTTP domain of the client's production desktop site (www.mwuclient.com)
+        @type  production_http_desktop  : str
+        
+        @param production_https_desktop : The HTTPS domain of the client's production desktop site (secure.mwuclient.com)
+        @type  production_https_desktop : str
+        
+        '''
         self.desktop = desktop
         self.mobile = mobile
 
@@ -36,6 +111,15 @@ class Domains:
     def from_defs(cls, defs):
         '''
         Attempt to create a Domains instance from the site's defs module
+
+        Will read the following settings from defs (only the first two
+        are required):
+        
+          - MOBILE_DOMAIN
+          - DESKTOP_DOMAIN
+          - PRODUCTION_HTTP_DESKTOP_DOMAIN
+          - PRODUCTION_HTTPS_DESKTOP_DOMAIN
+          - HTTPS_MOBILE_DOMAIN
 
         @param defs : definitions module
         @type  defs : module
