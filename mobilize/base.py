@@ -465,6 +465,7 @@ def _new_location(location, domains):
     
     '''
     from urllib.parse import urlsplit
+    from mobilize.httputil import replace_domain
     scheme = urlsplit(location)[0]
     if scheme not in {'http', 'https'}:
         # Only know how to deal with http and https
@@ -480,9 +481,5 @@ def _new_location(location, domains):
         old_domain = production_desktop
     else:
         old_domain = domains.desktop
-    re_pattern = r'^{scheme}://(?P<domain>{domain})/?.*$'.format(scheme=scheme, domain=old_domain)
-    match = re.search(re_pattern, location)
-    if match:
-        start, end = match.start('domain'), match.end('domain')
-        location = location[:start] + new_domain + location[end:]
+    location = replace_domain(location, old_domain, new_domain)
     return location

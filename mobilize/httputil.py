@@ -576,3 +576,17 @@ def is_absolute_url(url):
             is_abs = True
             break
     return is_abs
+
+def replace_domain(url, old_domain, new_domain):
+    '''
+    Swap out the domain in a URL.
+
+    If the starting domain is different from what's supplied, the url is unchanged.
+    
+    '''
+    re_pattern = r'^\w+://(?P<domain>{domain})/?.*$'.format(domain=old_domain)
+    match = re.search(re_pattern, url)
+    if match:
+        start, end = match.start('domain'), match.end('domain')
+        url = url[:start] + new_domain + url[end:]
+    return url
