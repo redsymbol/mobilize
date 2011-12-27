@@ -42,6 +42,9 @@ class Handler:
         '''
         assert False, 'subclass must implement'
 
+    def handler_log(self, log):
+        pass
+
 class WebSourcer(Handler):
     '''
     A Handler that uses another web page as an HTTP source
@@ -133,6 +136,8 @@ class WebSourcer(Handler):
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.log import wsgilog
         log = wsgilog(environ)
+        if msite.verboselog:
+            self.handler_log(log)
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
@@ -220,6 +225,7 @@ class Moplate(WebSourcer):
     must implement at least self._render().
 
     '''
+    
     def __init__(self, template_name, components, params=None, **kw):
         '''
         ctor
@@ -243,6 +249,17 @@ class Moplate(WebSourcer):
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
 
+    name = 'undefined'
+    def set_name(self, name):
+        '''
+        Give this moplate instance a name.  Used for debug logging.
+        
+        '''
+        self.name = name
+
+    def handler_log(self, log):
+        log.msg('Matching moplate: {}'.format(self.name))
+        
     def render(self, full_body, extra_params=None, site_filters=None, reqinfo=None):
         '''
         Render the moplate for a particular HTML document body
