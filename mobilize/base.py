@@ -420,7 +420,7 @@ def import_moplate(pagemodule, moplate_object='moplate'):
     mod = importlib.import_module('.' + pagemodule, 'msite.moplates')
     moplate = getattr(mod, moplate_object)
     assert isinstance(moplate, Moplate), type(moplate)
-    moplate.set_name(pagemodule + ' ' + moplate_object)
+    moplate.name = pagemodule + ' ' + moplate_object
     return moplate
 
 def find_moplate(arg):

@@ -55,7 +55,7 @@ class WebSourcer(Handler):
 
     _source = None
 
-    def __init__(self, source = None):
+    def __init__(self, source = None, **kw):
         '''
         ctor
         
@@ -69,9 +69,9 @@ class WebSourcer(Handler):
 
         @param source : Specifies source URI mapping policy 
         @type  source : mixed; see documention for self.source_uri
-        
-        
+
         '''
+        super(WebSourcer, self).__init__(**kw)
         from mobilize.httputil import NewBaseUri
         if type(source) is str:
             source = NewBaseUri(source)
@@ -226,7 +226,11 @@ class Moplate(WebSourcer):
 
     '''
     
-    def __init__(self, template_name, components, params=None, **kw):
+
+    #: Optional name/label for this moplate instance.  Used for debug logging.
+    name = 'undefined'
+    
+    def __init__(self, template_name, components, params = None, name = None, **kw):
         '''
         ctor
         
@@ -236,7 +240,10 @@ class Moplate(WebSourcer):
         @param components    : Components of content elements to extract from full body
         @type  components    : list
         
-        @param params        : Other template rendering parameters
+        @param name          : Human-readable name or label for this moplate
+        @type  name          : stra
+        
+        @param params        : Other handler parameters for superclass
         @type  params        : dict (str -> mixed)
         
         '''
@@ -248,14 +255,6 @@ class Moplate(WebSourcer):
         else:
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
-
-    name = 'undefined'
-    def set_name(self, name):
-        '''
-        Give this moplate instance a name.  Used for debug logging.
-        
-        '''
-        self.name = name
 
     def handler_log(self, log):
         log.msg('Matching moplate: {}'.format(self.name))
