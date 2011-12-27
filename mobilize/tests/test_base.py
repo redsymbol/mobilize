@@ -238,6 +238,34 @@ class TestMobileSite(unittest.TestCase):
         assert len(location_values) == 1, len(location_values)
         self.assertEqual('http://m.example.com/path/to/file', location_values[0])
 
+    def test_postprocess_response_headers_precise(self):
+        '''
+        Test that a recursively similar Location: domain target is not recursively replaced
+        '''
+        from mobilize.base import MobileSite, Domains
+        domains = Domains(mobile='testwww.example.com:2280', desktop='www.example.com', production_http_desktop='www.example.com')
+        msite = MobileSite(domains, [])
+        headers = [
+            ('host'     , 'testwww.example.com'),
+            ('location' , 'http://testwww.example.com:2280/path/to/file'),
+            ]
+        modified = msite.postprocess_response_headers(headers, 302)
+        location_values = list(v for k, v in modified if 'location' == k)
+        # Should just find one match...
+        assert len(location_values) == 1, len(location_values)
+        # Make sure it's not http://testtestwww.example.com:2280:2280/path/to/file
+        self.assertEqual('http://testwww.example.com:2280/path/to/file', location_values[0])
+
+        # again with different location
+        headers = [
+            ('host'     , 'testwww.example.com'),
+            ('location' , 'http://testwww.example.com:2280'),
+            ]
+        modified = msite.postprocess_response_headers(headers, 302)
+        location_values = list(v for k, v in modified if 'location' == k)
+        assert len(location_values) == 1, len(location_values)
+        self.assertEqual('http://testwww.example.com:2280', location_values[0])
+        
 
     def test__new_location(self):
         from mobilize.base import (

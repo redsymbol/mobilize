@@ -479,5 +479,9 @@ def _new_location(location, domains):
         old_domain = production_desktop
     else:
         old_domain = domains.desktop
-    location = location.replace(old_domain, new_domain, 1)
+    re_pattern = r'^{scheme}://(?P<domain>{domain})/?.*$'.format(scheme=scheme, domain=old_domain)
+    match = re.search(re_pattern, location)
+    if match:
+        start, end = match.start('domain'), match.end('domain')
+        location = location[:start] + new_domain + location[end:]
     return location
