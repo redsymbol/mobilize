@@ -1,4 +1,4 @@
-# Copyright 2010-2011 Mobile Web Up. All rights reserved.
+# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import unittest
 class TestHttp(unittest.TestCase):
     def test_redir_dest(self):

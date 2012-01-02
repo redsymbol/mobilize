@@ -1,4 +1,4 @@
-# Copyright 2010-2011 Mobile Web Up. All rights reserved.
+# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 def host(environ, value):
     return environ['MWU_OTHER_DOMAIN']
 

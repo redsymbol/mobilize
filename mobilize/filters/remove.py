@@ -1,4 +1,4 @@
-# Copyright 2010-2011 Mobile Web Up. All rights reserved.
+# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 '''
 Filters designed to omit or remove certain parts of the source HTML
 '''

@@ -1,4 +1,4 @@
-# Copyright 2010-2011 Mobile Web Up. All rights reserved.
+# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 class MobilizeException(Exception):
     '''
     Base class of Mobilize-specific exceptions

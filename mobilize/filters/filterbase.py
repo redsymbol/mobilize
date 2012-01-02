@@ -1,4 +1,4 @@
-# Copyright 2010-2011 Mobile Web Up. All rights reserved.
+# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 def filterapi(filtfunc):
     '''
     Marks a callable as conforming to the filter API.
