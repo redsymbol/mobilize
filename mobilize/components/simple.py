@@ -53,4 +53,4 @@ class Clear(RawString):
 
     '''
     def __init__(self):
-        super(Clear, self).__init__('<div style="clear: both;">&nbsp;</div>\n')
+        super().__init__('<div style="clear: both;">&nbsp;</div>\n')

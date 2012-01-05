@@ -71,7 +71,7 @@ class WebSourcer(Handler):
         @type  source : mixed; see documention for self.source_uri
 
         '''
-        super(WebSourcer, self).__init__(**kw)
+        super().__init__(**kw)
         from mobilize.httputil import NewBaseUri
         if type(source) is str:
             source = NewBaseUri(source)
@@ -247,7 +247,7 @@ class Moplate(WebSourcer):
         @type  params        : dict (str -> mixed)
         
         '''
-        super(Moplate, self).__init__(**kw)
+        super().__init__(**kw)
         self.template_name = template_name
         self.components = components
         if params:
@@ -429,7 +429,7 @@ class Redirect(Handler):
     def __init__(self, *a):
         assert self.status is not None, 'subclass must define self.status'
         assert self.where is not None, 'subclass must define self.where'
-        super(Redirect, self).__init__(*a)
+        super().__init__(*a)
     
     def wsgi_response(self, msite, environ, start_response):
         import re

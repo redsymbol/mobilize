@@ -302,7 +302,7 @@ class XPath(Extracted):
 
 class CssPath(XPath):
     def __init__(self, *a, **kw):
-        super(CssPath, self).__init__(*a, **kw)
+        super().__init__(*a, **kw)
         for ii, selector in enumerate(self.selectors):
             self.selectors[ii] = _csspath2xpath(selector)
             
@@ -324,7 +324,7 @@ class GoogleAnalytics(Extracted):
         if 'idname' not in kw:
             kw['idname'] = util.idname('ga')
         kw['selector'] = None
-        super(GoogleAnalytics, self).__init__(**kw)
+        super().__init__(**kw)
 
     def _extract(self, source):
         '''
@@ -377,7 +377,7 @@ class BigImage(XPath):
             )
         if idname is not None:
             kwargs['idname'] = idname
-        super(BigImage, self).__init__(xpath, **kwargs)
+        super().__init__(xpath, **kwargs)
 
 # supporting code
 from mobilize.filters import DEFAULT_FILTERS
