@@ -230,7 +230,12 @@ class Moplate(WebSourcer):
     #: Optional name/label for this moplate instance.  Used for debug logging.
     name = 'undefined'
     
-    def __init__(self, template_name, components, params = None, name = None, **kw):
+    def __init__(self,
+                 template_name,
+                 components,
+                 params = None,
+                 name = None,
+                 **kw):
         '''
         ctor
         

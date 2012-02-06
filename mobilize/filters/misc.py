@@ -218,7 +218,28 @@ def formaction(elem, urlprefix='/'):
     for form in elem.iterfind('.//form'):
         if 'action' in form.attrib and is_absolute_url(form.attrib['action']):
             form.attrib['action'] = re.sub(r'^\w+://[^/]+/', urlprefix, form.attrib['action'], 1)
-        
+
+@filterapi
+def imgsub(elem, subs):
+    '''
+    Image URL substitutions
+
+    Check each IMG element in the dom sub-tree.  If the value of its
+    SRC element is a key in the subs dictionary, replace with the
+    value of that key.
+
+    @param elem : Root element to search within
+    @type  elem : HtmlElement
+
+    @param subs : substitution mapping
+    @type  subs : dict: str -> str
+    
+    '''
+    for img in elem.iterfind('.//img'):
+        src = img.attrib.get('src')
+        if src in subs:
+            img.attrib['src'] = subs[src]
+    
 # Supporting code
 
 def _link_converter(attribute, desktop_url):

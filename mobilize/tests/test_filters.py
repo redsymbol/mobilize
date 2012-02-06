@@ -1189,3 +1189,91 @@ here's some extra trailing text for you too
             expected = normxml(td['form_html_out'])
             actual = normxml(html.tostring(elem))
             self.assertSequenceEqual(expected, actual)
+
+    def test_imgsub(self):
+        from mobilize.filters import imgsub
+        html1 = '''<div>
+<ul>
+<li><img id="a" alt="ima image" width="10" height="20" src="/path/to/a.png"/></li>
+<li><img id="b" alt="ima image" width="10" height="20" src="/path/to/b.png"/></li>
+<li><img id="c" alt="ima image" width="10" height="20" src="/path/to/c.png"/></li>
+<li><img id="d" alt="ima image" width="10" height="20" src="/path/to/d.png"/></li>
+<li><img id="e" alt="ima image" width="10" height="20" src="/path/to/e.png"/></li>
+<li><img id="f" alt="ima image" width="10" height="20" src="/path/to/f.png"/></li>
+<li><img id="g" alt="ima image" width="10" height="20" src="/path/to/g.png"/></li>
+</ul>
+  <section>
+    <div>
+      <p>
+        <aside>
+          <div>
+          <span>
+<img id="h" alt="ima image" width="10" height="20" src="/path/to/h.png"/>
+          </span>
+          </div>
+        </aside>
+      </p>
+    </div>
+  </section>
+</div>
+'''
+        # This dict defines the mapping of img IDs to the values in
+        # html1 and html2 above.  You can create a copy with certain
+        # overriden values with the id2src() functions, following, in order
+        # to make a specific test. 
+        # E.g.:
+        #   d = id2src1(a='/path/to/NEWa.png')
+        #   d['a']
+        #     -> '/path/to/NEWa.png'
+        #   d['b']
+        #     -> '/path/to/b.png'
+        
+        _id2src = {
+            'a' : '/path/to/a.png',
+            'b' : '/path/to/b.png',
+            'c' : '/path/to/c.png',
+            'd' : '/path/to/d.png',
+            'e' : '/path/to/e.png',
+            'f' : '/path/to/f.png',
+            'g' : '/path/to/g.png',
+            'h' : '/path/to/h.png',
+            }
+        def id2src(**overrides):
+            d = dict(_id2src)
+            d.update(overrides)
+            return d
+
+        testdata = [
+            {'subs' : {
+                    '/path/to/c.png' : '/mobile/c.png',
+                    '/path/to/e.png' : '/mobile/a.png',
+                    },
+             'expected' : id2src(
+                    c = '/mobile/c.png',
+                    e = '/mobile/a.png',
+                    ),
+             },
+            {'subs' : {},
+             'expected' : id2src(),
+             },
+            {'subs' : {
+                    '/path/to/h.png' : '/mobile/h.png',
+                    '/path/to/f.png' : '/mobile/h.png',
+                    },
+             'expected' : id2src(
+                    h = '/mobile/h.png',
+                    f = '/mobile/h.png',
+                    ),
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            root = html.fromstring(html1)
+            # check test precondition
+            for imgid, srcval in _id2src.items():
+                img = root.get_element_by_id(imgid)
+                self.assertEqual(img.tag, 'img')
+                self.assertEqual(img.attrib['src'], srcval)
+            imgsub(root, td['subs'])
+            for imgid, srcval in td['expected'].items():
+                img = root.get_element_by_id(imgid)
+                self.assertEqual(img.attrib['src'], srcval)

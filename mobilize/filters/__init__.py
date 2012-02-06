@@ -55,10 +55,11 @@ from .tables import (
 from .misc import (
     absimgsrc,
     abslinkfilesrc,
+    formaction,
     formcontroltypes,
+    imgsub,
     relhyperlinks,
     relhyperlinks_full,
-    formaction,
     )
 
 DEFAULT_FILTERS = [
