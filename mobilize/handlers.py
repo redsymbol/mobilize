@@ -218,11 +218,16 @@ class Moplate(WebSourcer):
     available to the template as the "elements" attribute of the
     parameter dictionary.
 
+    The imgsubs parameter can be used to specify image URL
+    substitutions specific to this moplate.  If provided, a
+    filters.imgsubs filter will be applied to all moplate components
+    with the indicated URL substitutions.
+
     Because of the magical "elements" parameter, the supplied params
     cannot have a key of that name.
 
-    Currently this is intended to be used as a base class. Subclasses
-    must implement at least self._render().
+    This is an abstract base class. Subclasses must implement at least
+    self._render().
 
     '''
     
@@ -235,6 +240,7 @@ class Moplate(WebSourcer):
                  components,
                  params = None,
                  name = None,
+                 imgsubs = None,
                  **kw):
         '''
         ctor
@@ -250,6 +256,9 @@ class Moplate(WebSourcer):
         
         @param params        : Other handler parameters for superclass
         @type  params        : dict (str -> mixed)
+
+        @param imgsubs       : Image URL substitutions
+        @type  imgsubs       : dict: str -> str
         
         '''
         super().__init__(**kw)
@@ -260,6 +269,7 @@ class Moplate(WebSourcer):
         else:
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
+        self.imgsubs = imgsubs
 
     def handler_log(self, log):
         log.msg('Matching moplate: {}'.format(self.name))
@@ -301,7 +311,7 @@ class Moplate(WebSourcer):
         assert 'elements' not in params # Not yet anyway
         if site_filters is None:
             site_filters = []
-        all_filters = list(site_filters) + self.mk_moplate_filters(params)
+        all_filters = self.mk_moplate_filters(params) + list(site_filters)
         components = [c for c in self.components
                       if c.relevant(reqinfo)]
         for ii, component in enumerate(components):
@@ -334,8 +344,12 @@ class Moplate(WebSourcer):
         be applied to the extracted content of every mobile page.
 
         This method is a hook that can be altered by subclasses.  By
-        default, it returns an empty list.  The params argument can be
-        used to generate filters specific to the parameter set.
+        default, it returns an empty list, unless the Moplate was
+        instantiated with a non-empty imgsub argument; in that case it
+        will contain a properly initialized imgsub filter.
+
+        The params argument can be used to generate filters specific
+        to the parameter set.
 
         @param params : Moplate template parameters
         @type  params : dict
@@ -344,7 +358,11 @@ class Moplate(WebSourcer):
         @rtype        : list of callable
         
         '''
-        return []
+        from mobilize.filters import imgsub
+        filts = []
+        if self.imgsubs:
+            filts.append(lambda elem: imgsub(elem, self.imgsubs))
+        return filts
 
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         extra_params = {
