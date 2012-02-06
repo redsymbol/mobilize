@@ -211,21 +211,6 @@ class Moplate(WebSourcer):
     Typically the moplate can be applied to a group of pages with
     similar DOM structure.
 
-    components is an ordered list of mobilize page components (see
-    L{mobilize.components}), identifying content elements in the
-    mobile page body, some of which are based on content from the
-    desktop page.  From this, a list of HTML snippets will be made
-    available to the template as the "elements" attribute of the
-    parameter dictionary.
-
-    The imgsubs parameter can be used to specify image URL
-    substitutions specific to this moplate.  If provided, a
-    filters.imgsubs filter will be applied to all moplate components
-    with the indicated URL substitutions.
-
-    Because of the magical "elements" parameter, the supplied params
-    cannot have a key of that name.
-
     This is an abstract base class. Subclasses must implement at least
     self._render().
 
@@ -245,6 +230,21 @@ class Moplate(WebSourcer):
         '''
         ctor
         
+        components is an ordered list of mobilize page components (see
+        L{mobilize.components}), identifying content elements in the
+        mobile page body, some of which are based on content from the
+        desktop page.  From this, a list of HTML snippets will be made
+        available to the template as the "elements" attribute of the
+        parameter dictionary.
+
+        The imgsubs parameter can be used to specify image URL
+        substitutions specific to this moplate.  If provided, a
+        filters.imgsubs filter will be applied to all moplate components
+        with the indicated URL substitutions.
+
+        Because of the magical "elements" parameter, the supplied params
+        cannot have a key of that name.
+
         @param template_name : Template name (file)
         @type  template_name : str
 
@@ -255,7 +255,7 @@ class Moplate(WebSourcer):
         @type  name          : stra
         
         @param params        : Other handler parameters for superclass
-        @type  params        : dict (str -> mixed)
+        @type  params        : dict (str -> mixed); no "elements" key allowed
 
         @param imgsubs       : Image URL substitutions
         @type  imgsubs       : dict: str -> str
@@ -350,6 +350,9 @@ class Moplate(WebSourcer):
 
         The params argument can be used to generate filters specific
         to the parameter set.
+
+        Note that these are applied after any component-level filters,
+        but before any site-level filters.
 
         @param params : Moplate template parameters
         @type  params : dict
