@@ -225,20 +225,31 @@ def imgsub(elem, subs):
     Image URL substitutions
 
     Check each IMG element in the dom sub-tree.  If the value of its
-    SRC element is a key in the subs dictionary, replace with the
-    value of that key.
+    SRC element is a key in the subs dictionary, modify the image.
+
+    Keys of the subs dictionary are strings.  The values may be either strings,
+    or callables.  If a string, the img's src attribute is set to the value.
+
+    If a callable, it is invoked with the img HtmlElement as a single
+    argument.  The callable may make any inspections or modifications
+    you like, in-place.
 
     @param elem : Root element to search within
     @type  elem : HtmlElement
 
     @param subs : substitution mapping
-    @type  subs : dict: str -> str
+    @type  subs : dict: str -> (str or callable)
     
     '''
     for img in elem.iterfind('.//img'):
         src = img.attrib.get('src')
         if src in subs:
-            img.attrib['src'] = subs[src]
+            value = subs[src]
+            if callable(value):
+                value(img)
+            else:
+                assert type(value) == str, type(value)
+                img.attrib['src'] = value
     
 # Supporting code
 

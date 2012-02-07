@@ -1277,3 +1277,29 @@ here's some extra trailing text for you too
             for imgid, srcval in td['expected'].items():
                 img = root.get_element_by_id(imgid)
                 self.assertEqual(img.attrib['src'], srcval)
+
+        # test for callable imgsub value
+        def alter_c(elem):
+            self.assertEqual('img', elem.tag)
+            elem.attrib['src'] = '/mobile/c.png'
+            elem.attrib['width'] = '45'
+            elem.attrib['height'] = '95'
+        def alter_h(elem):
+            self.assertEqual('img', elem.tag)
+            elem.attrib['src'] = '/mobile/h.png'
+            elem.attrib['width'] = '145'
+            del elem.attrib['height']
+        subs = {
+            '/path/to/c.png' : alter_c,
+            '/path/to/h.png' : alter_h,
+            }
+        root = html.fromstring(html1)
+        imgsub(root, subs)
+        img_c = root.get_element_by_id('c')
+        self.assertEqual('/mobile/c.png', img_c.attrib['src'])
+        self.assertEqual('45', img_c.attrib['width'])
+        self.assertEqual('95', img_c.attrib['height'])
+        img_h = root.get_element_by_id('h')
+        self.assertEqual('/mobile/h.png', img_h.attrib['src'])
+        self.assertEqual('145', img_h.attrib['width'])
+        self.assertFalse('height' in img_h.attrib)
