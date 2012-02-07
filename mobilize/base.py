@@ -152,7 +152,10 @@ class MobileSite:
     #: Signals whether this is a production environment, or we're in development mode
     is_production = False
     
-    def __init__(self, domains, handler_map):
+    def __init__(self,
+                 domains,
+                 handler_map,
+                 imgsubs=None):
         '''
         ctor
         
@@ -166,6 +169,7 @@ class MobileSite:
         self.domains = domains
         self.fullsite = domains.desktop
         self.handler_map = handler_map
+        self.imgsubs = imgsubs
 
     def mk_site_filters(self, params):
         '''
@@ -174,6 +178,10 @@ class MobileSite:
         Builds a list of filters that will be passed on to every
         moplate during rendering, to be applied to the extracted
         content of every mobile page.
+
+        Note that these are applyed *after* any moplate-level filters,
+        which are themselves applied after any component-level
+        filters.
 
         This list can be altered or added to by subclasses.
 
@@ -185,6 +193,8 @@ class MobileSite:
         
         '''
         site_filters = []
+        if self.imgsubs:
+            site_filters.append(lambda elem: filters.imgsub(elem, self.imgsubs))
         if 'fullsite' in params and 'request_path' in params:
             desktop_url = 'http://%(fullsite)s%(request_path)s' % params
             site_filters.extend((
