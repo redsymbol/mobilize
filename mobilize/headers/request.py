@@ -1,9 +1,9 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 def host(environ, value):
-    return environ['MWU_OTHER_DOMAIN']
+    return environ['MWU_SRC_DOMAIN']
 
 def source_referer(environ, value):
-    return value.replace(environ['HTTP_HOST'], environ['MWU_OTHER_DOMAIN'], 1)
+    return value.replace(environ['HTTP_HOST'], environ['MWU_SRC_DOMAIN'], 1)
 
 # Standard transformations of existing request headers
 request_xforms = {

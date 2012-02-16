@@ -122,7 +122,7 @@ def srchostport(environ, use_defined_fullsite=True):
     environ is meant to be the WSGI environment dictionary,
     expected to contain the following keys:
 
-      MWU_OTHER_DOMAIN
+      MWU_SRC_DOMAIN
       SERVER_PORT
 
     This function returns a tuple of hostname and port, so you will
@@ -137,7 +137,7 @@ def srchostport(environ, use_defined_fullsite=True):
     @rtype       : tuple(str, int)
     
     '''
-    hostkey = 'MWU_OTHER_DOMAIN' if use_defined_fullsite else 'SERVER_NAME'
+    hostkey = 'MWU_SRC_DOMAIN' if use_defined_fullsite else 'SERVER_NAME'
     full_host = environ[hostkey]
     if ':' in full_host:
         full_host, full_port = full_host.split(':')

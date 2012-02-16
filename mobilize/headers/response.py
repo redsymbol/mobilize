@@ -1,6 +1,6 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 def location(environ, value):
-    return value.replace(environ['MWU_OTHER_DOMAIN'], environ['HTTP_HOST'], 1)
+    return value.replace(environ['MWU_SRC_DOMAIN'], environ['HTTP_HOST'], 1)
 
 import re
 _set_cookie_re = re.compile(r'(?P<prefix>\bdomain\s*=\s*)(?P<domain>[^ ;]+)', re.I)

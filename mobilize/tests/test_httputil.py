@@ -46,7 +46,7 @@ environ1 = dict([
         ('wsgi.version', (1, 1)),
         ('GATEWAY_INTERFACE', 'CGI/1.1'),
         ('wsgi.run_once', False),
-        ('MWU_OTHER_DOMAIN', 'example.com'),
+        ('MWU_SRC_DOMAIN', 'example.com'),
         ('wsgi.errors', None),
         ('REMOTE_PORT', '49810'),
         ('HTTP_ACCEPT_LANGUAGE', 'en-us,en;q=0.5'),
@@ -525,7 +525,7 @@ class TestHttp(unittest.TestCase):
         from mobilize.httputil import _get_root_uri
         def env(**kw):
             environ = {
-            'MWU_OTHER_DOMAIN' : 'www.example.com',
+            'MWU_SRC_DOMAIN' : 'www.example.com',
             'wsgi.url_scheme' : 'http',
             'SERVER_PORT' : 80,
             'REQUEST_URI' : '/',
