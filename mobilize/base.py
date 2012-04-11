@@ -199,6 +199,7 @@ class MobileSite:
             desktop_url = 'http://%(fullsite)s%(request_path)s' % params
             site_filters.extend((
                 lambda elem: filters.absimgsrc(elem, desktop_url),
+                to_imgserve,
                 lambda elem: filters.abslinkfilesrc(elem, desktop_url),
                 ))
         return site_filters
@@ -493,3 +494,42 @@ def _new_location(location, domains):
         old_domain = domains.desktop
     location = replace_domain(location, old_domain, new_domain)
     return location
+
+DEFAULT_MAXW=300
+def to_imgserve_url(url, maxw):
+    from urllib.parse import quote
+    if maxw <= 0:
+        maxw = DEFAULT_MAXW
+    return '/_mwuimg/?src={src}&maxw={maxw}'.format(src=quote(url, safe=''), maxw=str(maxw))
+
+def _img_dim_valid(value):
+    valid = True
+    try:
+        castvalue = int(value)
+        if castvalue <= 0:
+            valid = False
+    except (TypeError, ValueError):
+        valid = False
+    return valid
+
+def scale_height(start_width, start_height, end_width):
+    return int(round(start_height * end_width / start_width))
+
+def to_imgserve(elem):
+    import imgserve
+    imgdb = imgserve.ImgDb()
+    for img_elem in elem.iter(tag='img'):
+        if img_elem.attrib.get('src', None):
+            img_data = imgdb.get(img_elem.attrib['src'])
+            if img_data is not None:
+                for name in ('height', 'width'):
+                    if not _img_dim_valid(img_elem.attrib.get(name, None)):
+                        img_elem.attrib[name] = str(img_data[name])
+                if img_data['width'] > DEFAULT_MAXW:
+                    # Too big for screen, resize
+                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], DEFAULT_MAXW)
+                    img_elem.attrib['width'] = str(DEFAULT_MAXW)
+                    img_elem.attrib['height'] = str(scale_height(int(img_elem.attrib['width']), int(img_elem.attrib['height']), DEFAULT_MAXW))
+                elif int(img_data['width']) > int(img_elem.attrib['width']):
+                    # Need to scale the source image down
+                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
