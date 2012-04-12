@@ -515,21 +515,83 @@ def _img_dim_valid(value):
 def scale_height(start_width, start_height, end_width):
     return int(round(start_height * end_width / start_width))
 
+def scale_width(start_width, start_height, end_height):
+    return int(round(start_width * end_height / start_height))
+
 def to_imgserve(elem):
     import imgserve
     imgdb = imgserve.ImgDb()
     for img_elem in elem.iter(tag='img'):
         if img_elem.attrib.get('src', None):
-            img_data = imgdb.get(img_elem.attrib['src'])
-            if img_data is not None:
-                for name in ('height', 'width'):
-                    if not _img_dim_valid(img_elem.attrib.get(name, None)):
-                        img_elem.attrib[name] = str(img_data[name])
-                if img_data['width'] > DEFAULT_MAXW:
-                    # Too big for screen, resize
-                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], DEFAULT_MAXW)
-                    img_elem.attrib['width'] = str(DEFAULT_MAXW)
-                    img_elem.attrib['height'] = str(scale_height(int(img_elem.attrib['width']), int(img_elem.attrib['height']), DEFAULT_MAXW))
-                elif int(img_data['width']) > int(img_elem.attrib['width']):
-                    # Need to scale the source image down
-                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
+            img_data = imgdb.get(img_elem.attrib['src']) or {}
+            tag_width = img_elem.attrib.get('width', None)
+            tag_height = img_elem.attrib.get('height', None)
+            data_width = img_data.get('width', None)
+            data_height = img_data.get('height', None)
+            sizes = new_img_sizes(tag_width, tag_height, data_width, data_height)
+            img_elem.attrib.update(sizes)
+            img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
+
+def new_img_sizes(tag_width,
+                  tag_height,
+                  data_width,
+                  data_height,
+                  default_maxw = DEFAULT_MAXW):
+    '''
+    All values can be "None" if undefined.
+
+    @param tag_height  : Height value on img tag in document
+    @type  tag_height  : None or str
+    
+    @param tag_width   : Width value on img tag in document
+    @type  tag_width   : None or str
+    
+    @param data_height : Height value of source if cached
+    @type  data_height : None or int
+    
+    @param data_width  : Height value of source if cached
+    @type  data_width  : None or int
+
+    @return            : a dict with 0 or 1 'width' keys, and 0 or 1 'height' keys
+    @rtype             : dict
+    
+    '''
+    def normalize(item):
+        if _img_dim_valid(item):
+            item = int(item)
+        else:
+            item = None
+        return item
+    tag_height = normalize(tag_height)
+    tag_width = normalize(tag_width)
+    data_height = normalize(data_height)
+    data_width = normalize(data_width)
+    height = tag_height
+    width = tag_width
+
+    have_full_data = (data_width is not None) and (data_height is not None)
+    if have_full_data:
+        if height is None:
+            if tag_width == data_width:
+                height = data_height
+            else:
+                if tag_width is not None:
+                    height = scale_height(data_width, data_height, tag_width)
+        if width is None:
+            if tag_height == data_height:
+                width = data_width
+            else:
+                if tag_height is not None:
+                    width = scale_width(data_width, data_height, tag_height)
+    if width is not None and width > default_maxw:
+        width = default_maxw
+        height = scale_height(data_width, data_height, default_maxw)
+    sizes = dict()
+    if width is not None:
+        sizes['width'] = width
+    if height is not None:
+        sizes['height'] = height
+    return sizes
+
+
+
