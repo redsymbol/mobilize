@@ -596,6 +596,9 @@ def new_img_sizes(tag_width,
     @param data_width  : Height value of source if cached
     @type  data_width  : None or int
 
+    @param default_maxw : Default maximum width to use for an image
+    @type  default_maxw : int
+
     @return            : a dict with 0 or 1 'width' keys, and 0 or 1 'height' keys
     @rtype             : dict
     
