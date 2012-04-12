@@ -522,15 +522,20 @@ def to_imgserve(elem):
     import imgserve
     imgdb = imgserve.ImgDb()
     for img_elem in elem.iter(tag='img'):
-        if img_elem.attrib.get('src', None):
+        if 'src' in img_elem.attrib:
             img_data = imgdb.get(img_elem.attrib['src']) or {}
             tag_width = img_elem.attrib.get('width', None)
             tag_height = img_elem.attrib.get('height', None)
             data_width = img_data.get('width', None)
             data_height = img_data.get('height', None)
             sizes = new_img_sizes(tag_width, tag_height, data_width, data_height)
+            # need to cast size values to type str, for lxml
+            for k, v in sizes.items():
+                sizes[k] = str(v)
             img_elem.attrib.update(sizes)
-            img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
+            if 'width' in img_elem.attrib:
+                if data_width is None or img_elem.attrib['width'] != data_width:
+                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
 
 def new_img_sizes(tag_width,
                   tag_height,
