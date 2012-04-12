@@ -532,6 +532,9 @@ def to_imgserve(elem):
             # need to cast size values to type str, for lxml
             for k, v in sizes.items():
                 sizes[k] = str(v)
+            for k in 'width', 'height':
+                if k in img_elem.attrib:
+                    del img_elem.attrib[k]
             img_elem.attrib.update(sizes)
             if 'width' in img_elem.attrib:
                 if data_width is None or img_elem.attrib['width'] != data_width:
@@ -597,6 +600,3 @@ def new_img_sizes(tag_width,
     if height is not None:
         sizes['height'] = height
     return sizes
-
-
-
