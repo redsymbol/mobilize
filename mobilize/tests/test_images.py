@@ -125,39 +125,6 @@ class TestImageOpt(unittest.TestCase):
             actual = new_img_sizes(**td['in'])
             self.assertDictEqual(expected, actual, str(ii))
 
-    def test_normalize_img_size(self):
-        testdata = [
-            {'value'  : None,
-             'result' : None,
-             },
-            {'value'  : '1',
-             'result' : 1,
-             },
-            {'value'  : '12345',
-             'result' : 12345,
-             },
-            {'value'  : '',
-             'result' : None,
-             },
-            {'value'  : 'lolwot',
-             'result' : None,
-             },
-            {'value'  : '11px',
-             'result' : 11,
-             },
-            {'value'  : '-42',
-             'result' : None,
-             },
-            {'value'  : '42 pixels wide',
-             'result' : 42,
-             },
-            ]
-        from mobilize.images import normalize_img_size
-        for ii, td in enumerate(testdata):
-            expected = td['result']
-            actual = normalize_img_size(td['value'])
-            self.assertEqual(expected, actual, ii)
-
     def test_to_imgserve_url(self):
         from mobilize.images import to_imgserve_url
         testdata = [

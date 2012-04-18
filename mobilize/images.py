@@ -3,13 +3,9 @@
 Code related to image optimization
 '''
 from mobilize.filters.filterbase import filterapi
-import re
 
 #: maximum image width when otherwise unspecified
 DEFAULT_MAXW=300
-
-# For recognizing the leading integer specified in a height/width value string
-_IMG_SIZE_INT_RE = re.compile(r'^\s*(\d+)')
 
 def to_imgserve_url(url, maxw, maxh):
     '''
@@ -104,8 +100,11 @@ def to_imgserve(elem):
     modified appropriately.
     
     '''
-    import imgserve
-    imgdb = imgserve.ImgDb()
+    from imgserve import (
+        normalize_img_size,
+        ImgDb,
+        )
+    imgdb = ImgDb()
     for img_elem in elem.iter(tag='img'):
         if 'src' in img_elem.attrib:
             img_data = imgdb.get(img_elem.attrib['src']) or {}
@@ -131,54 +130,6 @@ def to_imgserve(elem):
                                                              int(img_elem.attrib['width']),
                                                              maxh)
 
-def normalize_img_size(value):
-    '''
-    Tries to normalize the value of an img tag's "height" or "width" tag
-
-    This function accepts a string value from an img tag's "width" or
-    "height" attribute, and returns an integer pixel size if possible.
-    If not, returns None.
-
-    You'd think this would be simple, but people will put all manner
-    of surprising stuff within the value of HTML attributes. This
-    function will attempt to extract a valid integer value whenever
-    possible, handling some surprising edge cases.
-
-    SOME SOUL-SEARCHING ON VALUES OF ZERO
-
-    What's the best thing to do with values of 0, or negative numbers?
-    Right now, if the value is not castable to a positive integer,
-    it's considered invalid (i.e. the function returns None).  But
-    there may be situations where that isn't what we want.  I imagine
-    that somewhere/somewhen on the web, someone has an img tag
-    deliberately inserted for some kind of tracking purpose, and set
-    its width and/or height to 0 to prevent it from rendering.
-
-    Whatever we do with the value of 0, it seems reasonable to treat
-    negative integer values the same.  To the point of, early the
-    code, saying something to the effect of, "if value < 0: value = 0".
-
-    When the value evaluates to an integer <= 0, possibly we'll want
-    omit the img tag entirely from the mobile page.  Maybe the best
-    way to signal that would be to have this function/method raise a
-    special exception.
-
-    @param value : Value of the "width" or "height" attribute of an image tag
-    @type  value : str
-
-    @return      : Valid tag value, or None
-    @rtype       : int, or None
-    
-    '''
-    normed = None
-    if value is not None:
-        match = _IMG_SIZE_INT_RE.match(value)
-        if match:
-            normed = int(match.group(1))
-            if normed <= 0:
-                normed = None
-    return normed
-    
 def new_img_sizes(tag_width,
                   tag_height,
                   measured_width,
