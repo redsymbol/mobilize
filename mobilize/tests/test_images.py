@@ -10,8 +10,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 100,
                     'tag_height'  : 101,
-                    'data_width'  : None,
-                    'data_height' : None,
+                    'measured_width'  : None,
+                    'measured_height' : None,
                     },
              'out'                : {
                     'width'       : 100,
@@ -21,8 +21,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 100,
                     'tag_height'  : None,
-                    'data_width'  : 100,
-                    'data_height' : 102,
+                    'measured_width'  : 100,
+                    'measured_height' : 102,
                     },
              'out'                : {
                     'width'       : 100,
@@ -32,8 +32,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 100,
                     'tag_height'  : 101,
-                    'data_width'  : 102,
-                    'data_height' : 103,
+                    'measured_width'  : 102,
+                    'measured_height' : 103,
                     },
              'out'                : {
                     'width'       : 100,
@@ -43,8 +43,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 100,
                     'tag_height'  : None,
-                    'data_width'  : 200,
-                    'data_height' : 204,
+                    'measured_width'  : 200,
+                    'measured_height' : 204,
                     },
              'out'                : {
                     'width'       : 100,
@@ -54,8 +54,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : None,
                     'tag_height'  : 101,
-                    'data_width'  : 200,
-                    'data_height' : 202,
+                    'measured_width'  : 200,
+                    'measured_height' : 202,
                     },
              'out'                : {
                     'width'       : 100,
@@ -65,8 +65,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : None,
                     'tag_height'  : None,
-                    'data_width'  : None,
-                    'data_height' : None,
+                    'measured_width'  : None,
+                    'measured_height' : None,
                     },
              'out'                : {
                     },
@@ -74,8 +74,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 1200,
                     'tag_height'  : 800,
-                    'data_width'  : 1200,
-                    'data_height' : 800,
+                    'measured_width'  : 1200,
+                    'measured_height' : 800,
                     'default_maxw' : 300,
                     },
              'out'                : {
@@ -86,8 +86,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 1200,
                     'tag_height'  : 900,
-                    'data_width'  : 1200,
-                    'data_height' : 900,
+                    'measured_width'  : 1200,
+                    'measured_height' : 900,
                     'default_maxw' : 400,
                     },
              'out'                : {
@@ -98,8 +98,8 @@ class TestImageOpt(unittest.TestCase):
             {'in' : {
                     'tag_width'   : 1200,
                     'tag_height'  : 800,
-                    'data_width'  : 12000,
-                    'data_height' : 8000,
+                    'measured_width'  : 12000,
+                    'measured_height' : 8000,
                     'default_maxw' : 300,
                     },
              'out'                : {
@@ -110,8 +110,8 @@ class TestImageOpt(unittest.TestCase):
             # {'in' : {
             #         'tag_width'   : None,
             #         'tag_height'  : None,
-            #         'data_width'  : None,
-            #         'data_height' : None,
+            #         'measured_width'  : None,
+            #         'measured_height' : None,
             #         },
             #  'out'                : {
             #         'width'       : None,

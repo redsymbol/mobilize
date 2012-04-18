@@ -152,8 +152,8 @@ def normalize_img_size(value):
     
 def new_img_sizes(tag_width,
                   tag_height,
-                  data_width,
-                  data_height,
+                  measured_width,
+                  measured_height,
                   default_maxw = DEFAULT_MAXW):
     '''
     Calculate new height and width values of an image for the mobile view.
@@ -163,45 +163,45 @@ def new_img_sizes(tag_width,
     both.  If a key is missing, that means the img tag in the mobile
     view should omit that attribute.
 
-    @param tag_height  : Height value on img tag in source HTML document
-    @type  tag_height  : None or str
+    @param tag_height      : Height value on img tag in source HTML document
+    @type  tag_height      : None or str
     
-    @param tag_width   : Width value on img tag in source HTML document
-    @type  tag_width   : None or str
+    @param tag_width       : Width value on img tag in source HTML document
+    @type  tag_width       : None or str
     
-    @param data_height : Actual height value of source image in pixels, if known
-    @type  data_height : None or int
+    @param measured_height : Actual height value of source image in pixels, if known
+    @type  measured_height : None or int
     
-    @param data_width  : Actual width value of source image in pixels, if known
-    @type  data_width  : None or int
+    @param measured_width  : Actual width value of source image in pixels, if known
+    @type  measured_width  : None or int
 
-    @param default_maxw : Default maximum width to use for an image
-    @type  default_maxw : int
+    @param default_maxw    : Default maximum width to use for an image
+    @type  default_maxw    : int
 
-    @return            : a dict with 0 or 1 'width' keys, and 0 or 1 'height' keys
-    @rtype             : dict
+    @return                : a dict with 0 or 1 'width' keys, and 0 or 1 'height' keys
+    @rtype                 : dict
     
     '''
     height = tag_height
     width  = tag_width
 
-    have_full_data = (data_width is not None) and (data_height is not None)
+    have_full_data = (measured_width is not None) and (measured_height is not None)
     if have_full_data:
         if height is None:
-            if tag_width == data_width:
-                height = data_height
+            if tag_width == measured_width:
+                height = measured_height
             else:
                 if tag_width is not None:
-                    height = scale_height(data_width, data_height, tag_width)
+                    height = scale_height(measured_width, measured_height, tag_width)
         if width is None:
-            if tag_height == data_height:
-                width = data_width
+            if tag_height == measured_height:
+                width = measured_width
             else:
                 if tag_height is not None:
-                    width = scale_width(data_width, data_height, tag_height)
+                    width = scale_width(measured_width, measured_height, tag_height)
     if width is not None and width > default_maxw:
         width = default_maxw
-        height = scale_height(data_width, data_height, default_maxw)
+        height = scale_height(measured_width, measured_height, default_maxw)
     sizes = dict()
     if width is not None:
         sizes['width'] = width
