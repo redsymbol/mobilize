@@ -157,6 +157,30 @@ class TestImageOpt(unittest.TestCase):
             expected = td['result']
             actual = normalize_img_size(td['value'])
             self.assertEqual(expected, actual, ii)
+
+    def test_to_imgserve_url(self):
+        from mobilize.images import to_imgserve_url
+        testdata = [
+            {'url'          : 'http://example.com/foo/bar.png',
+             'maxw'         : 107,
+             'maxh'         : 42,
+             'imgserve_url' : '/_mwuimg/?src=http%3A%2F%2Fexample.com%2Ffoo%2Fbar.png&maxw=107&maxh=42',
+             },
+            {'url'          : 'http://example.com/robot.jpg',
+             'maxw'         : 107,
+             'maxh'         : 207,
+             'imgserve_url' : '/_mwuimg/?src=http%3A%2F%2Fexample.com%2Frobot.jpg&maxw=107&maxh=207',
+             },
+            {'url'          : 'http://example.com/robot.jpg',
+             'maxw'         : 107,
+             'imgserve_url' : '/_mwuimg/?src=http%3A%2F%2Fexample.com%2Frobot.jpg&maxw=107',
+             },
+            ]
+        for ii, td in enumerate(testdata):
+            maxh = td.get('maxh', None)
+            expected = td['imgserve_url']
+            actual = to_imgserve_url(td['url'], td['maxw'], maxh=maxh)
+            self.assertEqual(expected, actual, ii)
             
 if '__main__'==__name__:
     import unittest

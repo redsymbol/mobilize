@@ -11,13 +11,27 @@ DEFAULT_MAXW=300
 # For recognizing the leading integer specified in a height/width value string
 _IMG_SIZE_INT_RE = re.compile(r'^\s*(\d+)')
 
-def to_imgserve_url(url, maxw):
+def to_imgserve_url(url, maxw, maxh):
     '''
     Calculate the value of an imgserve URL for an image
 
+    Both the maximum width and height are specified for scaling.  This
+    is mainly to prevent off-by-one rounding errors: sometimes the
+    code of this module will come up with a barely different scaled
+    value of the height for a different resize width than Imagemagick
+    will (which is currently used on the backend), which would
+    mismatch the height attribute of the img tag in the final HTML
+    document.
+
+    So we just sidestep this by calculating the height in exactly one
+    place - the new_img_sizes function in this library - and directing
+    imgserve to scale both dimensions as we specify. This might lead
+    to a slight distortion in aspect ratio, but is going to be subtle
+    at worst, and worth the tradeoff.
+
     Example:
-    to_imgserve_url('http://example.com/foo.png', 42)
-      -> '/_mwuimg/?src=http%3A%2F%2Fexample.com%2Ffoo.png&maxw=42'
+    to_imgserve_url('http://example.com/foo.png', 42, 70)
+      -> '/_mwuimg/?src=http%3A%2F%2Fexample.com%2Ffoo.png&maxw=42&maxh=70'
 
     @param url  : URL pointing to the source image
     @type  url  : str
@@ -25,14 +39,19 @@ def to_imgserve_url(url, maxw):
     @param maxw : Maximum desired width of the image
     @type  maxw : int
 
+    @param maxh : Maximum desired height of the image
+    @type  maxh : None, or int
+
     @return     : URL to the imgserve version of the URL
     @rtype      : str
     
     '''
     from urllib.parse import quote
-    if maxw <= 0:
-        maxw = DEFAULT_MAXW
-    return '/_mwuimg/?src={src}&maxw={maxw}'.format(src=quote(url, safe=''), maxw=str(maxw))
+    assert maxw > 0, maxw
+    imgserve_url = '/_mwuimg/?src={src}&maxw={maxw}'.format(src=quote(url, safe=''), maxw=str(maxw))
+    if maxh is not None:
+        imgserve_url += '&maxh=' + str(maxh)
+    return imgserve_url
 
 def scale_height(start_width, start_height, end_width):
     '''
@@ -104,16 +123,26 @@ def to_imgserve(elem):
             img_elem.attrib.update(sizes)
             if 'width' in img_elem.attrib:
                 if data_width is None or img_elem.attrib['width'] != data_width:
-                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'], int(img_elem.attrib['width']))
+                    if 'height' in img_elem.attrib:
+                        maxh = int(img_elem.attrib['height'])
+                    else:
+                        maxh = None
+                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'],
+                                                             int(img_elem.attrib['width']),
+                                                             maxh)
 
 def normalize_img_size(value):
     '''
     Tries to normalize the value of an img tag's "height" or "width" tag
 
+    This function accepts a string value from an img tag's "width" or
+    "height" attribute, and returns an integer pixel size if possible.
+    If not, returns None.
+
     You'd think this would be simple, but people will put all manner
     of surprising stuff within the value of HTML attributes. This
     function will attempt to extract a valid integer value whenever
-    possible.  If it cannot, return None.
+    possible, handling some surprising edge cases.
 
     SOME SOUL-SEARCHING ON VALUES OF ZERO
 
