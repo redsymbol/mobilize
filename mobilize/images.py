@@ -150,16 +150,16 @@ def new_img_sizes(tag_width,
     view should omit that attribute.
 
     @param tag_height      : Height value on img tag in source HTML document
-    @type  tag_height      : None or str
+    @type  tag_height      : None or int > 0
     
     @param tag_width       : Width value on img tag in source HTML document
-    @type  tag_width       : None or str
+    @type  tag_width       : None or int > 0
     
     @param measured_height : Actual height value of source image in pixels, if known
-    @type  measured_height : None or int
+    @type  measured_height : None or int > 0
     
     @param measured_width  : Actual width value of source image in pixels, if known
-    @type  measured_width  : None or int
+    @type  measured_width  : None or int > 0
 
     @param default_maxw    : Default maximum width to use for an image
     @type  default_maxw    : int
@@ -168,25 +168,43 @@ def new_img_sizes(tag_width,
     @rtype                 : dict
     
     '''
+    assert tag_width is None or (tag_width > 0), tag_width
+    assert tag_height is None or (tag_height > 0), tag_height
+    assert measured_width is None or (measured_width > 0), measured_width
+    assert measured_height is None or (measured_height > 0), measured_height
+    
+    have_all_measured = (measured_width is not None) and (measured_height is not None)
+    have_all_tag = (tag_width is not None) and (tag_height is not None)
     height = tag_height
     width  = tag_width
+    # Whether we consider the aspect ratios of the measured and tag
+    # dimensions to be equivalent.  Valued True, False, or None - the
+    # latter if it's undefined because any piece of info is undefined.
+    ar_equal = None
 
-    have_full_data = (measured_width is not None) and (measured_height is not None)
-    if have_full_data:
+    done = False
+    if have_all_tag and have_all_measured:
+        ar_measured = measured_width / measured_height
+        ar_tag = tag_width / tag_height
+        ar_equal = abs((ar_measured - ar_tag) / (ar_measured + ar_tag)) < 0.001
+        if ar_equal:
+            if width > measured_width:
+                width = measured_width
+                assert height >= measured_height
+                height = measured_height
+    if have_all_measured:
         if height is None:
             if tag_width == measured_width:
                 height = measured_height
-            else:
-                if tag_width is not None:
-                    height = scale_height(measured_width, measured_height, tag_width)
+            elif tag_width is not None:
+                height = scale_height(measured_width, measured_height, tag_width)
         if width is None:
             if tag_height == measured_height:
                 width = measured_width
-            else:
-                if tag_height is not None:
-                    width = scale_width(measured_width, measured_height, tag_height)
-    if width is not None and width > default_maxw:
-        if have_full_data:
+            elif tag_height is not None:
+                width = scale_width(measured_width, measured_height, tag_height)
+    if (width is not None) and (width > default_maxw):
+        if have_all_measured:
             height = scale_height(measured_width, measured_height, default_maxw)
         elif height is not None:
             height = scale_height(width, height, default_maxw)

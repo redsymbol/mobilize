@@ -131,6 +131,44 @@ class TestImageOpt(unittest.TestCase):
                     'height'          : 50,
                     },
              },
+            # If the w/h ratio is as defined by the tag attributes is very different from that of the source, use the tag attrib ratio.
+            {'in' : {
+                    'tag_width'       : 200,
+                    'tag_height'      : 100,
+                    'measured_width'  : 300,
+                    'measured_height' : 150,
+                    'default_maxw'    : 100,
+                    },
+             'out'                    : {
+                    'width'           : 100,
+                    'height'          : 50,
+                    },
+             },
+            {'in' : {
+                    'tag_width'       : 200,
+                    'tag_height'      : 100,
+                    'measured_width'  : 100,
+                    'measured_height' : 200,
+                    'default_maxw'    : 1000,
+                    },
+             'out'                    : {
+                    'width'           : 200,
+                    'height'          : 100,
+                    },
+             },
+            # Don't scale up
+            {'in' : {
+                    'tag_width'       : 100,
+                    'tag_height'      : 200,
+                    'measured_width'  : 10,
+                    'measured_height' : 20,
+                    'default_maxw'    : 1000,
+                    },
+             'out'                    : {
+                    'width'           : 10,
+                    'height'          : 20,
+                    },
+             },
             # {'in' : {
             #         'tag_width'       : None,
             #         'tag_height'      : None,
