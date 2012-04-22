@@ -107,17 +107,42 @@ class TestImageOpt(unittest.TestCase):
                     'height'      : 200,
                     },
              },
+            # For next test, important that default_maxw < tag_width, and all other inputs are None
+            {'in' : {
+                    'tag_width'       : 104,
+                    'tag_height'      : None,
+                    'measured_width'  : None,
+                    'measured_height' : None,
+                    'default_maxw'    : 103,
+                    },
+             'out'                    : {
+                    'width'           : 103,
+                    },
+             },
+            {'in' : {
+                    'tag_width'       : 200,
+                    'tag_height'      : 100,
+                    'measured_width'  : None,
+                    'measured_height' : None,
+                    'default_maxw'    : 100,
+                    },
+             'out'                    : {
+                    'width'           : 100,
+                    'height'          : 50,
+                    },
+             },
             # {'in' : {
-            #         'tag_width'   : None,
-            #         'tag_height'  : None,
+            #         'tag_width'       : None,
+            #         'tag_height'      : None,
             #         'measured_width'  : None,
             #         'measured_height' : None,
             #         },
-            #  'out'                : {
-            #         'width'       : None,
-            #         'height'      : None,
+            #  'out'                    : {
+            #         'width'           : None,
+            #         'height'          : None,
             #         },
             #  },
+            
             ]
         from mobilize.images import new_img_sizes
         for ii, td in enumerate(testdata):

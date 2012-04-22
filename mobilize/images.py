@@ -69,6 +69,9 @@ def scale_height(start_width, start_height, end_width):
     @rtype              : int
     
     '''
+    assert start_width
+    assert start_height
+    assert end_width
     return int(round(start_height * end_width / start_width))
 
 def scale_width(start_width, start_height, end_height):
@@ -86,6 +89,9 @@ def scale_width(start_width, start_height, end_height):
     @rtype              : int
     
     '''
+    assert start_width
+    assert start_height
+    assert end_height
     return int(round(start_width * end_height / start_height))
 
 @filterapi
@@ -180,8 +186,11 @@ def new_img_sizes(tag_width,
                 if tag_height is not None:
                     width = scale_width(measured_width, measured_height, tag_height)
     if width is not None and width > default_maxw:
+        if have_full_data:
+            height = scale_height(measured_width, measured_height, default_maxw)
+        elif height is not None:
+            height = scale_height(width, height, default_maxw)
         width = default_maxw
-        height = scale_height(measured_width, measured_height, default_maxw)
     sizes = dict()
     if width is not None:
         sizes['width'] = width
