@@ -4,6 +4,8 @@ Mobilize logging facilities
 
 '''
 
+import logging
+
 def wsgilog(environ):
     '''
     Create a webserver logging function for a wsgi environment
@@ -22,30 +24,25 @@ def wsgilog(environ):
     @type  environ : dict
     
     '''
-    return Logger(environ['wsgi.errors'])
+    return Logger()
     
 class Logger:
     '''
     Class for logging
     '''
 
-    def __init__(self, outf):
+    def __init__(self):
         '''
         ctor
 
-        @param outf : File to write log messages to
-        @type  outf : quacks like a file
-        
         '''
-        self.outf = outf
+        logging.critical('Starting new-style logger')
 
     def msg(self, msg):
         '''
         Write a message
         '''
-        if not msg.endswith('\n'):
-            msg += '\n'
-        self.outf.write(msg)
+        logging.warn(msg)
 
     def headers(self, label, reqinfo, headers, **kw):
         '''
@@ -60,4 +57,3 @@ class Logger:
         for k, v in kw.items():
             msg += ', %s=%s' % (k, v)
         self.msg(msg)
-
