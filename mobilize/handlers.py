@@ -9,6 +9,7 @@ reusable (e.g., todesktop, which is an instance of ToDesktop)
 
 '''
 import re
+import logging
 from . import util
 from . import httputil
 from django.utils.safestring import SafeUnicode
@@ -134,25 +135,20 @@ class WebSourcer(Handler):
         return _html_fromstring(body)
     
     def wsgi_response(self, msite, environ, start_response):
-        from mobilize.log import wsgilog
-        log = wsgilog(environ)
-        if msite.verboselog:
-            self.handler_log(log)
+        from mobilize.log import format_headers_log
+        logging.info('Matching moplate: {}'.format(self.name))
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
-        if msite.verboselog:
-            log.headers('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders()))
+        logging.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
         request_headers = reqinfo.headers(request_overrides)
-        if msite.verboselog:
-            log.headers('modified request headers', reqinfo, request_headers)
+        logging.info(format_headers_log('modified request headers', reqinfo, request_headers))
         source_uri = reqinfo.root_uri + self.source_rel_uri(reqinfo.rel_uri)
         resp, src_resp_bytes = http.request(source_uri, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
-        if msite.verboselog:
-            log.headers('raw response headers', reqinfo, resp, status=resp.status)
+        logging.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
         # Note that for us to mobilize the response, both the request
@@ -165,8 +161,7 @@ class WebSourcer(Handler):
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
         final_resp_headers = msite.postprocess_response_headers(final_resp_headers, resp.status)
-        if msite.verboselog:
-            log.headers('final resp headers', reqinfo, final_resp_headers)
+        logging.info(format_headers_log('final resp headers', reqinfo, final_resp_headers))
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
         start_response(status, final_resp_headers)
         return [final_body]
@@ -270,9 +265,6 @@ class Moplate(WebSourcer):
             self.params = {}
         assert 'elements' not in self.params, '"elements" is reserved/magical in mobile template params.  See Moplate class documention'
         self.imgsubs = imgsubs
-
-    def handler_log(self, log):
-        log.msg('Matching moplate: {}'.format(self.name))
         
     def render(self, full_body, extra_params=None, site_filters=None, reqinfo=None):
         '''
@@ -421,6 +413,7 @@ class PassThrough(WebSourcer):
     '''
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         # TODO: if msite.verboselog, log that we're passing through
+        logging.info('Passing through response for {}'.format(reqinfo.uri))
         return _passthrough_response(src_resp_body, resp)
 
 class SecurityBlock(Handler):

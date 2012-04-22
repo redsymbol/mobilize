@@ -234,6 +234,8 @@ class RequestInfo:
 
     This is for the request directly from the client, prior to any handler.
 
+    TODO: s/uri/url/g
+
     Properties:
       body         : The request body, or None if not applicable
       method       : the request method: 'GET', 'POST', etc.
