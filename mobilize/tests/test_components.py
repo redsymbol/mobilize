@@ -358,3 +358,39 @@ pageTracker._trackPageview();
 
         # Should fail loudly if filters and some other arg are specified
         # TODO: implement assertRaises tests
+
+    def test_omit_dupe_extractions(self):
+        '''
+        Verify that selectors resolving to duplicate elements are discarded
+
+        It's entirely possible for a list of N selectors (either xpath
+        strings, or css path strings) to produce a list of extracted
+        elements that have some duplicates.  A real world example is
+        when one client inconsistendly used <div id="content1"> and
+        <div class="content1"> in their templates, while intending
+        them to mean the same thing.  A component catching both was
+        CssPath(['div#content1', 'div.content1']).  This worked fine
+        until the client started creating divs like: <div
+        class="content1" id="content1">.
+
+        What we normally want to do is to keep only the first matching
+        element, and perhaps log a warning.
+        '''
+        from mobilize.components.extracted import CssPath
+        doc_str = '''<html>
+  <body>
+    <div id="hello" class="blargh hello">
+      Hello, earthling! Are you... CRUNCHY
+    </div>
+  </body>
+</html>'''
+        css_selectors = [
+            'div.hello',
+            'div#hello',
+            ]
+        doc = html.fromstring(doc_str)
+        component = CssPath(css_selectors)
+        extracted = component.extract(doc)
+        self.assertEqual(1, len(extracted))
+        
+

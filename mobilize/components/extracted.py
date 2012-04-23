@@ -1,5 +1,6 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import copy
+import logging
 
 from mobilize import util
 from .common import Component
@@ -202,8 +203,8 @@ class Extracted(Component):
         @param source : HTML element of source to extract from
         @type  source : lxml.html.HtmlElement
 
-        @return       : html element representing extracted content
-        @rtype        : lxml.html.HtmlElement
+        @return       : html elements representing extracted content
+        @rtype        : list of lxml.html.HtmlElement
         
         '''
         if self.keep_if is None:
@@ -212,6 +213,20 @@ class Extracted(Component):
             keepable = self.keep_if
         self.elems = [elem for elem in self._extract(source)
                       if keepable(elem)]
+        # Omit duplicate extractions. See test_omit_dupe_extractions
+        found_ids = set()
+        def keep(elem):
+            _k = True
+            nonlocal found_ids
+            if id(elem) in found_ids:
+                _k = False
+            else:
+                found_ids.add(id(elem))
+            return _k
+        nondupe_elems = [elem for elem in self.elems
+                         if keep(elem)]
+        self.elems = nondupe_elems
+        # TODO: strip out duplicate elements
         if self.usecopy:
             for ii, elem in enumerate(self.elems):
                 self.elems[ii] = copy.deepcopy(elem)
