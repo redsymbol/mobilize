@@ -214,12 +214,11 @@ class Extracted(Component):
         found_ids = set()
         def keepable(elem):
             nonlocal found_ids
-            is_dupe = False
+            keep = True
             if id(elem) in found_ids:
-                is_dupe = True
+                keep = False
             else:
                 found_ids.add(id(elem))
-            keep = not is_dupe
             if keep and self.keep_if:
                 keep = self.keep_if(elem)
             return keep
