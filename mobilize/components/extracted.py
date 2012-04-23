@@ -198,7 +198,11 @@ class Extracted(Component):
         '''
         Extracts content from the source, sets to self.elems
 
-        Relies on self._extract, which should be implemented by the subclass.
+        Relies on self._extract, which should be implemented by the
+        subclass.  Note that if there are duplicates in the list
+        (which can happen given proper selector sets), the element
+        appears only once, in the first possible position. See
+        test_omit_dupe_extractions for more details.
         
         @param source : HTML element of source to extract from
         @type  source : lxml.html.HtmlElement
@@ -207,25 +211,20 @@ class Extracted(Component):
         @rtype        : list of lxml.html.HtmlElement
         
         '''
-        if self.keep_if is None:
-            keepable = lambda elem: True
-        else:
-            keepable = self.keep_if
-        self.elems = [elem for elem in self._extract(source)
-                      if keepable(elem)]
-        # Omit duplicate extractions. See test_omit_dupe_extractions
         found_ids = set()
-        def keep(elem):
-            _k = True
+        def keepable(elem):
             nonlocal found_ids
+            is_dupe = False
             if id(elem) in found_ids:
-                _k = False
+                is_dupe = True
             else:
                 found_ids.add(id(elem))
-            return _k
-        nondupe_elems = [elem for elem in self.elems
-                         if keep(elem)]
-        self.elems = nondupe_elems
+            keep = not is_dupe
+            if keep and self.keep_if:
+                keep = self.keep_if(elem)
+            return keep
+        self.elems = [elem for elem in self._extract(source)
+                      if keepable(elem)]
         # TODO: strip out duplicate elements
         if self.usecopy:
             for ii, elem in enumerate(self.elems):
