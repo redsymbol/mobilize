@@ -20,7 +20,7 @@ def format_headers_log(label, reqinfo, headers, **kw):
     msg = '%s (%s %s): %s' % (
         label,
         reqinfo.method,
-        reqinfo.uri,
+        reqinfo.url,
         str(headers),
         )
     for k, v in kw.items():

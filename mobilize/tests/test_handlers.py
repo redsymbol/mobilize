@@ -56,30 +56,30 @@ class TestMoplate(unittest.TestCase):
                          _todesktoplink('http', 'example.com', '/foobar.html?baz=2'))
 
 class TestWebSourcer(unittest.TestCase):
-    def test_source_uri(self):
+    def test_source_url(self):
         from mobilize.handlers import WebSourcer
         testdata = [
             {'source'      : None,
-             'rel_uri_in'  : '/foo/bar',
-             'rel_uri_out' : '/foo/bar',
+             'rel_url_in'  : '/foo/bar',
+             'rel_url_out' : '/foo/bar',
              },
             {'source'      : '/baz',
-             'rel_uri_in'  : '/foo/bar',
-             'rel_uri_out' : '/baz',
+             'rel_url_in'  : '/foo/bar',
+             'rel_url_out' : '/baz',
              },
             {'source'      : lambda u: u.replace('.php', '.html', 1),
-             'rel_uri_in'  : '/foo.php',
-             'rel_uri_out' : '/foo.html',
+             'rel_url_in'  : '/foo.php',
+             'rel_url_out' : '/foo.html',
              },
             {'source'      : lambda u: u,
-             'rel_uri_in'  : '/foo/bar',
-             'rel_uri_out' : '/foo/bar',
+             'rel_url_in'  : '/foo/bar',
+             'rel_url_out' : '/foo/bar',
              },
             ]
         for ii, td in enumerate(testdata):
             ws = WebSourcer(source = td['source'])
-            expected = td['rel_uri_out']
-            actual = ws.source_rel_uri(td['rel_uri_in'])
+            expected = td['rel_url_out']
+            actual = ws.source_rel_url(td['rel_url_in'])
             self.assertSequenceEqual(expected, actual, ii)
 
 class TestRedirect(unittest.TestCase):

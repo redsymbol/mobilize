@@ -143,7 +143,7 @@ class SquirrelMailMisc(SecurityHook):
         }
     def check_request(self, reqinfo):
         # Drop requests to URLs related to squirrelmail
-        if reqinfo.rel_uri.startswith('/mail/src/'):
+        if reqinfo.rel_url.startswith('/mail/src/'):
             raise DropResponseSignal()
 
 class PhpInfo(SecurityHook):
@@ -160,7 +160,7 @@ class PhpInfo(SecurityHook):
       
     '''
     def check_request(self, reqinfo):
-        if reqinfo.rel_uri.startswith('/phpinfo.php'):
+        if reqinfo.rel_url.startswith('/phpinfo.php'):
             raise DropResponseSignal()
 
 class PhpEasterEggs(SecurityHook):
@@ -196,7 +196,7 @@ class PhpNuke(SecurityHook):
     vulntags = { 'cve-2004-0269' }
     
     def check_request(self, reqinfo):
-        if _phpnuke_sqlinjection_urlmatch(reqinfo.rel_uri):
+        if _phpnuke_sqlinjection_urlmatch(reqinfo.rel_url):
             raise DropResponseSignal()
 
 class TomcatNull(SecurityHook):
@@ -215,20 +215,20 @@ class TomcatNull(SecurityHook):
         'cve-2003-0042',
         }
     def check_request(self, reqinfo):
-        if reqinfo.rel_uri.endswith('%00') or reqinfo.rel_uri.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
+        if reqinfo.rel_url.endswith('%00') or reqinfo.rel_url.startswith('/cgi-bin/tomcat_proxy_directory_traversal'):
             raise DropResponseSignal()
         
 # supporting code
 
-def _phpnuke_sqlinjection_urlmatch(rel_uri: str):
+def _phpnuke_sqlinjection_urlmatch(rel_url: str):
     '''
-    Check whether the relative uri matches some known phpnuke sql injection vectors
+    Check whether the relative url matches some known phpnuke sql injection vectors
     '''
     regexes = map(re.compile, {
             r'(?i)^/modules.php\?.*select.*nuke_',
             r'(?i)^/index.php\?.*select.*nuke_authors',
             })
 
-    return any(regex.search(rel_uri) is not None
+    return any(regex.search(rel_url) is not None
                for regex in regexes)
 

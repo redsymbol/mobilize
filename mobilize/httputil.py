@@ -24,30 +24,30 @@ def _name2field(name, prefix=''):
     field = '-'.join(part.capitalize() for part in parts)
     return field
 
-def _get_root_uri(environ, use_defined_fullsite=True):
+def _get_root_url(environ, use_defined_fullsite=True):
     '''
-    Get the root URI of the incoming request
+    Get the root URL of the incoming request
 
-    The "root URI" is defined as the full url with the request path
-    trunacted.  So the root URI of
+    The "root URL" is defined as the full url with the request path
+    trunacted.  So the root URL of
     "http://example.com/foo/bar?answer=42" is simply
     "http://example.com".
 
     @param environ : wsgi environment
     @type  environ : quackslike(dict)
 
-    @return : root URI
+    @return : root URL
     @rtype  : str
     
     '''
     proto = environ.get('wsgi.url_scheme', 'http')
     host, port = srchostport(environ, use_defined_fullsite)
     assert type(port) is int, type(port)
-    uri = '%s://%s' % (proto, host)
+    url = '%s://%s' % (proto, host)
     stdport = PROTOMAP.get(proto, False)
     if stdport and port != stdport:
-        uri += ':' + str(port)
-    return uri
+        url += ':' + str(port)
+    return url
 
 def get_response_headers(resp_headers, environ, overrides):
     '''
@@ -156,14 +156,14 @@ def srchostport(environ, use_defined_fullsite=True):
             full_port = requesting_port
     return full_host, full_port
     
-def get_rel_uri(environ):
+def get_rel_url(environ):
     '''
-    Shortcut function for getting the relative request URI
+    Shortcut function for getting the relative request URL
 
     So if the request is to http://m.example.com/foo/bar.html, this
     will return '/foo/bar.html'.
 
-    @return : relative request URI
+    @return : relative request URL
     @rtype  : str
     
     '''
@@ -235,8 +235,6 @@ class RequestInfo:
 
     This is for the request directly from the client, prior to any handler.
 
-    TODO: s/uri/url/g
-
     Properties:
       body         : The request body, or None if not applicable
       method       : the request method: 'GET', 'POST', etc.
@@ -244,9 +242,9 @@ class RequestInfo:
       protocol     : request protocol (http, https, etc.)
       queryparams  : query params (a QueryParams instance)
       querystring  : query string
-      rel_uri      : the relative request URI
-      root_uri     : the request URI sans the request path
-      uri          : full request URI
+      rel_url      : the relative request URL
+      root_url     : the request URL sans the request path
+      url          : full request URL
 
     '''
     _rawheaders = None
@@ -266,9 +264,9 @@ class RequestInfo:
             self.body = None
         self.querystring = wsgienviron['QUERY_STRING']
         self.queryparams = QueryParams(self.querystring)
-        self.root_uri = _get_root_uri(wsgienviron)
-        self.rel_uri = get_rel_uri(wsgienviron)
-        self.uri = self.root_uri + self.rel_uri
+        self.root_url = _get_root_url(wsgienviron)
+        self.rel_url = get_rel_url(wsgienviron)
+        self.url = self.root_url + self.rel_url
         self.protocol = wsgienviron['wsgi.url_scheme']
         self.mobilizeable = wsgienviron.get('HTTP_X_REQUESTED_WITH', None) != 'XMLHttpRequest'
 
@@ -464,7 +462,7 @@ def mk_wsgi_application(msite):
         def response(_handler):
             return _handler.wsgi_response(msite, environ, start_response)
         try:
-            handler = msite.handler_map.get_handler_for(get_rel_uri(environ))
+            handler = msite.handler_map.get_handler_for(get_rel_url(environ))
         except NoMatchingHandlerException:
             handler = passthrough
         
@@ -507,67 +505,67 @@ PROTOMAP = dict((v, k) for k, v in PORTMAP.items())
 assert set(PORTMAP.keys()) == set(PROTOMAP.values())
 assert set(PORTMAP.values()) == set(PROTOMAP.keys())
 
-class SourceUriMapper:
+class SourceUrlMapper:
     '''
-    Base class for source URI remappings
+    Base class for source URL remappings
 
-    Instances must be callable, accepting requested_uri as an
+    Instances must be callable, accepting requested_url as an
     argument, and returning the new value.
     
     Usable as the value of the source argument in the Moplate constructor.
     
     '''
-    def __call__(self, requested_uri):
+    def __call__(self, requested_url):
         '''
-        @param requested_uri : Incoming URI
-        @type  requested_uri : str
+        @param requested_url : Incoming URL
+        @type  requested_url : str
 
-        @return              : Source URI
+        @return              : Source URL
         @rtype               : str
         
         '''
         assert False, 'subclass must implement'
 
-class RequestedUriModifier(SourceUriMapper):
-    def __init__(self, new_rel_uri):
+class RequestedUrlModifier(SourceUrlMapper):
+    def __init__(self, new_rel_url):
         '''
-        @param new_rel_uri : New relative URI
-        @type  new_rel_uri : str
+        @param new_rel_url : New relative URL
+        @type  new_rel_url : str
         
         '''
-        self.new_rel_uri = new_rel_uri
+        self.new_rel_url = new_rel_url
         
     
-class NewBaseUri(RequestedUriModifier):
+class NewBaseUrl(RequestedUrlModifier):
     '''
-    Rewrite the base URI, preserving GET params
+    Rewrite the base URL, preserving GET params
 
     This is useful when you don't want to just replace the incoming
-    uri with a different static value, because you want to keep any
+    url with a different static value, because you want to keep any
     GET parameters.
     
     '''
-    def __call__(self, requested_uri):
+    def __call__(self, requested_url):
         '''
-        @param requested_uri : Incoming URI
-        @type  requested_uri : str
+        @param requested_url : Incoming URL
+        @type  requested_url : str
 
-        @return              : Source URI
+        @return              : Source URL
         @rtype               : str
         
         '''
-        uri = self.new_rel_uri
-        pos = requested_uri.find('?')
+        url = self.new_rel_url
+        pos = requested_url.find('?')
         if pos > -1:
-            uri += requested_uri[pos:]
-        return uri
+            url += requested_url[pos:]
+        return url
 
-class ForceUri(RequestedUriModifier):
+class ForceUrl(RequestedUrlModifier):
     '''
-    Hard remaps to a new static source URI, discarding GET parameters
+    Hard remaps to a new static source URL, discarding GET parameters
     '''
-    def __call__(self, requested_uri):
-        return self.new_rel_uri
+    def __call__(self, requested_url):
+        return self.new_rel_url
 
 def is_absolute_url(url):
     protocols = {

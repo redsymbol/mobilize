@@ -63,64 +63,64 @@ class WebSourcer(Handler):
         source defines the policy mapping between incoming request
         URLs and the corresponding URL from the source.  Normally,
         this is just going to be the default value of None, indicating
-        that the requested relative URI is the same as the relative
-        URI on the source.  Arbitrary alternatives are possible, as
-        encapsulated by the source_uri method of this class. See that
+        that the requested relative URL is the same as the relative
+        URL on the source.  Arbitrary alternatives are possible, as
+        encapsulated by the source_url method of this class. See that
         method's documentation for more info.
 
-        @param source : Specifies source URI mapping policy 
-        @type  source : mixed; see documention for self.source_uri
+        @param source : Specifies source URL mapping policy 
+        @type  source : mixed; see documention for self.source_url
 
         '''
         super().__init__(**kw)
-        from mobilize.httputil import NewBaseUri
+        from mobilize.httputil import NewBaseUrl
         if type(source) is str:
-            source = NewBaseUri(source)
+            source = NewBaseUrl(source)
         assert source is None or callable(source), source
         self._source = source
 
-    def source_rel_uri(self, requested_uri):
+    def source_rel_url(self, requested_url):
         '''
-        Return the relative URI to fetch from the source site
+        Return the relative URL to fetch from the source site
 
-        This method calculates the relative URI of the resource to
-        fetch on the source site, based on the incoming request URI to
+        This method calculates the relative URL of the resource to
+        fetch on the source site, based on the incoming request URL to
         the mobile site. The default case is to return the value of
-        requested_uri unmodified, but you also can specify arbitrary
+        requested_url unmodified, but you also can specify arbitrary
         transformation rules. Its behavior depends on the value of
         source passed to the instance's constructor.
 
-        If source is not supplied, or is None, then the relative URI
+        If source is not supplied, or is None, then the relative URL
         of the source is the same as for the incoming request.  In
-        other words, source_uri will return the value of
-        requested_uri.  For many websites this simple case is all you
+        other words, source_url will return the value of
+        requested_url.  For many websites this simple case is all you
         need.
 
-        Otherwise, source must be a SourceUriMapper instance (or quack
+        Otherwise, source must be a SourceUrlMapper instance (or quack
         like one - see below).  As a special case
         exception/convenience/shortcut, if source is a string, an
-        instance of NewBaseUri (with source as an argument) will be
+        instance of NewBaseUrl (with source as an argument) will be
         used instead.
         
-        Source must be a callable that accepts requested_uri as an
-        argument, and return a modified URL value. SourceUriMapper
+        Source must be a callable that accepts requested_url as an
+        argument, and return a modified URL value. SourceUrlMapper
         objects meet this interface, though any callable that behaves
         this way can be used instead.
 
         Note: all references to URLs in this description are meant to
         be relative URLs, not absolute.
 
-        @param requested_uri : Incoming relative URI
-        @type  requested_uri : str
+        @param requested_url : Incoming relative URL
+        @type  requested_url : str
 
-        @return              : Relative URI to fetch from source
+        @return              : Relative URL to fetch from source
         @rtype               : str
         
         '''
         
-        url = requested_uri
+        url = requested_url
         if self._source is not None:
-            url = self._source(requested_uri)
+            url = self._source(requested_url)
         return url
 
     def fromstring(self, body):
@@ -145,8 +145,8 @@ class WebSourcer(Handler):
         logging.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
         request_headers = reqinfo.headers(request_overrides)
         logging.info(format_headers_log('modified request headers', reqinfo, request_headers))
-        source_uri = reqinfo.root_uri + self.source_rel_uri(reqinfo.rel_uri)
-        resp, src_resp_bytes = http.request(source_uri, method=reqinfo.method, body=reqinfo.body,
+        source_url = reqinfo.root_url + self.source_rel_url(reqinfo.rel_url)
+        resp, src_resp_bytes = http.request(source_url, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         logging.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
@@ -362,8 +362,8 @@ class Moplate(WebSourcer):
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
         extra_params = {
             'fullsite'     : msite.fullsite,
-            'request_path' : reqinfo.rel_uri,
-            'todesktop'    : _todesktoplink(reqinfo.protocol, msite.fullsite, reqinfo.rel_uri),
+            'request_path' : reqinfo.rel_url,
+            'todesktop'    : _todesktoplink(reqinfo.protocol, msite.fullsite, reqinfo.rel_url),
             }
         final_body = self.render(src_resp_body, extra_params, msite.mk_site_filters(extra_params), reqinfo)
         response_overrides = msite.response_overrides(environ)
@@ -395,7 +395,7 @@ class ToDesktop(Handler):
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.httputil import RequestInfo
         reqinfo = RequestInfo(environ)
-        to = 'http://{}{}'.format(msite.fullsite, reqinfo.rel_uri)
+        to = 'http://{}{}'.format(msite.fullsite, reqinfo.rel_url)
         start_response(self.status, [('location', to)])
         return ['<html><body><a href="{}">Go to page</a>'.format(to)]
 
@@ -412,7 +412,7 @@ class PassThrough(WebSourcer):
     Pass through the response from the desktop source
     '''
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
-        logging.info('Passing through response for {}'.format(reqinfo.uri))
+        logging.info('Passing through response for {}'.format(reqinfo.url))
         return _passthrough_response(src_resp_body, resp)
 
 class SecurityBlock(Handler):
@@ -431,7 +431,7 @@ class SecurityBlock(Handler):
         reqinfo = RequestInfo(environ)
         message = '''<html><head><title>{status}</title></head><body>
 <h1>{status}</h1>
-The request to {rel_uri} is forbidden as a security measure.'''.format(status=self.status, rel_uri = reqinfo.rel_uri)
+The request to {rel_url} is forbidden as a security measure.'''.format(status=self.status, rel_url = reqinfo.rel_url)
         start_response(self.status, [])
         return [message]
 
@@ -451,14 +451,14 @@ class Redirect(Handler):
     
     def wsgi_response(self, msite, environ, start_response):
         import re
-        from mobilize.httputil import _get_root_uri
+        from mobilize.httputil import _get_root_url
         if re.match(r'\w+://', self.where):
-            # Has explicit protocol, so must be an absolute uri
+            # Has explicit protocol, so must be an absolute url
             location = self.where
         else:
-            # Relative URI; construct relative URI from current request
+            # Relative URL; construct relative URL from current request
             # TODO: I think there may be bug here regarding the desktop vs. mobile domain.
-            location = _get_root_uri(environ, use_defined_fullsite=False) + self.where
+            location = _get_root_url(environ, use_defined_fullsite=False) + self.where
         start_response(self.status, [('Location', location)])
         return ['<html><body><a href="{}">Go to page</a>'.format(location)]
 
@@ -466,7 +466,7 @@ def redirect_to(where, status_code=302):
     '''
     Returns a redirect handler for a specific url
 
-    where is either a relative URI, or can be a full absolute URI.
+    where is either a relative URL, or can be a full absolute URL.
     See the documentation of the where attribute of the Redirect class
     for more information (where is basically copied to
     Redirect.where).
@@ -519,7 +519,7 @@ def _html_fromstring(body):
         # No it doesn't, so let the error propagate
         raise
 
-def _todesktoplink(protocol, fullsite, rel_uri):
+def _todesktoplink(protocol, fullsite, rel_url):
     '''
     Calculate the "todesktop" link string
 
@@ -529,15 +529,15 @@ def _todesktoplink(protocol, fullsite, rel_uri):
     @param fullsite : Desktop (full) site domain, and port of applicable
     @type  fullsite : str
     
-    @return         : rel_uri
-    @rtype          : The relative URI
+    @return         : rel_url
+    @rtype          : The relative URL
 
     @return         : The link the mobile user can follow to view the desktop version of the page
     @rtype          : str
     
     '''
-    link = '{}://{}{}'.format(protocol, fullsite, rel_uri)
-    if '?' in rel_uri:
+    link = '{}://{}{}'.format(protocol, fullsite, rel_url)
+    if '?' in rel_url:
         link += '&'
     else:
         link += '?'

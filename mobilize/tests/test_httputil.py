@@ -85,8 +85,8 @@ class TestHttp(unittest.TestCase):
         self.assertDictEqual(expected, actual)
         self.assertEqual(reqinfo.body, 'hello')
         self.assertEqual(reqinfo.method, 'POST')
-        self.assertEqual(reqinfo.uri, 'http://example.com/Scripts/FormMail_WP2.asp')
-        self.assertEqual(reqinfo.rel_uri, '/Scripts/FormMail_WP2.asp')
+        self.assertEqual(reqinfo.url, 'http://example.com/Scripts/FormMail_WP2.asp')
+        self.assertEqual(reqinfo.rel_url, '/Scripts/FormMail_WP2.asp')
 
     def test_request_mobilizeable(self):
         from mobilize.httputil import RequestInfo
@@ -521,8 +521,8 @@ class TestHttp(unittest.TestCase):
         actual = netbytes2str(src, 'utf-8')
         self.assertEquals(expected, actual)
 
-    def test__get_root_uri(self):
-        from mobilize.httputil import _get_root_uri
+    def test__get_root_url(self):
+        from mobilize.httputil import _get_root_url
         def env(**kw):
             environ = {
             'MWU_SRC_DOMAIN' : 'www.example.com',
@@ -537,25 +537,25 @@ class TestHttp(unittest.TestCase):
             return environ
         testdata = [
             {'environ' : env(),
-             'uri'     : 'http://www.example.com',
+             'url'     : 'http://www.example.com',
              },
             {'environ' : env(REQUEST_URI='/foo/bar'),
-             'uri'     : 'http://www.example.com',
+             'url'     : 'http://www.example.com',
              },
             {'environ' : env(REQUEST_URI='/foo/bar', SERVER_PORT=42),
-             'uri'     : 'http://www.example.com:42',
+             'url'     : 'http://www.example.com:42',
              },
             {'environ' : env(),
-             'uri'     : 'http://www.example.com',
+             'url'     : 'http://www.example.com',
              },
             {'environ' : env(proto='https', SERVER_PORT=443),
-             'uri'     : 'https://www.example.com',
+             'url'     : 'https://www.example.com',
              },
             ]
         for ii, td in enumerate(testdata):
-            expected = td['uri']
+            expected = td['url']
             try:
-                actual = _get_root_uri(td['environ'])
+                actual = _get_root_url(td['environ'])
             except AttributeError:
                 print(td['environ'])
                 raise
@@ -631,12 +631,12 @@ class TestHttp(unittest.TestCase):
         for ii, headers in enumerate(testdata_no):
             self.assertFalse(mobilizeable(headers), ii)
 
-    def test_NewBaseUri(self):
-        from mobilize.httputil import NewBaseUri
-        requested_uri = '/Event/browse?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
-        ur = NewBaseUri('/Event/browseMobile')
+    def test_NewBaseUrl(self):
+        from mobilize.httputil import NewBaseUrl
+        requested_url = '/Event/browse?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
+        ur = NewBaseUrl('/Event/browseMobile')
         expected = '/Event/browseMobile?search_term=tour&search=Search&month=9&year=2011&event_type_id=&region_ids=&calendar_id=&page_number=1'
-        actual = ur(requested_uri)
+        actual = ur(requested_url)
         self.assertEqual(expected, actual)
 
 class TestRequestInfo(unittest.TestCase):
