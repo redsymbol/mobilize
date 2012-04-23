@@ -5,7 +5,13 @@ Mobilize logging facilities
 '''
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+
+# The mobile site can set LOGLEVEL in defs.py
+try:
+    from defs import LOGLEVEL
+except ImportError:
+    LOGLEVEL = logging.WARNING
+logging.basicConfig(level=LOGLEVEL)
 
 def format_headers_log(label, reqinfo, headers, **kw):
     '''
