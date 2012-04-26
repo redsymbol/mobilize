@@ -24,6 +24,16 @@ class Handler:
     
     '''
     
+    #: Optional name/label for this handler instance.  Used for debug logging.
+    _name = None
+    def get_name(self):
+        if self._name is None:
+            return '{} instance'.format(self.__class__.__name__)
+        return self._name
+    def set_name(self, value):
+        self._name = value
+    name = property(get_name, set_name)
+    
     def wsgi_response(self, msite, environ, start_response):
         '''
         Create WSGI HTTP response
@@ -210,11 +220,7 @@ class Moplate(WebSourcer):
     self._render().
 
     '''
-    
-
-    #: Optional name/label for this moplate instance.  Used for debug logging.
-    name = 'undefined'
-    
+      
     def __init__(self,
                  template_name,
                  components,
