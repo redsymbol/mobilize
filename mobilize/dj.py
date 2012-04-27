@@ -39,6 +39,7 @@ class DjangoMoplate(Moplate):
     '''
 
     def _render(self, params):
+        assert False, 'don\'t want to use django anymore: ' + self.template_name
         '''
         TODO: assert that all expected template parameters are in fact
         present in the params dict.  Because of how django's template

@@ -321,9 +321,7 @@ class Moplate(WebSourcer):
 
     def _render(self, params):
         '''
-        Implementation-dependent final rendering
-
-        Subclasses should implement this.
+        Final Jinja2 rendering
 
         @param params : Template parameters
         @type  params : dict (str -> mixed)
@@ -332,7 +330,13 @@ class Moplate(WebSourcer):
         @rtype        : str
         
         '''
-        assert False, 'must be implemented in subclass'
+        import defs
+        import jinja2
+        loader = jinja2.FileSystemLoader(defs.TEMPLATE_DIRS)
+        #cache = jinja2.MemcachedBytecodeCache('127.0.0.1:11211')
+        env = jinja2.Environment(loader=loader)
+        template = env.get_template(self.template_name)
+        return template.render(**params)
 
     def mk_moplate_filters(self, params):
         '''
@@ -375,10 +379,6 @@ class Moplate(WebSourcer):
         response_overrides = msite.response_overrides(environ)
         response_overrides['content-length'] = str(len(final_body))
         final_resp_headers = httputil.get_response_headers(resp, environ, response_overrides)
-        
-        # convert type of final_body from type django.utils.safestring.SafeUnicode to network-friendly bytes
-        # (Someday if/when we are no longer always using Django templates, need to omit or move this conversion.)
-        assert SafeUnicode == type(final_body), type(final_body).__name__
         final_body = bytes(final_body, 'utf-8')
 
         assert type(final_body) is bytes
