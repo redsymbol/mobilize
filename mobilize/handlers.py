@@ -216,13 +216,10 @@ class Moplate(WebSourcer):
     Typically the moplate can be applied to a group of pages with
     similar DOM structure.
 
-    This is an abstract base class. Subclasses must implement at least
-    self._render().
-
     '''
       
     def __init__(self,
-                 template_name,
+                 template,
                  components,
                  params = None,
                  name = None,
@@ -246,24 +243,27 @@ class Moplate(WebSourcer):
         Because of the magical "elements" parameter, the supplied params
         cannot have a key of that name.
 
-        @param template_name : Template name (file)
-        @type  template_name : str
+        @param template   : Template to use
+        @type  template   : mobilize.templates.Template
 
-        @param components    : Components of content elements to extract from full body
-        @type  components    : list
+        @param components : Components of content elements to extract from full body
+        @type  components : list
         
-        @param name          : Human-readable name or label for this moplate
-        @type  name          : stra
+        @param name       : Human-readable name or label for this moplate
+        @type  name       : stra
         
-        @param params        : Other handler parameters for superclass
-        @type  params        : dict (str -> mixed); no "elements" key allowed
+        @param params     : Other handler parameters for superclass
+        @type  params     : dict (str -> mixed); no "elements" key allowed
 
-        @param imgsubs       : Image URL substitutions
-        @type  imgsubs       : dict: str -> str
+        @param imgsubs    : Image URL substitutions
+        @type  imgsubs    : dict: str -> str
         
         '''
+        from jinja2 import Template
+        assert isinstance(template, Template), type(template)
         super().__init__(**kw)
-        self.template_name = template_name
+        self.template = template
+        # TODO: the next lines are an ugly hack, which we'll get rid of when __init__ takes a Template instance argument
         self.components = components
         if params:
             self.params = dict(params)
@@ -317,26 +317,7 @@ class Moplate(WebSourcer):
                 component.extract(doc)
                 component.process(util.idname(ii), all_filters, reqinfo)
         params['elements'] = [component.html() for component in components]
-        return self._render(params)
-
-    def _render(self, params):
-        '''
-        Final Jinja2 rendering
-
-        @param params : Template parameters
-        @type  params : dict (str -> mixed)
-
-        @return       : Rendered mobile page body
-        @rtype        : str
-        
-        '''
-        import defs
-        import jinja2
-        loader = jinja2.FileSystemLoader(defs.TEMPLATE_DIRS)
-        #cache = jinja2.MemcachedBytecodeCache('127.0.0.1:11211')
-        env = jinja2.Environment(loader=loader)
-        template = env.get_template(self.template_name)
-        return template.render(**params)
+        return self.template.render(**params)
 
     def mk_moplate_filters(self, params):
         '''

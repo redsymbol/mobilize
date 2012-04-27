@@ -8,11 +8,11 @@ class Simple(Component):
     '''abstract base of all components that are independent of the source HTML page'''
     extracted = False
 
-class DjangoTemplate(Simple):
+class FromTemplate(Simple):
     '''
     Render directly from a django template
     '''
-    def __init__(self, template, params = None):
+    def __init__(self, template_name, params = None, template_dirs=None):
         '''
         @param template : Path to the django template to render
         @type  template : str
@@ -21,14 +21,20 @@ class DjangoTemplate(Simple):
         @type  params   : dict
         
         '''
+        if not template_dirs:
+            from mobilize.templates import default_template_dirs
+            self.template_dirs = default_template_dirs()
+        else:
+            self.template_dirs = template_dirs
         if not params:
             params = {}
-        self.template = template
+        self.template_name = template_name
         self.params = params
 
     def html(self):
-        from django.template.loader import render_to_string
-        return render_to_string(self.template, self.params)
+        from mobilize.templates import TemplateLoader
+        loader = TemplateLoader(self.template_dirs)
+        return loader.get_template(self.template_name).render(**self.params)
 
 class RawString(Simple):
     '''

@@ -2,11 +2,8 @@
 import unittest
 import os
 import mobilize
-from utils4test import (
-    data_file_path, DATA_DIR,
-    )
+from utils4test import gtt
 
-TEMPLATE_DIR = os.path.join(DATA_DIR, 'templates')
 MINIMAL_HTML_DOCUMENT = '''<!doctype html>
 <html>
   <body>Hi.</body>
@@ -22,18 +19,14 @@ def norm_html(s):
     '''
     return ''.join([x.strip() for x in s.split('\n')])
 
-from mobilize.dj import init_django
-init_django([TEMPLATE_DIR])
-
 class TestMoplate(unittest.TestCase):
     def test_render(self):
-        from mobilize.dj import DjangoMoplate
-        moplate = DjangoMoplate('a.html', [])
+        moplate = mobilize.Moplate(gtt('a.html'), [])
         expected = 'abc xyz'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
 
-        moplate = DjangoMoplate('b.html', [], {'a' : 42})
+        moplate = mobilize.Moplate(gtt('b.html'), [], {'a' : 42})
         expected = 'a: 42'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
@@ -42,7 +35,7 @@ class TestMoplate(unittest.TestCase):
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        moplate = DjangoMoplate('c.html', [], params)
+        moplate = mobilize.Moplate(gtt('c.html'), [], params)
         expected = 'a: 42\nX\nY\nZ\n'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT)
         self.assertEqual(expected, actual)
@@ -51,7 +44,7 @@ class TestMoplate(unittest.TestCase):
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        moplate = DjangoMoplate('c.html', [], params)
+        moplate = mobilize.Moplate(gtt('c.html'), [], params)
         expected = 'a: 84\nX\nY\nZ\n'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
@@ -61,7 +54,7 @@ class TestMoplate(unittest.TestCase):
             'a' : 42,
             'elems' : ['X', 'Y', 'Z'],
             }
-        moplate = DjangoMoplate('c.html', [], params)
+        moplate = mobilize.Moplate(gtt('c.html'), [], params)
         expected = 'a: 84\nX\nY\nZ\n'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
@@ -72,17 +65,16 @@ class TestMoplate(unittest.TestCase):
             'b' : 21,
             'elems' : ['X', 'Y', 'Z'],
             }
-        moplate = DjangoMoplate('c.html', [], params)
+        moplate = mobilize.Moplate(gtt('c.html'), [], params)
         expected = 'a: 84\nX\nY\nZ\nb: 21'
         actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
         self.assertEqual(expected, actual)
 
     def test_params(self):
-        from mobilize.dj import DjangoMoplate
         # Expect the mobilize.Moplate ctor to loudly fail if we try to pass in controlled parameters
         ok = False
         try:
-            moplate = DjangoMoplate('a.html', [], {'elements' : ['a', 'b']} )
+            moplate = mobilize.Moplate(gtt('a.html'), [], {'elements' : ['a', 'b']} )
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -90,12 +82,11 @@ class TestMoplate(unittest.TestCase):
 class TestHandlerMap(unittest.TestCase):
     def test_get_handler_for(self):
         from mobilize.exceptions import NoMatchingHandlerException
-        from mobilize import DjangoMoplate
         # test templates
-        t_a = DjangoMoplate('a.html', [])
-        t_b = DjangoMoplate('b.html', [])
-        t_c = DjangoMoplate('c.html', [])
-        t_d = DjangoMoplate('d.html', [])
+        t_a = mobilize.Moplate(gtt('a.html'), [])
+        t_b = mobilize.Moplate(gtt('b.html'), [])
+        t_c = mobilize.Moplate(gtt('c.html'), [])
+        t_d = mobilize.Moplate(gtt('d.html'), [])
 
         mapping = [
             (r'/alpha/',    t_a),
@@ -103,11 +94,11 @@ class TestHandlerMap(unittest.TestCase):
             (r'/beta/',     t_c),
             (r'/\w+$',      t_d),
             ]
-        tmap = mobilize.HandlerMap(mapping)
+        hmap = mobilize.HandlerMap(mapping)
         def matching(url):
             # the name of the moplate actually matched
-            t = tmap.get_handler_for(url)
-            return t.template_name
+            h = hmap.get_handler_for(url)
+            return h.template.name
 
         self.assertEqual('a.html', matching('/alpha/'))
         self.assertEqual('b.html', matching('/beta/'))
@@ -119,7 +110,6 @@ class TestMobileSite(unittest.TestCase):
     maxDiff = None
 
     def test_render(self):
-        from mobilize.dj import DjangoMoplate
         full_body = '''<!doctype html>
 <html>
   <title>Test Page Content</title>
@@ -183,23 +173,29 @@ class TestMobileSite(unittest.TestCase):
   </body>
 </html>
 '''
-        from mobilize.components import DjangoTemplate, XPath, CssPath, RawString
+        from utils4test import TEST_TEMPLATE_DIR
+        from mobilize.components import (
+            FromTemplate,
+            XPath,
+            CssPath,
+            RawString,
+            )
         components = [
             XPath(r'//*[@id="header"]'),
             CssPath('ul.navigation'),
             CssPath('div#main-content'),
             RawString('<div class="custom-elem"><a href="http://mobilewebup.com">Mobile Websites</a> by Mobile Web Up</div>'),
-            DjangoTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}),
+            FromTemplate('footer1.html', {'full_site_url' : 'http://www.example.com'}, template_dirs=[TEST_TEMPLATE_DIR]),
             ]
         params = {
-            'title'        : '<Mobile Test One>',
+            'title'        : '&lt;Mobile Test One&gt;',
             'fullsite'     : 'example.com',
             'request_path' : '/foo',
             }
-        moplate = DjangoMoplate('one.html', components, params)
-        tmap = mobilize.HandlerMap([('/foo$', moplate)])
+        moplate = mobilize.Moplate(gtt('one.html'), components, params)
+        hmap = mobilize.HandlerMap([('/foo$', moplate)])
         domains = mobilize.Domains(mobile='m.example.com', desktop='example.com')
-        msite = mobilize.MobileSite(domains, tmap)
+        msite = mobilize.MobileSite(domains, hmap)
 
         expected = mobile_body
         actual = moplate.render(full_body, params)
