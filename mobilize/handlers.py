@@ -12,7 +12,6 @@ import re
 import logging
 from . import util
 from . import httputil
-from django.utils.safestring import SafeUnicode
 
 class Handler:
     '''
@@ -308,7 +307,7 @@ class Moplate(WebSourcer):
 
         '''
         if '' == full_body:
-            rendered = SafeUnicode('')
+            rendered = ''
         else:
             rendered = self._render_str(full_body, extra_params, site_filters, reqinfo)
         return rendered
