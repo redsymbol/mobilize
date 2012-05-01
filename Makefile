@@ -13,7 +13,7 @@ doc-api:
 	epydoc -v --output $(API_DOC_DIR) mobilize
 
 locdevpublish: clean
-	locdevpublish.sh ./mobilize /var/www/share/mobilize-libs/dev/
+	locdevpublish.sh ./ /var/www/share/mobilize-libs/dev/
 
 co:
 	rm -rf pack pack.tgz
