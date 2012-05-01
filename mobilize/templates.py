@@ -8,9 +8,11 @@ class TemplateLoader:
     '''
     Loads a template
     '''
-    def __init__(self, template_dirs):
+    def __init__(self, template_dirs = None):
         '''
         '''
+        if template_dirs is None:
+            template_dirs = default_template_dirs()
         self.template_dirs = template_dirs
         jloader = jinja2.FileSystemLoader(template_dirs)
         #cache = jinja2.MemcachedBytecodeCache('127.0.0.1:11211')

@@ -2,7 +2,6 @@
 import unittest
 import os
 import mobilize
-from utils4test import data_file_path, DATA_DIR
 
 import io
 fake_wsgi_input = io.StringIO('hello')

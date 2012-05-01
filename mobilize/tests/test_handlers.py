@@ -4,17 +4,6 @@ from lxml import html
 from utils4test import normxml
 
 class TestMoplate(unittest.TestCase):
-    def test_render_empty(self):
-        '''
-        test that we can render an empty document body correctly
-        '''
-        from mobilize.handlers import Moplate
-        class TestMoplate(Moplate):
-            def _render(self, params):
-                return ''
-        tm = TestMoplate('foo', [])
-        self.assertEquals('', tm.render(''))
-        
     def test_source_params(self):
         '''test that default parameters are correctly extracted from the source document'''
         from mobilize.handlers import _rendering_params

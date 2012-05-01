@@ -219,14 +219,19 @@ class Moplate(WebSourcer):
     '''
       
     def __init__(self,
-                 template,
+                 template_name_or_obj,
                  components,
                  params = None,
                  name = None,
                  imgsubs = None,
+                 template_loader = None,
                  **kw):
         '''
         ctor
+
+        template_name_or_obj can be either a string, or an instance of
+        jinja2.Template.  If the former, it's assumed to be the name
+        of a template to load from TEMPLATE_DIRS.
         
         components is an ordered list of mobilize page components (see
         L{mobilize.components}), identifying content elements in the
@@ -243,27 +248,36 @@ class Moplate(WebSourcer):
         Because of the magical "elements" parameter, the supplied params
         cannot have a key of that name.
 
-        @param template   : Template to use
-        @type  template   : mobilize.templates.Template
+        @param template_name_or_obj : Template to use
+        @type  template_name_or_obj : mobilize.templates.Template
 
-        @param components : Components of content elements to extract from full body
-        @type  components : list
+        @param components           : Components of content elements to extract from full body
+        @type  components           : list
         
-        @param name       : Human-readable name or label for this moplate
-        @type  name       : stra
+        @param name                 : Human-readable name or label for this moplate
+        @type  name                 : stra
         
-        @param params     : Other handler parameters for superclass
-        @type  params     : dict (str -> mixed); no "elements" key allowed
+        @param params               : Other handler parameters for superclass
+        @type  params               : dict (str -> mixed); no "elements" key allowed
 
-        @param imgsubs    : Image URL substitutions
-        @type  imgsubs    : dict: str -> str
+        @param imgsubs              : Image URL substitutions
+        @type  imgsubs              : dict: str -> str
+
+        @param template_loader      : Alternative template loader to use
+        @type  template_loader      : mobilize.templates.TemplateLoader
         
         '''
         from jinja2 import Template
+        from mobilize.templates import TemplateLoader
+        if template_loader is None:
+            template_loader = TemplateLoader()
+        if type(template_name_or_obj) == str:
+            template = template_loader.get_template(template_name_or_obj)
+        else:
+            template = template_name_or_obj
         assert isinstance(template, Template), type(template)
         super().__init__(**kw)
         self.template = template
-        # TODO: the next lines are an ugly hack, which we'll get rid of when __init__ takes a Template instance argument
         self.components = components
         if params:
             self.params = dict(params)

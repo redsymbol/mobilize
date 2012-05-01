@@ -2,7 +2,10 @@
 import unittest
 import os
 import mobilize
-from utils4test import gtt
+from utils4test import (
+    gtt,
+    test_template_loader,
+    )
 
 MINIMAL_HTML_DOCUMENT = '''<!doctype html>
 <html>
@@ -20,6 +23,14 @@ def norm_html(s):
     return ''.join([x.strip() for x in s.split('\n')])
 
 class TestMoplate(unittest.TestCase):
+    def test_template_name_or_obj(self):
+        '''
+        test that Moplate ctor can automatically create a Template from a name
+        '''
+        'abc xyz'
+        m_name = mobilize.Moplate('a.html', [], template_loader=test_template_loader)
+        m_template = mobilize.Moplate(gtt('a.html'), [])
+
     def test_render(self):
         moplate = mobilize.Moplate(gtt('a.html'), [])
         expected = 'abc xyz'

@@ -4,8 +4,10 @@ Utilities used by tests in this project
 '''
 
 import os
+from mobilize.templates import TemplateLoader
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 TEST_TEMPLATE_DIR = os.path.join(TEST_DATA_DIR, 'templates')
+test_template_loader = TemplateLoader([TEST_TEMPLATE_DIR])
 
 def data_file_path(*components):
     '''
@@ -35,6 +37,4 @@ def gtt(name):
     @rtype      : jinja2.Template
     
     '''
-    from mobilize.templates import TemplateLoader
-    loader = TemplateLoader([TEST_TEMPLATE_DIR])
-    return loader.get_template(name)
+    return test_template_loader.get_template(name)
