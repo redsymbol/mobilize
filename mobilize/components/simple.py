@@ -10,11 +10,11 @@ class Simple(Component):
 
 class FromTemplate(Simple):
     '''
-    Render directly from a django template
+    Render directly from a jinja2 template
     '''
     def __init__(self, template_name, params = None, template_dirs=None):
         '''
-        @param template : Path to the django template to render
+        @param template : Path to the jinja2 template file to render
         @type  template : str
 
         @param params   : Template parameters
