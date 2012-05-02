@@ -11,7 +11,8 @@ try:
     from defs import LOGLEVEL
 except ImportError:
     LOGLEVEL = logging.WARNING
-logging.basicConfig(level=LOGLEVEL)
+logger = logging.getLogger('mobilize')
+logger.setLevel(LOGLEVEL)
 
 def format_headers_log(label, reqinfo, headers, **kw):
     '''

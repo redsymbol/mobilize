@@ -6,7 +6,7 @@ HTTP and WSGI server utilities
 
 import re
 import collections
-import logging
+from mobilize.log import logger
 
 def _name2field(name, prefix=''):
     '''
@@ -452,7 +452,7 @@ def mk_wsgi_application(msite):
     '''
     def application(environ, start_response):
         from mobilize.log import LOGLEVEL
-        logging.critical('Log level is {}'.format(LOGLEVEL))
+        logger.critical('Log level is {}'.format(LOGLEVEL))
         from mobilize.handlers import (
             passthrough,
             securityblock,

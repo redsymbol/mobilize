@@ -1,6 +1,5 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import copy
-import logging
 
 from mobilize import util
 from .common import Component

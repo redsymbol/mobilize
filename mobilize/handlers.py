@@ -9,7 +9,7 @@ reusable (e.g., todesktop, which is an instance of ToDesktop)
 
 '''
 import re
-import logging
+from mobilize.log import logger
 from . import util
 from . import httputil
 
@@ -145,19 +145,19 @@ class WebSourcer(Handler):
     
     def wsgi_response(self, msite, environ, start_response):
         from mobilize.log import format_headers_log
-        logging.info('Matching moplate: {}'.format(self.name))
+        logger.info('Matching moplate: {}'.format(self.name))
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
-        logging.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
+        logger.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
         request_headers = reqinfo.headers(request_overrides)
-        logging.info(format_headers_log('modified request headers', reqinfo, request_headers))
+        logger.info(format_headers_log('modified request headers', reqinfo, request_headers))
         source_url = reqinfo.root_url + self.source_rel_url(reqinfo.rel_url)
         resp, src_resp_bytes = http.request(source_url, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
-        logging.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
+        logger.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
         # Note that for us to mobilize the response, both the request
@@ -170,7 +170,7 @@ class WebSourcer(Handler):
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
         final_resp_headers = msite.postprocess_response_headers(final_resp_headers, resp.status)
-        logging.info(format_headers_log('final resp headers', reqinfo, final_resp_headers))
+        logger.info(format_headers_log('final resp headers', reqinfo, final_resp_headers))
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
         start_response(status, final_resp_headers)
         return [final_body]
@@ -287,6 +287,7 @@ class Moplate(WebSourcer):
         if not isinstance(template, Template):
             template = template_loader.get_template(template)
         assert isinstance(template, Template), type(template)
+        logger.debug('Moplate {} using template named "{}"'.format(name, template.name))
         super().__init__(**kw)
         self.template = template
         self.components = components
@@ -437,7 +438,7 @@ class PassThrough(WebSourcer):
     Pass through the response from the desktop source
     '''
     def _final_wsgi_response(self, environ, msite, reqinfo, resp, src_resp_body):
-        logging.info('Passing through response for {}'.format(reqinfo.url))
+        logger.info('Passing through response for {}'.format(reqinfo.url))
         return _passthrough_response(src_resp_body, resp)
 
 class SecurityBlock(Handler):

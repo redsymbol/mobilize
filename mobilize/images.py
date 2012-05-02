@@ -3,6 +3,7 @@
 Code related to image optimization
 '''
 from mobilize.filters.filterbase import filterapi
+from mobilize.log import logger
 
 #: maximum image width when otherwise unspecified
 DEFAULT_MAXW=300
@@ -42,8 +43,7 @@ def to_imgserve_url(url, maxw, maxh):
     @rtype      : str
     
     '''
-    import logging
-    logging.debug('Converting img URL: {}'.format(url))
+    logger.debug('Converting img URL: {}'.format(url))
     from urllib.parse import quote
     assert maxw > 0, maxw
     imgserve_url = '/_mwuimg/?src={src}&maxw={maxw}'.format(src=quote(url, safe=''), maxw=str(maxw))
