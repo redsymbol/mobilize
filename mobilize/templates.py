@@ -9,6 +9,11 @@ def _mk_default_template_dirs():
     Calculate the default template directories from the mobile site
     Assumes a module "defs" is importable, which has a list
     TEMPLATE_DIRS.
+
+    Note that the value of this will differ depending on the context
+    in which it is imported, because it relies on a defs module that
+    mobilize does not include (but the importing code is expected to
+    have implemented).
     '''
     import os
     from mobilize import SITESKEL_ROOT
