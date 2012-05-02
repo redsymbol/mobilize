@@ -22,8 +22,8 @@ class FromTemplate(Simple):
         
         '''
         if not template_dirs:
-            from mobilize.templates import default_template_dirs
-            self.template_dirs = default_template_dirs()
+            from mobilize.templates import DEFAULT_TEMPLATE_DIRS
+            self.template_dirs = DEFAULT_TEMPLATE_DIRS
         else:
             self.template_dirs = template_dirs
         if not params:
