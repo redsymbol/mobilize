@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <!--[if lt IE 9]>
+    <script src="{{globalstatic_url}}iehtml5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta http-equiv="HandheldFriendly" content="True" />
+    {% if favicon %}<link rel="shortcut icon" type="image/png" href="{{favicon}}"/>{% endif %}
+    {% if touchicon %}<link rel="apple-touch-icon" href="{{touchicon}}"/>{% endif %}
+    <link rel="canonical" href="http://{{fullsite}}{{request_path}}"/>
+    <link rel="stylesheet" href="{{globalstatic_url}}base.css"/>
+    <link rel="stylesheet" href="{{static_url}}site.css"/>
+    <script src="{{globalstatic_url}}offset.js"></script>
+    {% if has_site_js %}<script src="{{static_url}}site.js"></script>{% endif %}
+    {% if title %}<title>{{title}}</title>{% elif default_title %}<title>{{default_title}}</title>{% endif %}
+    {% block extra_head %}{% endblock %}
+  </head>
+<body>
+  <header id="mwu-head">
+{% block header %}{% include "header.html" ignore missing %}{% endblock %}
+  </header>
+{% for element in elements %}{{element}}
+
+{% endfor %}
+  <footer id="mwu-foot">
+    <a href="{{todesktop}}">Full Site</a>
+  </footer>
+  </body>
+</html>
