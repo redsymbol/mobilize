@@ -42,12 +42,12 @@ def default_template_dirs():
     '''
     import os
     from mobilize import SITESKEL_ROOT
-    global_templates = [
-        os.path.join(SITESKEL_ROOT, 'templates'),
-        ]
     try:
         from defs import TEMPLATE_DIRS as sitedirs
     except ImportError:
         sitedirs = []
-    return global_templates + sitedirs
+    global_templates = [
+        os.path.join(SITESKEL_ROOT, 'templates'),
+        ]
+    return sitedirs + global_templates
 
