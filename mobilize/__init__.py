@@ -9,12 +9,17 @@ device-specific adaptation; and many other flexible, powerful,
 extensible features.
 
 '''
+import os
+
 from .base import *
 from .handlers import (
     todesktop,
     passthrough,
     Moplate,
     )
+
+MOBILIZE_ROOT = os.path.dirname(__file__)
+SITESKEL_ROOT = os.path.join(MOBILIZE_ROOT, '..', 'siteskel')
 
 __all__ = [
     'MobileSite',

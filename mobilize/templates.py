@@ -40,13 +40,14 @@ def default_template_dirs():
 
     If that is not the case, return an empty directory.
     '''
-    start = [
-        # HACK
-        '/var/www/share/mobilize-libs/dev/siteskel/templates/',
+    import os
+    from mobilize import SITESKEL_ROOT
+    global_templates = [
+        os.path.join(SITESKEL_ROOT, 'templates'),
         ]
     try:
         from defs import TEMPLATE_DIRS as sitedirs
     except ImportError:
         sitedirs = []
-    return start + sitedirs
+    return global_templates + sitedirs
 
