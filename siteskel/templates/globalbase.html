@@ -17,10 +17,8 @@
     {% if title %}<title>{{title}}</title>{% elif default_title %}<title>{{default_title}}</title>{% endif %}
     {% block extra_head %}{% endblock %}
   </head>
-<body>
-  <header id="mwu-head">
-{% block header %}{% include "header.html" ignore missing %}{% endblock %}
-  </header>
+<body{% if bodyclass %} class="{{bodyclass}}"{% endif %}>
+{% block header %}{% endblock %} {# put HEADER tag in here #}
 {% for element in elements %}{{element}}
 
 {% endfor %}
