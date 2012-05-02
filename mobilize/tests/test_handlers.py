@@ -1,9 +1,102 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import unittest
 from lxml import html
-from utils4test import normxml
+import mobilize
+from utils4test import (
+    normxml,
+    test_template_loader,
+    gtt,
+    )
 
-class TestMoplate(unittest.TestCase):
+MINIMAL_HTML_DOCUMENT = '''<!doctype html>
+<html>
+  <body>Hi.</body>
+</html>
+'''
+
+class TestMoplate(mobilize.Moplate):
+    '''
+    This is exactly like the regular mobilize.handler.Moplate, except
+    that it uses the test_template_loader to load templates.
+    '''
+    def default_template_loader(self):
+        return test_template_loader
+    
+class TestForMoplate(unittest.TestCase):
+    def test_ctor_template(self):
+        '''
+        test that Moplate ctor can automatically create a Template from a name
+        '''
+        m_name = TestMoplate([], template='a.html')
+        m_template = TestMoplate([], template=gtt('a.html'))
+        # select the first matching template by name
+        m_multi_a = TestMoplate([], template=['a.html', 'b.html'])
+        self.assertEqual('a.html', m_multi_a.template.name)
+        m_multi_b = TestMoplate([], template=['b.html', 'a.html'])
+        self.assertEqual('b.html', m_multi_b.template.name)
+        # if no match for first named template, fall back to second
+        m_multi_a2 = TestMoplate([], template=['doesnotexist.html', 'a.html'])
+        self.assertEqual('a.html', m_multi_a2.template.name)
+
+    def test_render(self):
+        moplate = mobilize.Moplate([], template=gtt('a.html'))
+        expected = 'abc xyz'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
+        self.assertEqual(expected, actual)
+
+        moplate = mobilize.Moplate([], {'a' : 42}, template=gtt('b.html'))
+        expected = 'a: 42'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
+        self.assertEqual(expected, actual)
+
+        params = {
+            'a' : 42,
+            'elems' : ['X', 'Y', 'Z'],
+            }
+        moplate = mobilize.Moplate([], params, template=gtt('c.html'))
+        expected = 'a: 42\nX\nY\nZ\n'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
+        self.assertEqual(expected, actual)
+
+        params = {
+            'a' : 42,
+            'elems' : ['X', 'Y', 'Z'],
+            }
+        moplate = mobilize.Moplate([], params, template=gtt('c.html'))
+        expected = 'a: 84\nX\nY\nZ\n'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        self.assertEqual(expected, actual)
+
+        # override params with extra_params
+        params = {
+            'a' : 42,
+            'elems' : ['X', 'Y', 'Z'],
+            }
+        moplate = mobilize.Moplate([], params, template=gtt('c.html'))
+        expected = 'a: 84\nX\nY\nZ\n'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        self.assertEqual(expected, actual)
+
+        # add in extra_params (no clobbering)
+        params = {
+            'a' : 42,
+            'b' : 21,
+            'elems' : ['X', 'Y', 'Z'],
+            }
+        moplate = mobilize.Moplate([], params, template=gtt('c.html'))
+        expected = 'a: 84\nX\nY\nZ\nb: 21'
+        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
+        self.assertEqual(expected, actual)
+
+    def test_params(self):
+        # Expect the mobilize.Moplate ctor to loudly fail if we try to pass in controlled parameters
+        ok = False
+        try:
+            moplate = mobilize.Moplate([], {'elements' : ['a', 'b']} , template=gtt('a.html'))
+        except AssertionError:
+            ok = True
+        self.assertTrue(ok)
+
     def test_source_params(self):
         '''test that default parameters are correctly extracted from the source document'''
         from mobilize.handlers import _rendering_params

@@ -2,16 +2,7 @@
 import unittest
 import os
 import mobilize
-from utils4test import (
-    gtt,
-    test_template_loader,
-    )
-
-MINIMAL_HTML_DOCUMENT = '''<!doctype html>
-<html>
-  <body>Hi.</body>
-</html>
-'''
+from utils4test import gtt
 
 def norm_html(s):
     '''
@@ -22,82 +13,14 @@ def norm_html(s):
     '''
     return ''.join([x.strip() for x in s.split('\n')])
 
-class TestMoplate(unittest.TestCase):
-    def test_template_name_or_obj(self):
-        '''
-        test that Moplate ctor can automatically create a Template from a name
-        '''
-        'abc xyz'
-        m_name = mobilize.Moplate('a.html', [], template_loader=test_template_loader)
-        m_template = mobilize.Moplate(gtt('a.html'), [])
-
-    def test_render(self):
-        moplate = mobilize.Moplate(gtt('a.html'), [])
-        expected = 'abc xyz'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
-        self.assertEqual(expected, actual)
-
-        moplate = mobilize.Moplate(gtt('b.html'), [], {'a' : 42})
-        expected = 'a: 42'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
-        self.assertEqual(expected, actual)
-
-        params = {
-            'a' : 42,
-            'elems' : ['X', 'Y', 'Z'],
-            }
-        moplate = mobilize.Moplate(gtt('c.html'), [], params)
-        expected = 'a: 42\nX\nY\nZ\n'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT)
-        self.assertEqual(expected, actual)
-
-        params = {
-            'a' : 42,
-            'elems' : ['X', 'Y', 'Z'],
-            }
-        moplate = mobilize.Moplate(gtt('c.html'), [], params)
-        expected = 'a: 84\nX\nY\nZ\n'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
-        self.assertEqual(expected, actual)
-
-        # override params with extra_params
-        params = {
-            'a' : 42,
-            'elems' : ['X', 'Y', 'Z'],
-            }
-        moplate = mobilize.Moplate(gtt('c.html'), [], params)
-        expected = 'a: 84\nX\nY\nZ\n'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
-        self.assertEqual(expected, actual)
-
-        # add in extra_params (no clobbering)
-        params = {
-            'a' : 42,
-            'b' : 21,
-            'elems' : ['X', 'Y', 'Z'],
-            }
-        moplate = mobilize.Moplate(gtt('c.html'), [], params)
-        expected = 'a: 84\nX\nY\nZ\nb: 21'
-        actual = moplate.render(MINIMAL_HTML_DOCUMENT, {'a' : 84})
-        self.assertEqual(expected, actual)
-
-    def test_params(self):
-        # Expect the mobilize.Moplate ctor to loudly fail if we try to pass in controlled parameters
-        ok = False
-        try:
-            moplate = mobilize.Moplate(gtt('a.html'), [], {'elements' : ['a', 'b']} )
-        except AssertionError:
-            ok = True
-        self.assertTrue(ok)
-
 class TestHandlerMap(unittest.TestCase):
     def test_get_handler_for(self):
         from mobilize.exceptions import NoMatchingHandlerException
         # test templates
-        t_a = mobilize.Moplate(gtt('a.html'), [])
-        t_b = mobilize.Moplate(gtt('b.html'), [])
-        t_c = mobilize.Moplate(gtt('c.html'), [])
-        t_d = mobilize.Moplate(gtt('d.html'), [])
+        t_a = mobilize.Moplate([], template=gtt('a.html'))
+        t_b = mobilize.Moplate([], template=gtt('b.html'))
+        t_c = mobilize.Moplate([], template=gtt('c.html'))
+        t_d = mobilize.Moplate([], template=gtt('d.html'))
 
         mapping = [
             (r'/alpha/',    t_a),
@@ -203,7 +126,7 @@ class TestMobileSite(unittest.TestCase):
             'fullsite'     : 'example.com',
             'request_path' : '/foo',
             }
-        moplate = mobilize.Moplate(gtt('one.html'), components, params)
+        moplate = mobilize.Moplate(components, params, template=gtt('one.html'))
         hmap = mobilize.HandlerMap([('/foo$', moplate)])
         domains = mobilize.Domains(mobile='m.example.com', desktop='example.com')
         msite = mobilize.MobileSite(domains, hmap)

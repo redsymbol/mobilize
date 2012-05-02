@@ -55,12 +55,12 @@ class TemplateLoader:
         '''
         Load a template
 
-        @param name : Name of template to load
-        @type  name : str
+        @param name : Name of template to load, or prioritized list of names
+        @type  name : str, or list of str
         
         @return     : ready-to-render Jinja2 template
         @rtype      : jinja2.Template
         
         '''
-        return self.jenv.get_template(name)
+        return self.jenv.get_or_select_template(name)
     
