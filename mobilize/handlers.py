@@ -217,6 +217,11 @@ class Moplate(WebSourcer):
 
     '''
       
+    DEFAULT_TEMPLATE_NAMES = [
+        'globalbase.html',
+        'base.html',
+        ]
+
     def __init__(self,
                  components,
                  params          = None,
@@ -270,10 +275,7 @@ class Moplate(WebSourcer):
         if template_loader is None:
             template_loader = self.default_template_loader()
         if template is None:
-            template = [
-                'globalbase.html',
-                'base.html',
-                ]
+            template = self.DEFAULT_TEMPLATE_NAMES
         if not isinstance(template, Template):
             template = template_loader.get_template(template)
         assert isinstance(template, Template), type(template)
