@@ -218,8 +218,8 @@ class Moplate(WebSourcer):
     '''
       
     DEFAULT_TEMPLATE_NAMES = [
-        'globalbase.html',
         'base.html',
+        'globalbase.html',
         ]
 
     def __init__(self,
