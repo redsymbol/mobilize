@@ -43,13 +43,17 @@ class TemplateLoader:
         @type  template_dirs : list of str
         
         '''
+        import memcache
         if template_dirs is None:
             template_dirs = DEFAULT_TEMPLATE_DIRS
         assert len(template_dirs) > 0
         self.template_dirs = template_dirs
         jloader = jinja2.FileSystemLoader(template_dirs)
-        #cache = jinja2.MemcachedBytecodeCache('127.0.0.1:11211')
-        self.jenv = jinja2.Environment(loader=jloader)
+        cache = jinja2.MemcachedBytecodeCache(memcache.Client(['127.0.0.1:11211']))
+        self.jenv = jinja2.Environment(
+            loader=jloader,
+            bytecode_cache = cache,
+            )
 
     def get_template(self, name):
         '''
