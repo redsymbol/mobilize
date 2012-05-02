@@ -233,10 +233,6 @@ class Moplate(WebSourcer):
         '''
         ctor
 
-        template can be either a string, or an instance of
-        jinja2.Template.  If the former, it's assumed to be the name
-        of a template to load from TEMPLATE_DIRS.
-        
         components is an ordered list of mobilize page components (see
         L{mobilize.components}), identifying content elements in the
         mobile page body, some of which are based on content from the
@@ -244,6 +240,18 @@ class Moplate(WebSourcer):
         available to the template as the "elements" attribute of the
         parameter dictionary.
 
+        The params field is for a starting set of template parameters
+        for final rendering.  It is optional, defaulting to an empty
+        dict, and there are ways to add to this set later on.  It MUST
+        NOT contain a key named "elements", as that is reserved for
+        later use; the ctor will check double check this for you, so
+        if you accidentally put it in, you'd get an immediate runtime
+        error.
+
+        template can be either a string, or an instance of
+        jinja2.Template.  If the former, it's assumed to be the name
+        of a template to load from TEMPLATE_DIRS.
+        
         The imgsubs parameter can be used to specify image URL
         substitutions specific to this moplate.  If provided, a
         filters.imgsubs filter will be applied to all moplate components
@@ -255,7 +263,7 @@ class Moplate(WebSourcer):
         @param components      : Components of content elements to extract from full body
         @type  components      : list
         
-        @param params          : Other handler parameters for superclass
+        @param params          : Starting set of rendering parameters
         @type  params          : dict (str -> mixed); no "elements" key allowed
 
         @param template        : Template to use
