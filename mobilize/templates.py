@@ -3,6 +3,7 @@
 Templating facilities
 '''
 import jinja2
+from mobilize.log import logger
 
 def _mk_default_template_dirs():
     '''
@@ -66,5 +67,13 @@ class TemplateLoader:
         @rtype      : jinja2.Template
         
         '''
-        return self.jenv.get_or_select_template(name)
+        from jinja2.exceptions import TemplatesNotFound
+        template = None
+        try:
+            template = self.jenv.get_or_select_template(name)
+        except TemplatesNotFound:
+            logger.critical('Could not find any template for names: {}'.format(str(name)))
+            raise
+        return template
+            
     
