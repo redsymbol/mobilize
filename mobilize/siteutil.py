@@ -31,10 +31,10 @@ def mk_tparams(sitedefs, is_https=False):
     @rtype          : function
     
     '''
+    globalstatic_url = 'http://gs.mobilewebup.com/'
+    globalstatic_url_https = 'https://gs-mobilewebup-com.s3.amazonaws.com/'
     if is_https:
-        globalstatic_url = 'https://gs-mobilewebup-com.s3.amazonaws.com/'
-    else:
-        globalstatic_url = 'http://gs.mobilewebup.com/'
+        globalstatic_url = globalstatic_url_https
     
     default_params = {
         'default_title'    : getattr(sitedefs, 'DEFAULT_TITLE', ''),
@@ -42,9 +42,15 @@ def mk_tparams(sitedefs, is_https=False):
         'fullsite'         : sitedefs.DESKTOP_DOMAIN,
         'static_url'       : '/_mwu/',
         'globalstatic_url' : globalstatic_url,
+        'globalstatic_url_https' : globalstatic_url_https,
         'nominify'         : getattr(sitedefs, 'NOMINIFY', False),
         }
-    
+
+    for option in ('FAVICON', 'TOUCHICON'):
+        if hasattr(sitedefs, option):
+            key = option.lower()
+            default_params[key] = getattr(sitedefs, option)
+            
     def tparams(**kw):
         '''
         Parameters for templates.  Common defaults, overrideable with keyword parameters.
