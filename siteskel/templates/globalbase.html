@@ -10,7 +10,7 @@
     {% if favicon %}<link rel="shortcut icon" type="image/png" href="{{favicon}}"/>{% endif %}
     {% if touchicon %}<link rel="apple-touch-icon" href="{{touchicon}}"/>{% endif %}
     <link rel="canonical" href="http://{{fullsite}}{{request_path}}"/>
-{#    <link rel="stylesheet" href="{{globalstatic_url}}base.css"/>  #}
+    <link rel="stylesheet" href="{{globalstatic_url}}base.css"/>
     <link rel="stylesheet" href="{{static_url}}site.css"/>
     <script src="{{globalstatic_url}}offset.js"></script>
     {% if has_site_js %}<script src="{{static_url}}site.js"></script>{% endif %}
