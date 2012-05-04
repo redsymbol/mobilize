@@ -42,6 +42,7 @@ def mk_tparams(sitedefs, is_https=False):
         'fullsite'         : sitedefs.DESKTOP_DOMAIN,
         'static_url'       : '/_mwu/',
         'globalstatic_url' : globalstatic_url,
+        'nominify'         : getattr(sitedefs, 'NOMINIFY', False),
         }
     
     def tparams(**kw):
