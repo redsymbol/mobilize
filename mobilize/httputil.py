@@ -471,7 +471,11 @@ def mk_wsgi_application(msite):
             return response(securityblock)
         except Exception as ex:
             # Something went fatally wrong, so attempt to fallback on the passthrough handler.
-            # TODO: log exception
+            try:
+                reqinfo = RequestInfo(environ)
+                logger.critical('Fatal error for {} {}: {}'.format(reqinfo.method, reqinfo.rel_url, str(ex)))
+            except:
+                logger.critical('Very Fatal error for {}'.format(environ.get('REQUEST_URI', '???')))
             if not msite.is_production:
                 # Don't mask the problem in development mode
                 raise
