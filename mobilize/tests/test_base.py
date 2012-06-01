@@ -230,6 +230,40 @@ class TestMobileSite(unittest.TestCase):
         actual = _new_location(location, domains)
         self.assertSequenceEqual(expected, actual)
 
+    def test_must_fake_http_head(self):
+        from mobilize.base import MobileSite, Domains, HandlerMap
+        class MockRequestInfo:
+            method = None
+            rel_url = None
+
+        msite = MobileSite(Domains('m.example.com', 'example.com'), HandlerMap([]))
+        reqinfo = MockRequestInfo()
+
+        msite.fake_head_requests = True
+        reqinfo.method = 'HEAD'
+        reqinfo.rel_url = '/'
+        self.assertTrue(msite.must_fake_http_head(reqinfo))
+        
+        msite.fake_head_requests = False
+        reqinfo.method = 'HEAD'
+        reqinfo.rel_url = '/'
+        self.assertFalse(msite.must_fake_http_head(reqinfo))
+        
+        msite.fake_head_requests = True
+        reqinfo.method = 'GET'
+        reqinfo.rel_url = '/'
+        self.assertFalse(msite.must_fake_http_head(reqinfo))
+        
+        msite.fake_head_requests = True
+        reqinfo.method = 'HEAD'
+        reqinfo.rel_url = '/foo'
+        self.assertFalse(msite.must_fake_http_head(reqinfo))
+        
+        msite.fake_head_requests = True
+        reqinfo.method = 'POST'
+        reqinfo.rel_url = '/'
+        self.assertFalse(msite.must_fake_http_head(reqinfo))
+
 class TestUtil(unittest.TestCase):
     def test_mobilizeable(self):
         '''tests for mobilize.httputil.mobilizeable'''

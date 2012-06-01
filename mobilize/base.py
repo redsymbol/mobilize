@@ -149,7 +149,7 @@ class MobileSite:
     #: Signals whether this is a production environment, or we're in development mode
     is_production = False
 
-    #: Whether to fake HTTP HEAD requests
+    #: Whether to fake certain HTTP HEAD requests
     fake_head_requests = True
     
     def __init__(self,
@@ -314,6 +314,30 @@ class MobileSite:
         for hook in self.sechooks():
             modified = hook.response(modified)
         return modified
+
+    def must_fake_http_head(self, reqinfo):
+        '''
+        Whether this is a HEAD request that we need to fake
+    
+        See docs of mobilize.handlers.WebSourcer.wsgi_response for
+        explanation and info, including what exactly we mean by
+        "fake".
+    
+        @return : msite
+        @rtype  : MobileSite
+    
+        @return : request info
+        @rtype  : RequestInfo
+        
+        @return : True iff this is an HTTP HEAD request that we need to fake
+        @rtype  : bool
+        
+        '''
+        must_fake = False
+        if 'HEAD' == reqinfo.method and '/' == reqinfo.rel_url:
+            if self.fake_head_requests:
+                must_fake = True
+        return must_fake
 
 class HandlerMap:
     '''

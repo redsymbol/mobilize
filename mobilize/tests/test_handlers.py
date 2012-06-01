@@ -164,43 +164,6 @@ class TestWebSourcer(unittest.TestCase):
             actual = ws.source_rel_url(td['rel_url_in'])
             self.assertSequenceEqual(expected, actual, ii)
 
-    def test_must_fake_head_req(self):
-        from mobilize.handlers import must_fake_head_req
-        class MockMobileSite:
-            fake_head_requests = None
-        class MockRequestInfo:
-            method = None
-            rel_url = None
-
-        msite = MockMobileSite()
-        reqinfo = MockRequestInfo()
-
-        msite.fake_head_requests = True
-        reqinfo.method = 'HEAD'
-        reqinfo.rel_url = '/'
-        self.assertTrue(must_fake_head_req(msite, reqinfo))
-        
-        msite.fake_head_requests = False
-        reqinfo.method = 'HEAD'
-        reqinfo.rel_url = '/'
-        self.assertFalse(must_fake_head_req(msite, reqinfo))
-        
-        msite.fake_head_requests = True
-        reqinfo.method = 'GET'
-        reqinfo.rel_url = '/'
-        self.assertFalse(must_fake_head_req(msite, reqinfo))
-        
-        msite.fake_head_requests = True
-        reqinfo.method = 'HEAD'
-        reqinfo.rel_url = '/foo'
-        self.assertFalse(must_fake_head_req(msite, reqinfo))
-        
-        msite.fake_head_requests = True
-        reqinfo.method = 'POST'
-        reqinfo.rel_url = '/'
-        self.assertFalse(must_fake_head_req(msite, reqinfo))
-        
-
 class TestRedirect(unittest.TestCase):
     def test_mk_redirect(self):
         from mobilize.handlers import (

@@ -182,7 +182,7 @@ class WebSourcer(Handler):
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
-        fake_head_req = must_fake_head_req(msite, reqinfo)
+        fake_head_req = msite.must_fake_http_head(reqinfo)
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
         logger.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
@@ -646,26 +646,3 @@ def _rendering_params(doc, paramdictlist):
         if param not in params:
             params[param] = finder()
     return params
-
-def must_fake_head_req(msite, reqinfo):
-    '''
-    Whether this is a HEAD request that we need to fake
-
-    See docs of WebSourcer.wsgi_response for explanation and info,
-    including what exactly we mean by "fake".
-
-    @return : msite
-    @rtype  : MobileSite
-
-    @return : request info
-    @rtype  : RequestInfo
-    
-    @return : True iff this is an HTTP HEAD request that we need to fake
-    @rtype  : bool
-    
-    '''
-    must_fake = False
-    if 'HEAD' == reqinfo.method and '/' == reqinfo.rel_url:
-        if getattr(msite, 'fake_head_requests', True):
-            must_fake = True
-    return must_fake
