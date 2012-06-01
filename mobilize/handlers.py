@@ -183,17 +183,18 @@ class WebSourcer(Handler):
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
         fake_head_req = must_fake_head_req(msite, reqinfo)
-        if fake_head_req:
-            reqinfo.method = 'GET'
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
         logger.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
         request_headers = reqinfo.headers(request_overrides)
         logger.info(format_headers_log('modified request headers', reqinfo, request_headers))
         source_url = reqinfo.root_url + self.source_rel_url(reqinfo.rel_url)
+        if fake_head_req:
+            reqinfo.method = 'GET'
         resp, src_resp_bytes = http.request(source_url, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
         if fake_head_req:
+            reqinfo.method = 'HEAD' # restore original method
             src_resp_bytes = b''
         logger.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
