@@ -144,11 +144,49 @@ class WebSourcer(Handler):
         return _html_fromstring(body)
     
     def wsgi_response(self, msite, environ, start_response):
+        '''
+        Generate the WSGI response
+
+        FAKING HEAD REQUESTS
+
+        According to HTTP 1.1, HTTP HEAD requests are supposed to
+        elicit the exact same response headers as a GET request, with
+        an empty response body.  But some real-world web servers don't
+        follow this, and may return a 500 or some other error.  This
+        has affected our uptime monitoring for at least one client,
+        since the third-party monitoring we use checks the server via
+        an HTTP HEAD request to the home page.
+
+        To deal with this, we fake such HEAD requests by (1)
+        converting them to a GET request; (2) discarding the response
+        body; and (3) adding an X-MWU-Info response header describing
+        what we have done.
+
+        TODO: Have this disablable by the msite, controlled by a boolean setting in defs.py
+
+        @param msite          : Mobile site
+        @type  msite          : MobileSite
+        
+        @param environ        : WSGI environment
+        @type  environ        : dict
+        
+        @param start_response : WSGI start_response callable
+        @type  start_response : callable
+        
+        @return               : Final body components
+        @rtype                : list of str
+        
+        '''
         from mobilize.log import format_headers_log
         logger.info('Matching moplate: {}'.format(self.name))
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
+        def do_fake_head_req(_msite, _reqinfo):
+            return 'HEAD' == _reqinfo.method and '/' == _reqinfo.rel_url
+        fakeable_head_req = do_fake_head_req(msite, reqinfo)
+        if fakeable_head_req:
+            reqinfo.method = 'GET'
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
         logger.info(format_headers_log('NEW: raw request headers', reqinfo, list(reqinfo.iterrawheaders())))
@@ -157,6 +195,8 @@ class WebSourcer(Handler):
         source_url = reqinfo.root_url + self.source_rel_url(reqinfo.rel_url)
         resp, src_resp_bytes = http.request(source_url, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
+        if fakeable_head_req:
+            src_resp_bytes = b''
         logger.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
         status = '%s %s' % (resp.status, resp.reason)
@@ -170,6 +210,9 @@ class WebSourcer(Handler):
             final_resp_headers = httputil.dict2list(resp)
             final_body = src_resp_bytes
         final_resp_headers = msite.postprocess_response_headers(final_resp_headers, resp.status)
+        assert type(final_resp_headers) == list
+        if fakeable_head_req:
+            final_resp_headers.append(('X-MWU-Info', 'Faked HEAD request as GET on source server'))
         logger.info(format_headers_log('final resp headers', reqinfo, final_resp_headers))
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
         start_response(status, final_resp_headers)
