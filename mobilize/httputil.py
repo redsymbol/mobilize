@@ -482,7 +482,6 @@ def mk_wsgi_application(msite):
             if handler == passthrough:
                 # Nothing to do here...
                 raise
-            # TODO: Sometimes this will block, under conditions I haven't characterized yet.  Maybe when start_response is already invoked?
             return response(passthrough)
     return application
 
