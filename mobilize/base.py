@@ -148,6 +148,9 @@ class MobileSite:
     
     #: Signals whether this is a production environment, or we're in development mode
     is_production = False
+
+    #: Whether to fake HTTP HEAD requests
+    fake_head_requests = True
     
     def __init__(self,
                  domains,

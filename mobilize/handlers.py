@@ -663,4 +663,8 @@ def must_fake_head_req(msite, reqinfo):
     @rtype  : bool
     
     '''
-    return 'HEAD' == reqinfo.method and '/' == reqinfo.rel_url
+    must_fake = False
+    if 'HEAD' == reqinfo.method and '/' == reqinfo.rel_url:
+        if getattr(msite, 'fake_head_requests', True):
+            must_fake = True
+    return must_fake
