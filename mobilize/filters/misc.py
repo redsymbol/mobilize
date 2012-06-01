@@ -15,11 +15,11 @@ def absimgsrc(elem, desktop_url):
     and it is not a mobile-site image as indicated by a URL prefix of
     mobilize.util.STATIC_URL, then the 
     '''
+    def _has_data_url(ielem):
+        return img_elem.attrib.get('src', '').lower().startswith('data:')
     fiximg = _link_converter('src', desktop_url)
-    if 'img' == elem.tag:
-        fiximg(elem)
-    else:
-        for img_elem in elem.iterfind('.//img'):
+    for img_elem in elem.iter('img'):
+        if not _has_data_url(img_elem):
             fiximg(img_elem)
 
 # Default file extensions to convert to absolute links

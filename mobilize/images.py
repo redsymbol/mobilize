@@ -115,6 +115,8 @@ def to_imgserve(elem):
     imgdb = ImgDb()
     for img_elem in elem.iter(tag='img'):
         if 'src' in img_elem.attrib:
+            if elem.attrib.get('src', '').lower().startswith('data:'):
+                log.error('Should not be converting data URL: {}'.format(elem.attrib.get('src', '')))
             img_data = imgdb.get(img_elem.attrib['src']) or {}
             tag_width = normalize_img_size(img_elem.attrib.get('width', None))
             tag_height = normalize_img_size(img_elem.attrib.get('height', None))

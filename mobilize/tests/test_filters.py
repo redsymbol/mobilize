@@ -861,6 +861,8 @@ here's some extra trailing text for you too
 <img src="/fruitpics/strawberry.jpg" alt="berry good">
 <p>and then:
 <img src="standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+<img src="data:image/gif;base64,R0lGODlhQgEDAJEAANTW2Pr06rO8yAAAACH5BAAAAAAALAAAAABCAQMAAAIilI+0Po5y02ouz3lyDDobiSJbmiXZA8KXuC8fyTDdrApy+QA7 alt="GIF data URL"/>
+<img src="DATA:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAkCAMAAACpD3pbAAAAYFBMVEVZbYftuWNoP0iYbFJDHkBcNEWAVk3JmFzVo17hrmG8jVmQk5+8sJOwgldse4xPKUN0S0r3yXdLJULcwpI4FD75x2f5yniSmJ07Fz/WpF6MYU/wyoShn5XTvZT84bL5xGZPqaqJAAAAdUlEQVQ4y+XTRw7EQAgEQJg8jmtvdOz//9IvaE57c19LQoBAvjuNiMgJmkdrMl69yXjbfNyFtfMN5zo4P0RlPCYAzjN+KoDsGIcKoKGcRkAjLb78JhcS7TyuJRc6WIrWWrqgFodsLrXc95j+yq3Jm/X+n7mXC9defIzz7p9PAAAAAElFTkSuQmCC" alt="PNG data URL"/>
 <img src="" alt="Pathological HTML!">
 </p>
 </div>'''
@@ -872,6 +874,8 @@ here's some extra trailing text for you too
 <img src="http://desktop.example.com/fruitpics/strawberry.jpg" alt="berry good">
 <p>and then:
 <img src="http://desktop.example.com/articles/standard/nrolling-kiwi.gif" alt="delicious but takes time to peel">
+<img src="data:image/gif;base64,R0lGODlhQgEDAJEAANTW2Pr06rO8yAAAACH5BAAAAAAALAAAAABCAQMAAAIilI+0Po5y02ouz3lyDDobiSJbmiXZA8KXuC8fyTDdrApy+QA7 alt="GIF data URL"/>
+<img src="DATA:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAkCAMAAACpD3pbAAAAYFBMVEVZbYftuWNoP0iYbFJDHkBcNEWAVk3JmFzVo17hrmG8jVmQk5+8sJOwgldse4xPKUN0S0r3yXdLJULcwpI4FD75x2f5yniSmJ07Fz/WpF6MYU/wyoShn5XTvZT84bL5xGZPqaqJAAAAdUlEQVQ4y+XTRw7EQAgEQJg8jmtvdOz//9IvaE57c19LQoBAvjuNiMgJmkdrMl69yXjbfNyFtfMN5zo4P0RlPCYAzjN+KoDsGIcKoKGcRkAjLb78JhcS7TyuJRc6WIrWWrqgFodsLrXc95j+yq3Jm/X+n7mXC9defIzz7p9PAAAAAElFTkSuQmCC" alt="PNG data URL"/>
 <img src="" alt="Pathological HTML!">
 </p>
 </div>'''
