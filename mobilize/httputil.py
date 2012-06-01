@@ -452,7 +452,6 @@ def mk_wsgi_application(msite):
     '''
     def application(environ, start_response):
         from mobilize.log import LOGLEVEL
-        logger.critical('Log level is {}'.format(LOGLEVEL))
         from mobilize.handlers import (
             passthrough,
             securityblock,
