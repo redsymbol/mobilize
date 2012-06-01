@@ -182,10 +182,8 @@ class WebSourcer(Handler):
         reqinfo = httputil.RequestInfo(environ)
         for sechook in msite.sechooks():
             sechook.check_request(reqinfo)
-        def do_fake_head_req(_msite, _reqinfo):
-            return 'HEAD' == _reqinfo.method and '/' == _reqinfo.rel_url
-        fakeable_head_req = do_fake_head_req(msite, reqinfo)
-        if fakeable_head_req:
+        fake_head_req = must_fake_head_req(msite, reqinfo)
+        if fake_head_req:
             reqinfo.method = 'GET'
         http = msite.get_http()
         request_overrides = msite.request_overrides(environ)
@@ -195,7 +193,7 @@ class WebSourcer(Handler):
         source_url = reqinfo.root_url + self.source_rel_url(reqinfo.rel_url)
         resp, src_resp_bytes = http.request(source_url, method=reqinfo.method, body=reqinfo.body,
                                            headers=request_headers)
-        if fakeable_head_req:
+        if fake_head_req:
             src_resp_bytes = b''
         logger.info(format_headers_log('raw response headers', reqinfo, resp, status=resp.status))
         charset = httputil.guess_charset(resp, src_resp_bytes, msite.default_charset)
@@ -211,7 +209,7 @@ class WebSourcer(Handler):
             final_body = src_resp_bytes
         final_resp_headers = msite.postprocess_response_headers(final_resp_headers, resp.status)
         assert type(final_resp_headers) == list
-        if fakeable_head_req:
+        if fake_head_req:
             final_resp_headers.append(('X-MWU-Info', 'Faked HEAD request as GET on source server'))
         logger.info(format_headers_log('final resp headers', reqinfo, final_resp_headers))
         # TODO: if the next line raises a TypeError, catch it and log final_resp_headers in detail (and everything else while we're at it)
@@ -647,3 +645,22 @@ def _rendering_params(doc, paramdictlist):
         if param not in params:
             params[param] = finder()
     return params
+
+def must_fake_head_req(msite, reqinfo):
+    '''
+    Whether this is a HEAD request that we need to fake
+
+    See docs of WebSourcer.wsgi_response for explanation and info,
+    including what exactly we mean by "fake".
+
+    @return : msite
+    @rtype  : MobileSite
+
+    @return : request info
+    @rtype  : RequestInfo
+    
+    @return : True iff this is an HTTP HEAD request that we need to fake
+    @rtype  : bool
+    
+    '''
+    return 'HEAD' == reqinfo.method and '/' == reqinfo.rel_url
