@@ -1,6 +1,7 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 '''
 Code related to image optimization
+
 '''
 from mobilize.filters.filterbase import filterapi
 from mobilize.log import logger
@@ -130,15 +131,34 @@ def to_imgserve(elem):
                 if k in img_elem.attrib:
                     del img_elem.attrib[k]
             img_elem.attrib.update(sizes)
-            if 'width' in img_elem.attrib:
-                if data_width is None or img_elem.attrib['width'] != data_width:
-                    if 'height' in img_elem.attrib:
-                        maxh = int(img_elem.attrib['height'])
-                    else:
-                        maxh = None
-                    img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'],
-                                                             int(img_elem.attrib['width']),
-                                                             maxh)
+            if convertable(img_elem, data_width):
+                if 'height' in img_elem.attrib:
+                    maxh = int(img_elem.attrib['height'])
+                else:
+                    maxh = None
+                img_elem.attrib['src'] = to_imgserve_url(img_elem.attrib['src'],
+                                                         int(img_elem.attrib['width']),
+                                                         maxh)
+
+def convertable(img_elem, data_width):
+    '''
+    Determine whether this is an image whose src attribute should be
+    converted to an imgserve URL.
+
+    @param img_elem   : The image element being considered
+    @type  img_elem   : lxml.html.HtmlElement
+
+    @param data_width : The measured width of he source image in pixels; or None if that is not known
+    @type  data_width : int > 0; or, None
+    
+    @return           : True iff this img's source attribute should be converted to an imgserve URL
+    @rtype            : bool
+    
+    '''
+    if 'width' in img_elem.attrib:
+        if data_width is None or img_elem.attrib['width'] != data_width:
+            return True
+    return False
 
 def new_img_sizes(tag_width,
                   tag_height,

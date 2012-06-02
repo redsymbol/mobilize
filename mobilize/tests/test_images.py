@@ -211,6 +211,39 @@ class TestImageOpt(unittest.TestCase):
             expected = td['imgserve_url']
             actual = to_imgserve_url(td['url'], td['maxw'], maxh=maxh)
             self.assertEqual(expected, actual, ii)
+
+    def test_convertable(self):
+        '''tests for mobilize.images.convertable'''
+        from lxml import html
+        from mobilize.images import convertable
+        class ImgElement(html.HtmlElement):
+            def __init__(self):
+                super().__init__()
+                self.tag = 'img'
+
+        # defined width & height
+        img_wh = ImgElement()
+        img_wh.attrib['width'] = '100'
+        img_wh.attrib['height'] = '42'
+        # height but no width
+        img_h = ImgElement()
+        img_h.attrib['height'] = '42'
+        # neither width nor height
+        img_ = ImgElement()
+
+        ### Convertable situations
+        # data width, tag width and tag height all defined, but widths are unequal
+        self.assertTrue(convertable(img_wh, '90'))
+        # data width is not known
+        self.assertTrue(convertable(img_wh, None))
+
+        ### Nonconvertable situations
+        # data width is known to be same as tag width
+        self.assertFalse(convertable(img_wh, '100'))
+        # Tag has no defined width
+        self.assertFalse(convertable(img_h, '90'))
+        self.assertFalse(convertable(img_, '90'))
+        
             
 if '__main__'==__name__:
     import unittest
