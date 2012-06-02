@@ -233,16 +233,16 @@ class TestImageOpt(unittest.TestCase):
 
         ### Convertable situations
         # data width, tag width and tag height all defined, but widths are unequal
-        self.assertTrue(convertable(img_wh, '90'))
+        self.assertTrue(convertable(img_wh, 90))
         # data width is not known
         self.assertTrue(convertable(img_wh, None))
 
         ### Nonconvertable situations
         # data width is known to be same as tag width
-        self.assertFalse(convertable(img_wh, '100'))
+        self.assertFalse(convertable(img_wh, 100))
         # Tag has no defined width
-        self.assertFalse(convertable(img_h, '90'))
-        self.assertFalse(convertable(img_, '90'))
+        self.assertFalse(convertable(img_h, 90))
+        self.assertFalse(convertable(img_, 90))
         
             
 if '__main__'==__name__:

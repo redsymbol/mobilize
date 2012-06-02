@@ -146,6 +146,10 @@ def convertable(img_elem, data_width):
     Determine whether this is an image whose src attribute should be
     converted to an imgserve URL.
 
+    Note carefully the dimension types.  data_width is either an
+    integer, or None.  The width and heigh attributes of img_elem, if
+    they are present, are strings.
+
     @param img_elem   : The image element being considered
     @type  img_elem   : lxml.html.HtmlElement
 
@@ -156,8 +160,14 @@ def convertable(img_elem, data_width):
     @rtype            : bool
     
     '''
+    from imgserve import normalize_img_size
+    if data_width is not None:
+        assert type(data_width) == int, type(data_width)
     if 'width' in img_elem.attrib:
-        if data_width is None or img_elem.attrib['width'] != data_width:
+        if data_width is None:
+            return True
+        tag_width = normalize_img_size(img_elem.attrib.get('width', None))
+        if tag_width != data_width:
             return True
     return False
 
