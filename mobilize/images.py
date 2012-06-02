@@ -2,7 +2,27 @@
 '''
 Code related to image optimization
 
+CONCEPTS
+
+Throughout this code, we'll often be specifying the size of an image
+as a pair of integers.  The convention is that the first number is
+ALWAYS the width, and the second is always the height.  Following this
+just makes it so much more maintainable, dodging lots of silly bugs.
+
+Semantically there are two kinds of sizes: the "tag" width/height; and
+the "data" width/height.  The tag size refers to the values of the
+"width" and "height" attributes in the HTML img tag.  In contrast, the
+data size refers to the *measured* dimensions of the image that is
+actually downloaded.
+
+For any width or height variable, the valid value is either a positive
+integer; or, the value None. None means that the value is not known or
+unspecified.  For a tag, that means the img tag in the HTML doesn't
+have that attribute; for the data, it means we haven't yet measured
+the dimensions of the source image.
+
 '''
+
 from mobilize.filters.filterbase import filterapi
 from mobilize.log import logger
 
