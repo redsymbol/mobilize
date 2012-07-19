@@ -326,6 +326,7 @@ class GoogleAnalytics(Extracted):
     '''
     #: Matching Google Analytics v.2 
     GA_SCRIPT_V2 = re.compile(r'^var\s*_gaq\s*=\s*', re.I)
+    GA_SCRIPT_V1 = re.compile(r'^var gaJsHost')
     
     def __init__(self, **kw):
         '''
@@ -355,7 +356,7 @@ class GoogleAnalytics(Extracted):
                 if self.GA_SCRIPT_V2.match(scripttext):
                     # newer ga version
                     elems = [script_elem]
-                elif scripttext.startswith('var gaJsHost'):
+                elif self.GA_SCRIPT_V1.match(scripttext):
                     # older ga version
                     next_elem = script_elem.getnext()
                     if next_elem is not None and 'script' == next_elem.tag:
