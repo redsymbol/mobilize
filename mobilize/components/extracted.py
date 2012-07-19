@@ -1,5 +1,6 @@
 # Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import copy
+import re
 
 from mobilize import util
 from .common import Component
@@ -323,6 +324,9 @@ class GoogleAnalytics(Extracted):
     Locates and extracts Google Analytics tracking code from desktop page
 
     '''
+    #: Matching Google Analytics v.2 
+    GA_SCRIPT_V2 = re.compile(r'^var\s*_gaq\s*=\s*', re.I)
+    
     def __init__(self, **kw):
         '''
         ctor
@@ -348,7 +352,7 @@ class GoogleAnalytics(Extracted):
                 break
             if script_elem.text is not None:
                 scripttext = script_elem.text.lstrip()
-                if scripttext.startswith('var _gaq ='):
+                if self.GA_SCRIPT_V2.match(scripttext):
                     # newer ga version
                     elems = [script_elem]
                 elif scripttext.startswith('var gaJsHost'):

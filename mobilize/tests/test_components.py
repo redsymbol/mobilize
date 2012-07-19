@@ -156,7 +156,7 @@ pageTracker._trackPageview();
 ''')
         self.assertSequenceEqual(expected, actual)
 
-        # Check positive case, where we expect to find the GA tracking code (newer version)
+        # Check positive case, where we expect to find the GA tracking code (V2, variant 1)
         doc_str = open(data_file_path('whole-html', 'msia.org.html')).read()
         doc = html.fromstring(doc_str)
         ga = GoogleAnalytics()
@@ -179,6 +179,19 @@ pageTracker._trackPageview();
 </div>
 ''')
         self.assertSequenceEqual(expected, actual)
+        
+        # Check positive case, where we expect to find the GA tracking code (V2, variant 2)
+        doc_str = open(data_file_path('whole-html', 'msia.org.2.html')).read()
+        doc = html.fromstring(doc_str)
+        ga = GoogleAnalytics()
+        ga.extract(doc)
+        ga.process()
+        extracted_str = ga.html()
+        extracted = html.fromstring(extracted_str)
+        extracted_script_tags = extracted.cssselect('script')
+        self.assertEqual(len(extracted_script_tags), 1)
+        ga_script_text = extracted_script_tags[0].text
+        self.assertTrue('UA-12345678-1' in ga_script_text)
         
         # Check negative case where we expect to not find any code
         doc_str = open(data_file_path('whole-html', 'cnn.html')).read()
