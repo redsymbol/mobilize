@@ -141,20 +141,14 @@ class TestExtracted(unittest.TestCase):
         ga = GoogleAnalytics()
         ga.extract(doc)
         ga.process()
-        actual = normxml(ga.html())
-        expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga">
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-7559570-4");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-</div>
-''')
-        self.assertSequenceEqual(expected, actual)
+        extracted_str = ga.html()
+        extracted = html.fromstring(extracted_str)
+        extracted_script_tags = extracted.cssselect('script')
+        self.assertEqual(len(extracted_script_tags), 2)
+        ga_script1_text = extracted_script_tags[0].text
+        self.assertTrue('var gaJsHost' in ga_script1_text)
+        ga_script2_text = extracted_script_tags[1].text
+        self.assertTrue('UA-12345678-1' in ga_script2_text)
 
         # Check positive case, where we expect to find the GA tracking code (V2, variant 1)
         doc_str = open(data_file_path('whole-html', 'msia.org.html')).read()
@@ -162,23 +156,12 @@ pageTracker._trackPageview();
         ga = GoogleAnalytics()
         ga.extract(doc)
         ga.process()
-        actual = normxml(ga.html())
-        expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga">
-<script type="text/javascript"> 
-
-  var _gaq = _gaq || []; 
-  _gaq.push(['_setAccount', 'UA-17055085-1']); 
-  _gaq.push(['_trackPageview']); 
-
-  (function() { 
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; 
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; 
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); 
-  })(); 
-</script>
-</div>
-''')
-        self.assertSequenceEqual(expected, actual)
+        extracted_str = ga.html()
+        extracted = html.fromstring(extracted_str)
+        extracted_script_tags = extracted.cssselect('script')
+        self.assertEqual(len(extracted_script_tags), 1)
+        ga_script_text = extracted_script_tags[0].text
+        self.assertTrue('UA-12345678-1' in ga_script_text)
         
         # Check positive case, where we expect to find the GA tracking code (V2, variant 2)
         doc_str = open(data_file_path('whole-html', 'msia.org.2.html')).read()
