@@ -133,7 +133,7 @@ class TestExtracted(unittest.TestCase):
         # check the style attribute
         self.assertEqual(style, rendered.attrib['style'])
 
-    def test_GoogleAnalytics(self):
+    def test_GoogleAnalytics_v1(self):
         from mobilize.components import GoogleAnalytics
         # Check positive case, where we expect to find the GA tracking code (older version)
         doc_str = open(data_file_path('whole-html', 'luxwny.html')).read()
@@ -150,33 +150,9 @@ class TestExtracted(unittest.TestCase):
         ga_script2_text = extracted_script_tags[1].text
         self.assertTrue('UA-12345678-1' in ga_script2_text)
 
-        # Check positive case, where we expect to find the GA tracking code (V2, variant 1)
-        doc_str = open(data_file_path('whole-html', 'msia.org.html')).read()
-        doc = html.fromstring(doc_str)
-        ga = GoogleAnalytics()
-        ga.extract(doc)
-        ga.process()
-        extracted_str = ga.html()
-        extracted = html.fromstring(extracted_str)
-        extracted_script_tags = extracted.cssselect('script')
-        self.assertEqual(len(extracted_script_tags), 1)
-        ga_script_text = extracted_script_tags[0].text
-        self.assertTrue('UA-12345678-1' in ga_script_text)
-        
-        # Check positive case, where we expect to find the GA tracking code (V2, variant 2)
-        doc_str = open(data_file_path('whole-html', 'msia.org.2.html')).read()
-        doc = html.fromstring(doc_str)
-        ga = GoogleAnalytics()
-        ga.extract(doc)
-        ga.process()
-        extracted_str = ga.html()
-        extracted = html.fromstring(extracted_str)
-        extracted_script_tags = extracted.cssselect('script')
-        self.assertEqual(len(extracted_script_tags), 1)
-        ga_script_text = extracted_script_tags[0].text
-        self.assertTrue('UA-12345678-1' in ga_script_text)
-        
-        # Check negative case where we expect to not find any code
+    def test_GoogleAnalytics_none(self):
+        # Check negative case where we expect to not find GA tracking codes
+        from mobilize.components import GoogleAnalytics
         doc_str = open(data_file_path('whole-html', 'cnn.html')).read()
         doc = html.fromstring(doc_str)
         noga = GoogleAnalytics()
@@ -185,7 +161,26 @@ class TestExtracted(unittest.TestCase):
         actual = normxml(noga.html())
         expected = normxml('''<div class="mwu-elem" id="mwu-elem-ga"></div>''')
         self.assertSequenceEqual(expected, actual)
-
+        
+    def test_GoogleAnalytics_v2(self):
+        # Check positive case, where we expect to find the GA tracking codes
+        from mobilize.components import GoogleAnalytics
+        testdatafiles = [
+            'msia.org.html',   # variant 1
+            'msia.org.2.html', # variant 2
+            ]
+        for testdatafile in testdatafiles:
+            doc_str = open(data_file_path('whole-html', testdatafile)).read()
+            doc = html.fromstring(doc_str)
+            ga = GoogleAnalytics()
+            ga.extract(doc)
+            ga.process()
+            extracted_str = ga.html()
+            extracted = html.fromstring(extracted_str)
+            extracted_script_tags = extracted.cssselect('script')
+            self.assertEqual(len(extracted_script_tags), 1, testdatafile)
+            ga_script_text = extracted_script_tags[0].text
+            self.assertTrue('UA-12345678-1' in ga_script_text, testdatafile)
 
     def test_innerhtml(self):
         from mobilize.components import XPath
