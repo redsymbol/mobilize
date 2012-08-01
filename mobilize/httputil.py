@@ -419,6 +419,14 @@ def guess_charset(resp, src_resp_bytes, default_charset):
     # Else just keep the default charset.
     return charset
 
+ALT_CHARSETS = [
+    'iso-8859-1',
+    'utf-8',
+    ]
+
+def _netbytes2str(rawbytes, charset):
+    return rawbytes.replace(b'\r\n', b'\n').decode(charset)
+
 def netbytes2str(rawbytes, charset):
     '''
     Create a lxml-friendly Python string from the raw HTTP response
@@ -430,14 +438,27 @@ def netbytes2str(rawbytes, charset):
     @param rawbytes : The response body from the network
     @type  rawbytes : bytes
 
-    @param charset : Character encoding of rawbytes
-    @type  charset : str
+    @param charset  : Character encoding of rawbytes
+    @type  charset  : str
 
-    @return : lxml-friendly Python string
-    @rtype  : str
+    @return         : lxml-friendly Python string
+    @rtype          : str
 
     '''
-    return rawbytes.replace(b'\r\n', b'\n').decode(charset)
+    s = None
+    try:
+        s = _netbytes2str(rawbytes, charset)
+    except UnicodeDecodeError:
+        alt_charsets = [cs for cs in ALT_CHARSETS
+                        if cs != charset]
+        for alt_charset in alt_charsets:
+            try:
+                s = _netbytes2str(rawbytes, alt_charset)
+                break
+            except UnicodeDecodeError:
+                continue
+    assert s is not None
+    return s
 
 def mk_wsgi_application(msite):
     '''
@@ -451,7 +472,6 @@ def mk_wsgi_application(msite):
     
     '''
     def application(environ, start_response):
-        from mobilize.log import LOGLEVEL
         from mobilize.handlers import (
             passthrough,
             securityblock,

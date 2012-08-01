@@ -467,6 +467,16 @@ class TestHttp(unittest.TestCase):
         actual = netbytes2str(src, 'utf-8')
         self.assertEquals(expected, actual)
 
+    def test_netbytes2str_wrongencoding(self):
+        '''Test for when the guessed encoding is wrong, and we need to automatically try different ones'''
+        from mobilize.httputil import netbytes2str
+        # iso-8859-1 encoding, but we'll initially parse it as utf-8
+        kungfu = '功夫' # b'\xe5\x8a\x9f\xe5\xa4\xab'
+        src = b'<p>a \xa0 b</p>'
+        expected = '<p>a   b</p>'
+        actual = netbytes2str(src, 'utf-8')
+        self.assertEquals(expected, actual)
+        
     def test__get_root_url(self):
         from mobilize.httputil import _get_root_url
         def env(**kw):
