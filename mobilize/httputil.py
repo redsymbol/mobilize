@@ -427,6 +427,11 @@ ALT_CHARSETS = [
 def _netbytes2str(rawbytes, charset):
     return rawbytes.replace(b'\r\n', b'\n').decode(charset)
 
+CHARSET_DECODE_EXCEPTIONS = (
+    UnicodeDecodeError,
+    LookupError,
+    )
+
 def netbytes2str(rawbytes, charset):
     '''
     Create a lxml-friendly Python string from the raw HTTP response
@@ -445,17 +450,18 @@ def netbytes2str(rawbytes, charset):
     @rtype          : str
 
     '''
+    
     s = None
     try:
         s = _netbytes2str(rawbytes, charset)
-    except UnicodeDecodeError:
+    except CHARSET_DECODE_EXCEPTIONS:
         alt_charsets = [cs for cs in ALT_CHARSETS
                         if cs != charset]
         for alt_charset in alt_charsets:
             try:
                 s = _netbytes2str(rawbytes, alt_charset)
                 break
-            except UnicodeDecodeError:
+            except CHARSET_DECODE_EXCEPTIONS:
                 continue
     assert s is not None
     return s
