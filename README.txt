@@ -12,6 +12,13 @@ Mobilize itself is written in Python 3.4 and runs on Linux, but works
 with websites implemented in any language, running on any stack and
 operating system.
 
+The current source code is not enough to get up and running; I am in
+the process of bringing all the dependencies in.  Some things that are
+currently missing include the image resizing server, device detection
+service, and some essential documentation (on everything from
+installation and configuration, to actual mobile development using the
+framework.)
+
 DOCUMENTATION
 
 Is in progress.
