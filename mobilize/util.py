@@ -1,4 +1,3 @@
-# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 from lxml import html
 
 #: Default prefix used for all mobile-site CSS identifiers

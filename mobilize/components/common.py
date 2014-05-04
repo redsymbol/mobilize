@@ -1,4 +1,3 @@
-# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 class Component:
     '''
     abstract base of all component classes

@@ -1,4 +1,3 @@
-# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 import unittest
 from mobilize import util
 

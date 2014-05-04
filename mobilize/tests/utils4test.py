@@ -1,4 +1,3 @@
-# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 '''
 Utilities used by tests in this project
 '''

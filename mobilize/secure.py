@@ -1,4 +1,3 @@
-# Copyright 2010-2012 Mobile Web Up. All rights reserved.
 '''
 TODO: update vulntags cruft
 TODO: rename SecurityHook.check_request to something more consistent
